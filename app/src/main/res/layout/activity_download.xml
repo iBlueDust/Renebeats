@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".Activities.DownloadActivity">
+
+
+        <!--android:maxWidth="150dp"-->
+        <!--android:maxHeight="150dp"-->
+        <!--android:minWidth="100dp"-->
+        <!--android:minHeight="100dp"-->
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/image"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:riv_border_width="0dp"
+            app:riv_corner_radius="5dp"
+            app:riv_mutate_background="true"
+            app:srcCompat="@color/SecondaryDark" />
+
+        <!--<Button-->
+            <!--android:id="@+id/image_edit"-->
+            <!--android:layout_width="60dp"-->
+            <!--android:layout_height="24dp"-->
+            <!--android:layout_marginEnd="4dp"-->
+            <!--android:layout_marginRight="4dp"-->
+            <!--android:layout_marginBottom="4dp"-->
+            <!--android:background="@android:color/transparent"-->
+            <!--android:drawableStart="@drawable/ic_image_white_24dp"-->
+            <!--android:drawableLeft="@drawable/ic_image_white_24dp"-->
+            <!--android:ellipsize="end"-->
+            <!--android:text="Edit"-->
+            <!--android:textAllCaps="false"-->
+            <!--android:textColor="@color/textAccent"-->
+            <!--app:layout_constraintBottom_toBottomOf="@+id/image"-->
+            <!--app:layout_constraintEnd_toEndOf="@+id/image"-->
+            <!--app:layout_constraintHorizontal_bias="1.0"-->
+            <!--app:layout_constraintStart_toStartOf="@+id/image" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/location"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_marginBottom="8dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@drawable/rounded_accent"-->
+            <!--android:drawableStart="@drawable/ic_folder_white_24dp"-->
+            <!--android:drawableLeft="@drawable/ic_folder_white_24dp"-->
+            <!--android:drawablePadding="5dp"-->
+            <!--android:minWidth="32dp"-->
+            <!--android:padding="5dp"-->
+            <!--android:paddingEnd="8dp"-->
+            <!--android:paddingRight="8dp"-->
+            <!--android:text="Location"-->
+            <!--android:textAllCaps="false"-->
+            <!--android:textColor="@color/textAccent"-->
+            <!--app:layout_constraintBottom_toTopOf="@+id/autofill"-->
+            <!--app:layout_constraintEnd_toEndOf="@+id/autofill" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/autofill"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_marginEnd="16dp"-->
+            <!--android:layout_marginRight="16dp"-->
+            <!--android:background="@drawable/rounded_accent"-->
+            <!--android:drawableStart="@drawable/ic_cloud_circle_white_24dp"-->
+            <!--android:drawableLeft="@drawable/ic_cloud_circle_white_24dp"-->
+            <!--android:drawablePadding="5dp"-->
+            <!--android:minWidth="32dp"-->
+            <!--android:padding="5dp"-->
+            <!--android:paddingEnd="8dp"-->
+            <!--android:paddingRight="8dp"-->
+            <!--android:text="Autofill"-->
+            <!--android:textAllCaps="false"-->
+            <!--android:textColor="@color/textAccent"-->
+            <!--app:layout_constraintBottom_toBottomOf="@+id/image_edit"-->
+            <!--app:layout_constraintEnd_toEndOf="parent" />-->
+
+        <TextView
+            android:id="@+id/display"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:textColor="@color/textDark"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/image" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/display">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Title"
+                android:inputType="text"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Spinner
+            android:id="@+id/done"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_secondarydark"
+            android:entries="@array/bitrates"
+            app:layout_constraintEnd_toStartOf="@+id/assigned"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+
+        <Spinner
+            android:id="@+id/assigned"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_secondarydark"
+            android:entries="@array/formats"
+            app:layout_constraintStart_toEndOf="@id/done"
+            app:layout_constraintBottom_toBottomOf="@+id/done"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/done" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/done">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Artist"
+                android:inputType="text|textCapWords|textPersonName"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/album"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Album"
+                android:inputType="text"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            app:layout_constraintEnd_toStartOf="@+id/textInputLayout5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/year"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Year"
+                android:inputType="number"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/textInputLayout4"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/track"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Track #"
+                android:inputType="number"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!--<mabbas007.tagsedittext.TagsEditText-->
+            <!--android:id="@+id/genres"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginStart="16dp"-->
+            <!--android:layout_marginLeft="16dp"-->
+            <!--android:layout_marginEnd="16dp"-->
+            <!--android:layout_marginRight="16dp"-->
+            <!--android:layout_marginBottom="16dp"-->
+            <!--android:inputType="text"-->
+            <!--app:allowSpaceInTag="true"-->
+            <!--app:layout_constraintBottom_toBottomOf="parent"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/textInputLayout5"-->
+            <!--app:tagsBackground="@drawable/rounded_secondary"-->
+            <!--app:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"-->
+            <!--app:tagsCloseImageRight="@drawable/tag_close"-->
+            <!--app:tagsTextColor="@color/textLight" />-->
+
+        <mabbas007.tagsedittext.TagsEditText
+            android:id="@+id/genres"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            app:allowSpaceInTag="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout5"
+            app:tagsBackground="@drawable/square"
+            app:tagsCloseImageLeft="@drawable/dot"
+            app:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"
+            app:tagsCloseImageRight="@drawable/tag_close"
+            app:tagsTextColor="#39393F"
+            app:tagsTextSize="@dimen/defaultTagsTextSize" />
+
+        <CheckBox
+            android:id="@+id/exception"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Normalize"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/genres" />
+
+        <ImageButton
+            android:id="@+id/normalize_help"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="@+id/exception"
+            app:layout_constraintStart_toEndOf="@+id/exception"
+            app:layout_constraintTop_toTopOf="@+id/exception"
+            app:srcCompat="@drawable/ic_help_secondarydark_24dp"
+            tools:ignore="VectorDrawableCompat"
+            android:contentDescription="\?" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="Start"
+            android:textAllCaps="true"
+            app:layout_constraintEnd_toEndOf="@+id/download"
+            app:layout_constraintStart_toStartOf="@+id/download"
+            app:layout_constraintTop_toBottomOf="@+id/exception" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="End"
+            android:textAllCaps="true"
+            app:layout_constraintBottom_toBottomOf="@+id/textView"
+            app:layout_constraintEnd_toEndOf="@+id/conversion"
+            app:layout_constraintStart_toStartOf="@+id/conversion"
+            app:layout_constraintTop_toTopOf="@+id/textView" />
+
+        <Button
+            android:id="@+id/download"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/conversion"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+        <Button
+            android:id="@+id/conversion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/download"
+            app:layout_constraintTop_toTopOf="@+id/download" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

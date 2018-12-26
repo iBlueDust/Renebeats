@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Renebeats</string>
+
+    <string-array name="bitrates">
+        <item>64kbps</item>
+        <item>96kbps</item>
+        <item>128kbps</item>
+        <item>192kbps</item>
+        <item>256kbps</item>
+        <item>320kbps</item>
+    </string-array>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="formats">
+        <item>mp3</item>
+        <item>aac</item>
+        <item>m4a</item>
+        <item>wma</item>
+        <item>wav</item>
+        <item>flac</item>
+    </string-array>
+</resources>

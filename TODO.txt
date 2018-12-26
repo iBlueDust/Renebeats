@@ -1,0 +1,18 @@
+# = testing pending  :: = Optional but desirable
+
+Done notification is disappearing because of another process
+Predictive title field fill
+Do not start download until sparsearray is get.
+Cover DownloadActivity when retrieving
+Download Fragment
+Settings Activity
+Clear Cache
+Put "Normalize" in DownloadActivity
+When converting, querying would not work
+# Error and Success Notifications should display what song was processed
+DownloadService pausing feature
+# Separate finished notifications and the ongoing one
+Genre support
+Service implement callbacks
+Download Location (Preference)
+If any errors occured, inform at app start or send notification through Commons for ease of use
