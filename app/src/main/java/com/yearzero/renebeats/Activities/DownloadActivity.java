@@ -2,7 +2,6 @@ package com.yearzero.renebeats.Activities;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -149,106 +147,87 @@ public class DownloadActivity extends AppCompatActivity {
 
         Genres.setSeparator(",");
 
-        Start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (length <= 0) {
-                    Log.e(TAG, "Length is 0");
-                    return;
-                }
-                DurationPicker dialog = new DurationPicker(DownloadActivity.this);
-                dialog.setTitle("Set a start time");
-
-                if (length > 3600)
-                    dialog.setEnabled(DurationPicker.Mode.Hour);
-                else if (length > 60)
-                    dialog.setEnabled(DurationPicker.Mode.Minute);
-                else dialog.setEnabled(DurationPicker.Mode.Second);
-
-                dialog.setMaxTime(length);
-                dialog.setTime(start == null ? 0 : start);
-                dialog.setCallbacks(new DurationPicker.Callbacks() {
-                    @Override
-                    public String Validate(int time) {
-                        if (time >= (end == null ? length : end))
-                            return "Start time cannot be equal or exceed the end time";
-                        return null;
-                    }
-
-                    @Override
-                    public void onSubmit(int time) {
-                        start = time;
-                        RefreshTimeRange();
-                    }
-                });
-                dialog.show();
+        Start.setOnClickListener(v -> {
+            if (length <= 0) {
+                Log.e(TAG, "Length is 0");
+                return;
             }
+            DurationPicker dialog = new DurationPicker(DownloadActivity.this);
+            dialog.setTitle("Set a start time");
+
+            if (length > 3600)
+                dialog.setEnabled(DurationPicker.Mode.Hour);
+            else if (length > 60)
+                dialog.setEnabled(DurationPicker.Mode.Minute);
+            else dialog.setEnabled(DurationPicker.Mode.Second);
+
+            dialog.setMaxTime(length);
+            dialog.setTime(start == null ? 0 : start);
+            dialog.setCallbacks(new DurationPicker.Callbacks() {
+                @Override
+                public String Validate(int time) {
+                    if (time >= (end == null ? length : end))
+                        return "Start time cannot be equal or exceed the end time";
+                    return null;
+                }
+
+                @Override
+                public void onSubmit(int time) {
+                    start = time;
+                    RefreshTimeRange();
+                }
+            });
+            dialog.show();
         });
 
-        End.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (length <= 0) {
-                    Log.e(TAG, "Length is 0");
-                    return;
-                }
-                DurationPicker dialog = new DurationPicker(DownloadActivity.this);
-                dialog.setTitle("Set an end time");
-                dialog.setTime(end == null ? 0 : end);
-
-                if (length > 3600)
-                    dialog.setEnabled(DurationPicker.Mode.Hour);
-                else if (length > 60)
-                    dialog.setEnabled(DurationPicker.Mode.Minute);
-                else dialog.setEnabled(DurationPicker.Mode.Second);
-
-                dialog.setMaxTime(length);
-                dialog.setTime(end == null ? length : end);
-                dialog.setCallbacks(new DurationPicker.Callbacks() {
-                    @Override
-                    public String Validate(int time) {
-                        if (start != null && time <= start)
-                            return "End time cannot be equal or be less than the start time";
-                        else if (end != null && end > length)
-                            return "End time cannot exceed the video's length";
-                        return null;
-                    }
-
-                    @Override
-                    public void onSubmit(int time) {
-                        end = time;
-                        RefreshTimeRange();
-                    }
-                });
-                dialog.show();
+        End.setOnClickListener(v -> {
+            if (length <= 0) {
+                Log.e(TAG, "Length is 0");
+                return;
             }
+            DurationPicker dialog = new DurationPicker(DownloadActivity.this);
+            dialog.setTitle("Set an end time");
+            dialog.setTime(end == null ? 0 : end);
+
+            if (length > 3600)
+                dialog.setEnabled(DurationPicker.Mode.Hour);
+            else if (length > 60)
+                dialog.setEnabled(DurationPicker.Mode.Minute);
+            else dialog.setEnabled(DurationPicker.Mode.Second);
+
+            dialog.setMaxTime(length);
+            dialog.setTime(end == null ? length : end);
+            dialog.setCallbacks(new DurationPicker.Callbacks() {
+                @Override
+                public String Validate(int time) {
+                    if (start != null && time <= start)
+                        return "End time cannot be equal or be less than the start time";
+                    else if (end != null && end > length)
+                        return "End time cannot exceed the video's length";
+                    return null;
+                }
+
+                @Override
+                public void onSubmit(int time) {
+                    end = time;
+                    RefreshTimeRange();
+                }
+            });
+            dialog.show();
         });
 
         Normalize.setChecked(Commons.Pref.normalize);
-        NormalizeHelp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AlertDialog.Builder(DownloadActivity.this)
-                        .setMessage("Some audio/videos may have a quieter audio than other audios. This is because sometimes an audio/video file does not use the full volume range available and thus resulting in its audio being very quiet. Normalization will increase the audio's volume in such that it will utilize the whole available volume range though it may take more time.")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
-            }
-        });
+        NormalizeHelp.setOnClickListener(v -> new AlertDialog.Builder(DownloadActivity.this)
+                .setMessage("Some audio/videos may have a quieter audio than other audios. This is because sometimes an audio/video file does not use the full volume range available and thus resulting in its audio being very quiet. Normalization will increase the audio's volume in such that it will utilize the whole available volume range though it may take more time.")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss()).show());
 
         retrieveDialog = new Dialog(this);
         retrieveDialog.setTitle("Retrieving...");
         retrieveDialog.setCanceledOnTouchOutside(false);
         retrieveDialog.setContentView(R.layout.dialog_retrieving);
-        retrieveDialog.findViewById(R.id.info).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                retrieveDialog.dismiss();
-                onBackPressed();
-            }
+        retrieveDialog.findViewById(R.id.info).setOnClickListener(v -> {
+            retrieveDialog.dismiss();
+            onBackPressed();
         });
         retrieveDialog.show();
     }
@@ -320,7 +299,7 @@ public class DownloadActivity extends AppCompatActivity {
         service.putExtra(Commons.ARGS.DATA, args);
         startService(service);
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, NewMainActivity.class);
         intent.putExtra("page", 0);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

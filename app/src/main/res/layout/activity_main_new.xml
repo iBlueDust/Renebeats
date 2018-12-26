@@ -35,7 +35,7 @@
                 android:textAppearance="@style/AppTheme" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <ImageView
+        <ImageButton
             android:id="@+id/query"
             android:layout_width="75dp"
             android:layout_height="45dp"
@@ -59,7 +59,7 @@
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/info"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" >
+            app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
                 android:id="@+id/error_img"
@@ -87,16 +87,17 @@
                 android:layout_marginRight="8dp"
                 android:textColor="@color/textDark"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/query"
+                app:layout_constraintStart_toEndOf="@+id/error_img"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/error_msg"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="16dp"
                 app:layout_constraintBottom_toTopOf="@+id/error_action"
+                app:layout_constraintEnd_toEndOf="@+id/error_title"
                 app:layout_constraintStart_toStartOf="@+id/error_title"
                 app:layout_constraintTop_toBottomOf="@+id/error_title" />
 
@@ -117,13 +118,13 @@
             android:id="@+id/info"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:background="@drawable/edittext_border"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="192dp"
+            android:layout_marginTop="256dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
+            android:background="@drawable/edittext_border"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
