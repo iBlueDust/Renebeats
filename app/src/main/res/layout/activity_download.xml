@@ -105,6 +105,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:ellipsize="end"
+            android:fontFamily="@font/bold"
             android:maxLines="3"
             android:textColor="@color/textDark"
             android:textSize="18sp"
@@ -113,7 +114,7 @@
             app:layout_constraintTop_toBottomOf="@+id/image" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout"
+            android:id="@+id/cardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -131,11 +132,12 @@
                 android:layout_height="wrap_content"
                 android:hint="Title"
                 android:inputType="text"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:text="asdadasd" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Spinner
-            android:id="@+id/done"
+        <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/bitrate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -144,13 +146,15 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_weight="1"
-            android:background="@drawable/rounded_secondarydark"
             android:entries="@array/bitrates"
+            app:ms_multiline="false"
+            app:ms_floatingLabelText="Bitrate"
+            app:ms_errorColor="@color/red"
             app:layout_constraintEnd_toStartOf="@+id/assigned"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
-        <Spinner
+        <fr.ganfra.materialspinner.MaterialSpinner
             android:id="@+id/assigned"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -159,12 +163,14 @@
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:layout_weight="1"
-            android:background="@drawable/rounded_secondarydark"
             android:entries="@array/formats"
-            app:layout_constraintStart_toEndOf="@id/done"
-            app:layout_constraintBottom_toBottomOf="@+id/done"
+            app:ms_multiline="false"
+            app:ms_floatingLabelText="Bitrate"
+            app:ms_errorColor="@color/red"
+            app:layout_constraintBottom_toBottomOf="@+id/bitrate"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/done" />
+            app:layout_constraintStart_toEndOf="@id/bitrate"
+            app:layout_constraintTop_toTopOf="@+id/bitrate" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout2"
@@ -177,7 +183,7 @@
             android:layout_marginRight="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/done">
+            app:layout_constraintTop_toBottomOf="@+id/bitrate">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/artist"
@@ -296,6 +302,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="8dp"
+            android:fontFamily="@font/semibold"
             android:text="Normalize"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/genres" />
@@ -324,7 +331,9 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
+            android:fontFamily="@font/medium"
             android:text="Start"
+            android:textColor="@color/textDarkGray"
             android:textAllCaps="true"
             app:layout_constraintEnd_toEndOf="@+id/download"
             app:layout_constraintStart_toStartOf="@+id/download"
@@ -338,7 +347,9 @@
             android:layout_marginLeft="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
+            android:fontFamily="@font/medium"
             android:text="End"
+            android:textColor="@color/textDarkGray"
             android:textAllCaps="true"
             app:layout_constraintBottom_toBottomOf="@+id/textView"
             app:layout_constraintEnd_toEndOf="@+id/conversion"

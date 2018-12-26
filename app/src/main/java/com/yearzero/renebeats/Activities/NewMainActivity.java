@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -37,7 +36,7 @@ public class NewMainActivity extends AppCompatActivity implements ServiceConnect
     private TextInputEditText Search;
     private ImageButton QueryBtn;
 
-    private ConstraintLayout ErrorCard;
+    private View ErrorCard;
     private ImageView ErrorImg;
     private TextView ErrorTitle, ErrorMsg;
     private Button ErrorAction;
