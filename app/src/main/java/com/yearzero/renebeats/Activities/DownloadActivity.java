@@ -80,7 +80,7 @@ public class DownloadActivity extends AppCompatActivity {
         Image = findViewById(R.id.image);
         Display = findViewById(R.id.display);
         Format = findViewById(R.id.assigned);
-        Bitrate = findViewById(R.id.done);
+        Bitrate = findViewById(R.id.bitrate);
         Title = findViewById(R.id.title);
         Artist = findViewById(R.id.artist);
         Album = findViewById(R.id.album);

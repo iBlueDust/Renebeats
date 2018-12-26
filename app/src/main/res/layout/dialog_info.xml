@@ -26,6 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
+                android:textColor="@color/textDarkGray"
                 android:text="Subscribe to Pewdiepie" />
         </ScrollView>
     </HorizontalScrollView>
@@ -52,6 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
+                android:textColor="@color/textDarkGray"
                 android:text="Do your part in the war" />
         </ScrollView>
     </HorizontalScrollView>
@@ -67,6 +69,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:background="@android:color/transparent"
+        android:fontFamily="@font/semibold"
         android:text="Save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/close"
@@ -83,6 +86,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:background="@android:color/transparent"
+        android:fontFamily="@font/semibold"
         android:text="Close"
         android:textColor="@color/Accent"
         app:layout_constraintBottom_toBottomOf="parent"

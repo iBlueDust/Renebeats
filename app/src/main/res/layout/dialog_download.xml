@@ -34,6 +34,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Title"
                     android:textStyle="bold" />
 
@@ -59,6 +60,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Artist"
                     android:textStyle="bold" />
 
@@ -83,6 +85,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Album"
                     android:textStyle="bold" />
 
@@ -107,6 +110,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Genres"
                     android:textStyle="bold" />
 
@@ -131,6 +135,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Year"
                     android:textStyle="bold" />
 
@@ -155,6 +160,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Track #"
                     android:textStyle="bold" />
 
@@ -180,6 +186,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
+            android:fontFamily="@font/regular"
             android:text="Format"
             android:textAllCaps="true"
             app:layout_constraintEnd_toEndOf="parent"
@@ -220,6 +227,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Format"
                     android:textStyle="bold" />
 
@@ -244,6 +252,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Bitrate"
                     android:textStyle="bold" />
 
@@ -268,6 +277,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Normalize"
                     android:textStyle="bold" />
 
@@ -292,6 +302,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Start"
                     android:textStyle="bold" />
 
@@ -316,6 +327,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="End"
                     android:textStyle="bold" />
 
@@ -341,6 +353,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
+            android:fontFamily="@font/regular"
             android:text="Status"
             android:textAllCaps="true"
             app:layout_constraintEnd_toStartOf="@+id/status"
@@ -393,6 +406,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Download"
                     android:textStyle="bold" />
 
@@ -418,6 +432,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Conversion"
                     android:textStyle="bold" />
 
@@ -442,6 +457,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Metadata"
                     android:textStyle="bold" />
 
@@ -481,6 +497,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Assigned at"
                     android:textStyle="bold" />
 
@@ -505,6 +522,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Completed at"
                     android:textStyle="bold" />
 
@@ -530,6 +548,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
+            android:fontFamily="@font/regular"
             android:text="Super Secret"
             android:textAllCaps="true"
             android:visibility="gone"
@@ -573,6 +592,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="YouTube ID"
                     android:textStyle="bold" />
 
@@ -597,6 +617,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="PRDownloader ID"
                     android:textStyle="bold" />
 
@@ -621,6 +642,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="URL"
                     android:textStyle="bold" />
 
@@ -645,6 +667,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Available Format"
                     android:textStyle="bold" />
 
@@ -669,6 +692,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Exception"
                     android:textStyle="bold" />
 
@@ -693,6 +717,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
+            android:fontFamily="@font/regular"
             android:text="Paths"
             android:textAllCaps="true"
             android:visibility="gone"
@@ -726,6 +751,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Download"
                     android:textStyle="bold" />
 
@@ -756,6 +782,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Conversion"
                     android:textStyle="bold" />
 
@@ -788,6 +815,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/medium"
                     android:text="Final (MTDT)"
                     android:textStyle="bold" />
 
@@ -821,6 +849,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:background="@android:color/transparent"
+            android:fontFamily="@font/semibold"
             android:text="Close"
             android:textColor="@color/Accent"
             app:layout_constraintBottom_toBottomOf="parent"
