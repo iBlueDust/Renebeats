@@ -100,7 +100,10 @@ public class NewMainActivity extends AppCompatActivity implements ServiceConnect
 
     @Override
     protected void onStop() {
-        Log.w(TAG, service.removeCallbacks(this) ? "Service callback has been removed" : "Failed to remove service callback");
+        if (service != null) {
+            if (service.removeCallbacks(this)) Log.i(TAG, "Service callback has been removed");
+            else Log.e(TAG, "Failed to remove service callback");
+        }
         super.onStop();
     }
 
