@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -54,6 +55,13 @@ public class NewMainActivity extends AppCompatActivity implements ServiceConnect
 
         bindService(new Intent(this, DownloadService.class), this, 0);
     }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//        bindService(new Intent(this, DownloadService.class), this, 0);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,12 +106,13 @@ public class NewMainActivity extends AppCompatActivity implements ServiceConnect
     }
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         if (service != null) {
             if (service.removeCallbacks(this)) Log.i(TAG, "Service callback has been removed");
             else Log.e(TAG, "Failed to remove service callback");
         }
-        super.onStop();
+        unbindService(this);
+        super.onDestroy();
     }
 
     @Override
@@ -111,6 +120,7 @@ public class NewMainActivity extends AppCompatActivity implements ServiceConnect
         service = ((DownloadService.LocalBinder) iBinder).getService();
         service.addCallbacks(this);
         adapter = new DownloadAdapter(this, service, List);
+        List.setLayoutManager(new LinearLayoutManager(this));
         List.setAdapter(adapter);
     }
 

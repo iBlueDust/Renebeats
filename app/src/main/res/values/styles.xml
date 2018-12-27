@@ -6,7 +6,7 @@
         <item name="colorAccent">@color/Accent</item>
         <item name="android:textColorPrimary">@color/textLight</item>
         <item name="android:textColorSecondary">@color/textLightGray</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="AppTheme.Dark.NoActionBar" parent="Theme.AppCompat.NoActionBar">
@@ -16,7 +16,7 @@
         <item name="colorAccent">@color/Accent</item>
         <item name="android:textColorPrimary">@color/textLight</item>
         <item name="android:textColorSecondary">@color/textLightGray</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light">
@@ -25,7 +25,7 @@
         <item name="colorAccent">@color/Accent</item>
         <item name="android:textColorPrimary">@color/textDark</item>
         <item name="android:textColorSecondary">@color/textDarkGray</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -34,7 +34,7 @@
         <item name="colorAccent">@color/Accent</item>
         <item name="android:textColorPrimary">@color/textDark</item>
         <item name="android:textColorSecondary">@color/textDarkGray</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <!--<style name="AppTheme.NoActionBar">-->

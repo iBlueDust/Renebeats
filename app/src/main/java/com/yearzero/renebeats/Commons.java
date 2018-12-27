@@ -41,7 +41,7 @@ public class Commons extends Application {
     private static final String TAG = "Commons";
     static final String INTL_DATE_FORMAT = "yyyy-mm-ddThh:mm:sszzz";
 
-    public static final int PERM_REQUEST = 0x9E4A24D1;
+    public static final int PERM_REQUEST = 0x24D1;
 
     public static DownloadReceiver downloadReceiver;
     public static Fetch fetch;
@@ -118,10 +118,10 @@ public class Commons extends Application {
 
         public static void Load() {
             bitrate = (short) SharedPref.getInt(location_bitrate, bitrate);
-            format = SharedPref.getString(location_bitrate, format);
+            format = SharedPref.getString(location_format, format);
             sdcard = Directories.isExternalStorageAvailable() && SharedPref.getBoolean(location_sdcard, true);
             normalize = SharedPref.getBoolean(location_normalize, true);
-            location = new File(SharedPref.getString(location_bitrate, location.getAbsolutePath()));
+            location = new File(SharedPref.getString(location_location, location.getAbsolutePath()));
             concurrency = (short) SharedPref.getInt(location_concurrency, 1);
         }
 
