@@ -42,17 +42,16 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="80dp"
-            android:layout_height="36dp"
+            android:layout_height="42dp"
             android:layout_marginTop="8dp"
             app:cardCornerRadius="16dp"
-            app:contentPadding="8dp"
             app:layout_constraintEnd_toEndOf="@+id/cardView"
             app:layout_constraintTop_toBottomOf="@+id/cardView">
 
             <ImageButton
                 android:id="@+id/query"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@android:color/transparent"
                 android:contentDescription="Search"
                 app:srcCompat="@drawable/ic_search_accent_24dp"

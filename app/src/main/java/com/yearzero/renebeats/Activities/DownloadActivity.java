@@ -59,7 +59,7 @@ public class DownloadActivity extends AppCompatActivity {
     private SparseArray<YouTubeExtractor.YtFile> sparseArray;
 
     private Integer start, end;
-    private int length;
+    private int length = -1;
 
     @SuppressLint({"StaticFieldLeak", "WrongViewCast"})
     @Override
@@ -106,40 +106,69 @@ public class DownloadActivity extends AppCompatActivity {
 
         if (query.title != null) Display.setText(query.title);
 
-        new YouTubeExtractor(this) {
-            @Override
-            protected void onExtractionComplete(SparseArray<YouTubeExtractor.YtFile> data, YouTubeExtractor.VideoMeta videoMeta) {
-                int maxbit = 64;
+        if (length < 0 || sparseArray == null) {
+            new YouTubeExtractor(this) {
+                @Override
+                protected void onExtractionComplete(SparseArray<YouTubeExtractor.YtFile> data, YouTubeExtractor.VideoMeta videoMeta) {
+                    int maxbit = 64;
 
-                sparseArray = data;
+                    sparseArray = data;
 
-                start = null;
-                end = null;
-                length = (int) videoMeta.getVideoLength();
+                    start = null;
+                    end = null;
+                    length = (int) videoMeta.getVideoLength();
 
+                    retrieveDialog.dismiss();
+
+                    RefreshTimeRange();
+
+                    if (data == null) return;
+                    for (int i = 0; i < data.size(); i++)
+                        maxbit = Math.max(data.get(data.keyAt(i)).getFormat().getAudioBitrate(), maxbit);
+
+                    int i = 0;
+                    while (i < Commons.Pref.BITRATES.length && Commons.Pref.BITRATES[i] <= maxbit)
+                        i++;
+
+                    List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.bitrates));
+
+                    Bitrate.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, bitrates.subList(0, i)));
+                    if (Commons.Pref.bitrate < Commons.Pref.BITRATES[i])
+                        Bitrate.setSelection(bitrates.indexOf(Commons.Pref.bitrate + "kbps"));
+                }
+            }.extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.id, true, false);
+
+            retrieveDialog = new Dialog(this);
+            retrieveDialog.setTitle("Retrieving...");
+            retrieveDialog.setCanceledOnTouchOutside(false);
+            retrieveDialog.setContentView(R.layout.dialog_retrieving);
+            retrieveDialog.findViewById(R.id.info).setOnClickListener(v -> {
                 retrieveDialog.dismiss();
+                onBackPressed();
+            });
+            retrieveDialog.show();
+        } else {
+            RefreshTimeRange();
 
-                RefreshTimeRange();
+            int maxbit = 64;
+            for (int i = 0; i < sparseArray.size(); i++)
+                maxbit = Math.max(sparseArray.get(sparseArray.keyAt(i)).getFormat().getAudioBitrate(), maxbit);
 
-                if (data == null) return;
-                for (int i = 0; i < data.size(); i++)
-                    maxbit = Math.max(data.get(data.keyAt(i)).getFormat().getAudioBitrate(), maxbit);
+            int i = 0;
+            while (i < Commons.Pref.BITRATES.length && Commons.Pref.BITRATES[i] <= maxbit)
+                i++;
 
-                int i = 0;
-                while (i < Commons.Pref.BITRATES.length && Commons.Pref.BITRATES[i] <= maxbit) i++;
+            List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.bitrates));
 
-                List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.bitrates));
-
-                Bitrate.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, bitrates.subList(0, i)));
-                if (Commons.Pref.bitrate < Commons.Pref.BITRATES[i])
-                    Bitrate.setSelection(bitrates.indexOf(Commons.Pref.bitrate + "kbps"));
-            }
-        }.extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.id, true, false);
+            Bitrate.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, bitrates.subList(0, i)));
+            if (Commons.Pref.bitrate < Commons.Pref.BITRATES[i])
+                Bitrate.setSelection(bitrates.indexOf(Commons.Pref.bitrate + "kbps"));
+        }
 
         String[] formats = getResources().getStringArray(R.array.formats);
         Format.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, formats));
         int index = Arrays.asList(formats).indexOf(Commons.Pref.format);
-        Format.setSelection(index < 0 ? 1 : index);
+        Format.setSelection(index < 0 ? 0 : index);
 
         if (query.artist != null) Artist.setText(query.artist);
 
@@ -220,16 +249,6 @@ public class DownloadActivity extends AppCompatActivity {
         NormalizeHelp.setOnClickListener(v -> new AlertDialog.Builder(DownloadActivity.this)
                 .setMessage("Some audio/videos may have a quieter audio than other audios. This is because sometimes an audio/video file does not use the full volume range available and thus resulting in its audio being very quiet. Normalization will increase the audio's volume in such that it will utilize the whole available volume range though it may take more time.")
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss()).show());
-
-        retrieveDialog = new Dialog(this);
-        retrieveDialog.setTitle("Retrieving...");
-        retrieveDialog.setCanceledOnTouchOutside(false);
-        retrieveDialog.setContentView(R.layout.dialog_retrieving);
-        retrieveDialog.findViewById(R.id.info).setOnClickListener(v -> {
-            retrieveDialog.dismiss();
-            onBackPressed();
-        });
-        retrieveDialog.show();
     }
 
     public void Download() {
@@ -280,10 +299,14 @@ public class DownloadActivity extends AppCompatActivity {
         if (track > 0) query.track = track;
         if (year > 0) query.year = year;
 
+        int index = Format.getSelectedItemPosition();
+        String[] formats = getResources().getStringArray(R.array.formats);
+        String format = index < 0 || index >= formats.length ? Commons.Pref.format : formats[index];
+
         Download args = new Download(
                 query,
                 bitrate,
-                Format.getSelectedItem().toString(),
+                format,
                 sparseArray,
                 start,
                 end != null && end == Math.floor(length) ? null : end,

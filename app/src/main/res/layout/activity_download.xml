@@ -132,8 +132,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Title"
                 android:inputType="text"
-                android:singleLine="true"
-                android:text="asdadasd" />
+                android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <fr.ganfra.materialspinner.MaterialSpinner

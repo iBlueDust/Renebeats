@@ -457,6 +457,7 @@ public class DownloadService extends Service {
     }
 
     private void Convert() {
+        if (convertProgress != null) return;
         final Download current = convertQueue.poll();
         if (current == null) {
             if (CheckQueues()) stop();
@@ -464,10 +465,6 @@ public class DownloadService extends Service {
         }
 
         if (current.convert) {
-            if (convertProgress != null) {
-                current.convertStatus = Download.ConvertStatus.QUEUED;
-                return;
-            }
             converter = AndroidAudioConverter.with(getApplicationContext())
                     .setFile(new File(Commons.Directories.BIN, current.down))
                     .setTrim(current.start, current.end)
