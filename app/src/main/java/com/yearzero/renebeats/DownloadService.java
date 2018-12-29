@@ -67,6 +67,7 @@ public class DownloadService extends Service {
             args.downloadStatus = Download.DownloadStatus.COMPLETE;
             convertQueue.add(args);
             downloadMap.remove(download.getId());
+            DownloadService.this.onProgress(1L, 1L, false, args);
             Convert();
         }
 
@@ -88,8 +89,7 @@ public class DownloadService extends Service {
         }
 
         @Override
-        public void onDownloadBlockUpdated(com.tonyodev.fetch2.@NotNull Download download, @NotNull DownloadBlock downloadBlock, int i) {
-        }
+        public void onDownloadBlockUpdated(com.tonyodev.fetch2.@NotNull Download download, @NotNull DownloadBlock downloadBlock, int i) { }
 
 
         @Override
@@ -526,6 +526,8 @@ public class DownloadService extends Service {
             return;
         }
 
+        onProgress(0L, 0L, true, current);
+
         MusicMetadataSet src_set = null;
         try {
             src_set = new MyID3().read(new File(current.conv));
@@ -831,7 +833,7 @@ public class DownloadService extends Service {
                     d.convertStatus = Download.ConvertStatus.FAILED;
                     d.exception = v;
                 }
-            } else if (d.down == null || !new File(d.down).exists()) {
+            } else if (d.down == null || !new File(Commons.Directories.BIN, d.down).exists()) {
                 convertQueue.remove(d);
                 Download(d);
             } else d.convertStatus = Download.ConvertStatus.QUEUED;

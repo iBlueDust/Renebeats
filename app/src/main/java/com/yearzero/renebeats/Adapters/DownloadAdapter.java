@@ -350,19 +350,20 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
 
     @Override
     public void onDone(Download args, boolean successful, Exception e) {
-        Download[] array = getServiceDownloads();
-
-        int index = -1;
-
-        for (int i = 0; i < array.length; i++) {
-            if (array[i].hashCode() == args.hashCode()) {
-                index = i;
-                break;
-            }
-        }
-
-        if (index < 0) notifyDataSetChanged();
-        else notifyItemChanged(index);
+//        Download[] array = getServiceDownloads();
+//
+//        int index = -1;
+//
+//        for (int i = 0; i < array.length; i++) {
+//            if (array[i].hashCode() == args.hashCode()) {
+//                index = i;
+//                break;
+//            }
+//        }
+//
+//        if (index < 0) notifyDataSetChanged();
+//        else notifyItemChanged(index);
+        notifyDataSetChanged();
     }
 
     @Override
