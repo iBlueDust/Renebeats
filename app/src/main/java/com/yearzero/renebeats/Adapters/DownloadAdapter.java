@@ -86,7 +86,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
         else if (i == Boolean.FALSE.hashCode())
             md = false;
 
-        if (!(dl == all[position].downloadStatus() || cv == all[position].convertStatus || md == all[position].metadataSuccess)) Log.w(TAG, "ViewHolder type does not match Download type. Defaulting to follow ViewHolder type");
+        if (!(dl == all[position].downloadStatus || cv == all[position].convertStatus || md == all[position].metadataSuccess)) Log.w(TAG, "ViewHolder type does not match Download type. Defaulting to follow ViewHolder type");
 
         InitializeViewHolder(holder, all[position], type);
     }
@@ -220,11 +220,11 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
             //endregion
         } else if (pack.isCancelled())
             ((QueueViewHolder) holder).setStatus("Cancelled");
-        else if (pack.downloadStatus() != null) {
+        else if (pack.downloadStatus != null) {
 
             try {
                 //region Status Main
-                switch (pack.downloadStatus()) {
+                switch (pack.downloadStatus) {
                     case QUEUED:
                         QueueViewHolder g = (QueueViewHolder) holder;
                         g.setStatus("Waiting for download");
@@ -385,11 +385,11 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     private int getViewHolderType(Download pack) {
         if (pack.isFailed())
             return FailedViewHolder.LocalID;
-        else if (pack.downloadStatus() == Download.DownloadStatus.COMPLETE && (pack.convertStatus == Download.ConvertStatus.COMPLETE || pack.convertStatus == Download.ConvertStatus.SKIPPED))
+        else if (pack.downloadStatus == Download.DownloadStatus.COMPLETE && (pack.convertStatus == Download.ConvertStatus.COMPLETE || pack.convertStatus == Download.ConvertStatus.SKIPPED))
             return pack.metadataSuccess == null ? RunningViewHolder.LocalID : SuccessViewHolder.LocalID;
         else if (pack.isCancelled() || pack.isQueued())
             return QueueViewHolder.LocalID;
-        else if (pack.downloadStatus() == Download.DownloadStatus.RUNNING || pack.downloadStatus() == Download.DownloadStatus.PAUSED ||
+        else if (pack.downloadStatus == Download.DownloadStatus.RUNNING || pack.downloadStatus == Download.DownloadStatus.PAUSED ||
                 pack.convertStatus == Download.ConvertStatus.RUNNING || pack.convertStatus == Download.ConvertStatus.PAUSED)
             return RunningViewHolder.LocalID;
         else return BasicViewHolder.LocalID;

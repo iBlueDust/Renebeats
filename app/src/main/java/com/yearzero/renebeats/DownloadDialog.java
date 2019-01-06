@@ -206,7 +206,7 @@ public class DownloadDialog extends Dialog {
             PathDownload.setText(download.down);
             if (new File(Commons.Directories.BIN, download.down).exists())
                 StatusDownload.setImageResource(download.metadataSuccess != null && download.metadataSuccess ? R.color.red : R.color.yellow);
-            else if (download.downloadStatus() == Download.DownloadStatus.COMPLETE)
+            else if (download.downloadStatus == Download.DownloadStatus.COMPLETE)
                 StatusDownload.setImageResource(R.color.green);
             else StatusDownload.setImageResource(R.color.SecondaryDark);
         }

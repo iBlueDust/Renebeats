@@ -8,6 +8,7 @@ package com.yearzero.renebeats;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -58,6 +59,8 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
     private boolean useHttp = false;
     private boolean parseDashManifest = false;
     private String cacheDirPath;
+
+    private int timeout;
 
     private volatile String decipheredSignature;
 
@@ -170,6 +173,22 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
         onExtractionComplete(ytFiles, videoMeta);
     }
 
+    @Override
+    protected void onPreExecute() {
+        new CountDownTimer(timeout, timeout) {
+            @Override
+            public void onTick(long l) {}
+
+            @Override
+            public void onFinish() {
+                if (getStatus() == Status.RUNNING) {
+                    onTimeout();
+                    cancel();
+                }
+            }
+        }.start();
+        super.onPreExecute();
+    }
 
     /**
      * Start the extraction.
@@ -178,19 +197,22 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
      * @param parseDashManifest true if the dash manifest should be downloaded and parsed
      * @param includeWebM       true if WebM streams should be extracted
      */
-    public void extract(String youtubeLink, boolean parseDashManifest, boolean includeWebM) {
+    public YouTubeExtractor extract(String youtubeLink, boolean parseDashManifest, boolean includeWebM) {
         this.parseDashManifest = parseDashManifest;
         this.includeWebM = includeWebM;
         this.execute(youtubeLink);
+        return this;
     }
 
-    public void extractOnExecutor(Executor executor, String youtubeLink, boolean parseDashManifest, boolean includeWebM) {
+    public YouTubeExtractor extractOnExecutor(Executor executor, String youtubeLink, boolean parseDashManifest, boolean includeWebM) {
         this.parseDashManifest = parseDashManifest;
         this.includeWebM = includeWebM;
         this.executeOnExecutor(executor, youtubeLink);
+        return this;
     }
 
     protected abstract void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta);
+    protected abstract void onTimeout();
 
     @Override
     protected SparseArray<YouTubeExtractor.YtFile> doInBackground(String... params) {
@@ -688,16 +710,18 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
     /**
      * Parse the dash manifest for different dash streams and high quality audio. Default: false
      */
-    public void setParseDashManifest(boolean parseDashManifest) {
+    public YouTubeExtractor setParseDashManifest(boolean parseDashManifest) {
         this.parseDashManifest = parseDashManifest;
+        return this;
     }
 
 
     /**
      * Include the webm format files into the result. Default: true
      */
-    public void setIncludeWebM(boolean includeWebM) {
+    public YouTubeExtractor setIncludeWebM(boolean includeWebM) {
         this.includeWebM = includeWebM;
+        return this;
     }
 
 
@@ -708,8 +732,14 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
      * Note: Enciphered videos require HTTPS so they are not affected by
      * this.
      */
-    public void setDefaultHttpProtocol(boolean useHttp) {
+    public YouTubeExtractor setDefaultHttpProtocol(boolean useHttp) {
         this.useHttp = useHttp;
+        return this;
+    }
+
+    public YouTubeExtractor setTimeout(int timeout) {
+        this.timeout = timeout;
+        return this;
     }
 
     private void writeDeciperFunctToChache() {
@@ -785,7 +815,7 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
     }
 
     public static class Format implements Serializable {
-        private static final long serialVersionUID = 130L;
+        private static final long serialVersionUID = 1300L;
 
         public enum VCodec {
             H263, H264, MPEG4, VP8, VP9, NONE
@@ -958,7 +988,7 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
     }
 
     public static class VideoMeta implements Serializable {
-        private static final long serialVersionUID = 120L;
+        private static final long serialVersionUID = 1200L;
         private static final String IMAGE_BASE_URL = "http://i.ytimg.com/vi/";
 
         private String videoId;
@@ -1085,7 +1115,7 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
     }
 
     public static class YtFile implements Serializable {
-        private static final long serialVersionUID = 110L;
+        private static final long serialVersionUID = 1100L;
 
         private Format format;
         private String url = "";

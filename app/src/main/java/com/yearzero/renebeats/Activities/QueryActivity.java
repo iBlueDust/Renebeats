@@ -2,14 +2,13 @@ package com.yearzero.renebeats.Activities;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
@@ -55,8 +54,6 @@ public class QueryActivity extends AppCompatActivity implements SwipeRefreshLayo
             return;
         }
 
-        //TODO: Timeout
-
         query = bundle.getString(Commons.ARGS.DATA);
 
         ActionBar actionBar = getSupportActionBar();
@@ -74,12 +71,9 @@ public class QueryActivity extends AppCompatActivity implements SwipeRefreshLayo
         List.setLayoutManager(new LinearLayoutManager(this));
         List.setAdapter(adapter);
 
-        OfflineAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Swipe.setRefreshing(true);
-                onRefresh();
-            }
+        OfflineAction.setOnClickListener(v -> {
+            Swipe.setRefreshing(true);
+            onRefresh();
         });
 
         Swipe.setOnRefreshListener(this);
@@ -90,7 +84,7 @@ public class QueryActivity extends AppCompatActivity implements SwipeRefreshLayo
 
     @Override
     public void onRefresh() {
-        new YoutubeQueryTask(new YoutubeQueryTask.OnCompleteListener() {
+        new YoutubeQueryTask(new YoutubeQueryTask.Callbacks() {
             @Override
             public void onComplete(List<SearchResult> results) {
                 int visi = View.GONE;
@@ -100,25 +94,17 @@ public class QueryActivity extends AppCompatActivity implements SwipeRefreshLayo
                     OfflineImg.setImageResource(R.drawable.ic_cloud_off_secondarydark_96dp);
                     OfflineMsg.setText("It seems that we can't connect to YouTube. Please check your connection and try again later.");
                     OfflineAction.setText("Retry");
-                    OfflineAction.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Swipe.setRefreshing(true);
-                            onRefresh();
-                        }
+                    OfflineAction.setOnClickListener(v -> {
+                        Swipe.setRefreshing(true);
+                        onRefresh();
                     });
                 } else if (results.size() <= 0) {
                     visi = View.VISIBLE;
 
-                    OfflineImg.setImageResource(R.drawable.ic_search_secondarydark_96dp);
+                    OfflineImg.setImageResource(R.drawable.ic_search_lightgray_96dp);
                     OfflineMsg.setText("Your search didn't come out with any results");
                     OfflineAction.setText("Back");
-                    OfflineAction.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onBackPressed();
-                        }
-                    });
+                    OfflineAction.setOnClickListener(v -> onBackPressed());
                 } else adapter.resetList(Query.CastList(results));
 
                 OfflineImg.setVisibility(visi);
@@ -127,7 +113,23 @@ public class QueryActivity extends AppCompatActivity implements SwipeRefreshLayo
 
                 Swipe.setRefreshing(false);
             }
-        }, getPackageName()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
+
+            @Override
+            public void onTimeout() {
+                OfflineImg.setImageResource(R.drawable.ic_timer_lightgray_96dp);
+                OfflineImg.setVisibility(View.VISIBLE);
+                OfflineMsg.setText("Request timed out");
+                OfflineMsg.setVisibility(View.VISIBLE);
+                OfflineAction.setVisibility(View.VISIBLE);
+                OfflineAction.setText("Retry");
+                OfflineAction.setOnClickListener(v -> {
+                    Swipe.setRefreshing(true);
+                    onRefresh();
+                });
+            }
+        }, getPackageName())
+            .setTimeout(Commons.Pref.timeout)
+            .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
     }
 
     @Override
@@ -139,32 +141,55 @@ public class QueryActivity extends AppCompatActivity implements SwipeRefreshLayo
 
     public static class YoutubeQueryTask extends AsyncTask<String, Void, List<SearchResult>> {
 
-        public interface OnCompleteListener {
+        public interface Callbacks {
             void onComplete(List<SearchResult> results);
+            void onTimeout();
         }
 
-        private OnCompleteListener listener;
+        private Callbacks listener;
         private String pkgName;
+        private int timeout;
 
-        public YoutubeQueryTask(OnCompleteListener listener, @NonNull String pkgName) {
+        public YoutubeQueryTask(Callbacks listener, @NonNull String pkgName) {
             this.listener = listener;
             this.pkgName = pkgName;
+        }
+
+        public YoutubeQueryTask setTimeout(int timeout){
+            this.timeout = timeout;
+            return this;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            new CountDownTimer(timeout, timeout) {
+                @Override
+                public void onTick(long l) {}
+
+                @Override
+                public void onFinish() {
+                    if (getStatus() == Status.RUNNING) {
+                        cancel();
+                        if (listener != null) listener.onTimeout();
+                    }
+                }
+            }.start();
+            super.onPreExecute();
         }
 
         @Override
         protected List<SearchResult> doInBackground(String... query) {
             try {
-                YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
-                    public void initialize(HttpRequest request) {
-                    }
-                }).setApplicationName(pkgName).build();
+                YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), request -> {})
+                    .setApplicationName(pkgName)
+                    .build();
 
                 YouTube.Search.List search = youtube.search().list("id,snippet");
                 search.setKey(Commons.YT_API_KEY);
                 search.setQ(query[0]);
 
                 search.setType("video");
-                search.setMaxResults(25L);
+                search.setMaxResults((long) Commons.Pref.query_amount);
 
                 SearchListResponse searchResponse = search.execute();
                 return searchResponse.getItems();
