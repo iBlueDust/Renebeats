@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -19,10 +20,10 @@ import com.yearzero.renebeats.Adapters.DownloadAdapter;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.Download;
 import com.yearzero.renebeats.DownloadService;
+import com.yearzero.renebeats.Query;
 import com.yearzero.renebeats.R;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
@@ -31,7 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class NewMainActivity extends AppCompatActivity implements ServiceConnection, DownloadService.ClientCallbacks, View.OnClickListener {
+public class NewMainActivity extends AppCompatActivity implements ServiceConnection, DownloadService.ClientCallbacks, View.OnClickListener, View.OnKeyListener {
     private static final String TAG = "NewMainActivity";
 
     private TextInputEditText Search;
@@ -49,19 +50,15 @@ public class NewMainActivity extends AppCompatActivity implements ServiceConnect
     private DownloadAdapter adapter;
     private DownloadService service;
 
+    //TODO: Implement Download Header Features
+    //TODO: History Activity and support
+    //TODO: Preference Activity
+
     @Override
     protected void onStart() {
         super.onStart();
-
         bindService(new Intent(this, DownloadService.class), this, 0);
     }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//
-//        bindService(new Intent(this, DownloadService.class), this, 0);
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +79,8 @@ public class NewMainActivity extends AppCompatActivity implements ServiceConnect
 
         List = findViewById(R.id.list);
 
+        Search.requestFocus();
+
         try {
             String[] perms = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_PERMISSIONS).requestedPermissions;
             if (!EasyPermissions.hasPermissions(this, perms))
@@ -95,8 +94,8 @@ public class NewMainActivity extends AppCompatActivity implements ServiceConnect
             e.printStackTrace();
         }
 
+        Search.setOnKeyListener(this);
         QueryBtn.setOnClickListener(this);
-
     }
 
     @Override
@@ -152,23 +151,31 @@ public class NewMainActivity extends AppCompatActivity implements ServiceConnect
     public void onClick(View view) {
         if(Search.getText().toString().trim().isEmpty()) return;
 
-        Intent intent = new Intent(this, DownloadActivity.class);
-
         String url = "";
         String query = Search.getText().toString();
 
-        if(!(query.startsWith("http://") || query.startsWith("https://") || query.contains(" ")) && query.contains(".")) url = "http://";
-        if(Pattern.compile("^(https?://)?[\\w\\d]+\\.[\\w\\d]+", Pattern.CASE_INSENSITIVE).matcher(url).matches()) url += "www.";
+        if(!(query.startsWith("http://") || query.startsWith("https://") || query.contains(" ")) && query.contains(".")) url = "https://";
+        if(Pattern.compile("[\\w\\d]+\\.[\\w\\d]+", Pattern.CASE_INSENSITIVE).matcher(url).matches()) url += "www.";
         url += query;
 
-        try {
-            new URL(url);
-            intent.putExtra(Commons.ARGS.URL, Search.getText().toString().isEmpty());
-        } catch (MalformedURLException ignored) {
-            intent = new Intent(this, QueryActivity.class);
+        Matcher matcher = Pattern.compile("^https?://.*(?:youtu.be/|v/|u/\\w/|embed/|watch\\?v=)([^#&?]*).*$", Pattern.CASE_INSENSITIVE).matcher(url);
+        if (matcher.matches()){
+            Intent intent = new Intent(this, DownloadActivity.class);
+            intent.putExtra(Commons.ARGS.DATA, new Query(matcher.group(1)));
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(this, QueryActivity.class);
             intent.putExtra(Commons.ARGS.DATA, query);
-        } finally {
             startActivity(intent);
         }
+    }
+
+    @Override
+    public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+        if (keyEvent.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_ENTER) {
+            onClick(Search);
+            return true;
+        }
+        return false;
     }
 }

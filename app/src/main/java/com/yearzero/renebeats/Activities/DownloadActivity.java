@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.Download;
@@ -32,6 +31,7 @@ import com.yearzero.renebeats.Query;
 import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.YouTubeExtractor;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -93,27 +93,71 @@ public class DownloadActivity extends AppCompatActivity {
         NormalizeHelp = findViewById(R.id.normalize_help);
 
         if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null)
-            Picasso.get()
-                    .load(query.getThumbnail(Commons.Pref.downloadImage))
-                    .transform(new RoundedTransformationBuilder()
-                            .cornerRadiusDp(10)
-                            .oval(false)
-                            .build())
-                    .placeholder(R.color.SecondaryDark)
-                    .into(Image);
+            LoadThumbnail();
 
         if (query.thumbmap != null) Image.setImageURI(query.thumbmap);
 
-        if (query.title != null) Display.setText(query.title);
+        if (query.title != null) {
+            Display.setText(query.title);
+
+            String[] result = extractTitleandArtist(query.title, query.artist);
+            Title.setText(result[0]);
+            if (result[1] != null) Artist.setText(result[1]);
+        }
+
 
         if (length < 0 || sparseArray == null) {
             new YouTubeExtractor(this) {
                 @Override
-                protected void onExtractionComplete(SparseArray<YouTubeExtractor.YtFile> data, YouTubeExtractor.VideoMeta videoMeta) {
-                    int maxbit = 64;
+                protected void onExtractionComplete(SparseArray<YtFile> data, VideoMeta videoMeta) {
+                    if (videoMeta.getVideoLength() <= 0) {
+                        onBackPressed();
+                        Toast.makeText(DownloadActivity.this, "Invalid video ID", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    if (query.artist == null) {
+                        query.artist = videoMeta.getAuthor();
+                        Artist.setText(query.artist);
+                    }
+
+                    if (query.title == null) {
+                        query.title = videoMeta.getTitle();
+                        Display.setText(query.title);
+
+                        String[] result = extractTitleandArtist(query.title, query.artist);
+                        Title.setText(result[0]);
+                        if (result[1] != null) Artist.setText(result[1]);
+                    }
+
+                    boolean thumbnail = false;
+                    if (query.thumbMax == null) {
+                        query.thumbMax = videoMeta.getMaxResImageUrl();
+                        thumbnail = true;
+                    }
+                    if (query.thumbHigh == null) {
+                        query.thumbHigh = videoMeta.getHqImageUrl();
+                        thumbnail = true;
+                    }
+                    if (query.thumbMedium == null) {
+                        query.thumbMedium = videoMeta.getMqImageUrl();
+                        thumbnail = true;
+                    }
+                    if (query.thumbDefault == null) {
+                        query.thumbDefault = videoMeta.getThumbUrl();
+                        thumbnail = true;
+                    }
+                    if (query.thumbStandard == null) {
+                        query.thumbStandard = videoMeta.getSdImageUrl();
+                        thumbnail = true;
+                    }
+
+                    if (thumbnail)
+                        LoadThumbnail();
 
                     sparseArray = data;
 
+                    int maxbit = 64;
                     start = null;
                     end = null;
                     length = (int) videoMeta.getVideoLength();
@@ -136,7 +180,22 @@ public class DownloadActivity extends AppCompatActivity {
                     if (Commons.Pref.bitrate < Commons.Pref.BITRATES[i])
                         Bitrate.setSelection(bitrates.indexOf(Commons.Pref.bitrate + "kbps"));
                 }
-            }.extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.id, true, false);
+
+                @Override
+                protected void onTimeout() {
+                    if (retrieveDialog != null) retrieveDialog.dismiss();
+
+                    new AlertDialog.Builder(DownloadActivity.this)
+                            .setTitle("Timeout")
+                            .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
+                            .setPositiveButton("OK", (dialogInterface, i) -> {
+                                dialogInterface.dismiss();
+                                onBackPressed();
+                            }).show();
+                }
+            }
+                .setTimeout(Commons.Pref.timeout)
+                .extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.id, true, false);
 
             retrieveDialog = new Dialog(this);
             retrieveDialog.setTitle("Retrieving...");
@@ -254,7 +313,11 @@ public class DownloadActivity extends AppCompatActivity {
     public void Download() {
         if (query == null || query.id == null) return;
 
-        if (!Title.getText().toString().isEmpty()) query.title = Title.getText().toString();
+        if (Title.getText().toString().isEmpty()) {
+            Title.setError("There must be a title");
+            return;
+        } else query.title = Title.getText().toString();
+
         if (!Artist.getText().toString().isEmpty()) query.artist = Artist.getText().toString();
         if (!Album.getText().toString().isEmpty()) query.album = Album.getText().toString();
 
@@ -313,6 +376,31 @@ public class DownloadActivity extends AppCompatActivity {
                 Normalize.isChecked()
         );
 
+        String name = String.format("%s%s.%s", query.artist == null ? "" : query.artist + " - ", query.title, format);
+
+        if (Commons.Pref.overwrite == Commons.Pref.OverwriteMode.PROMPT) {
+            if (new File(Commons.Directories.MUSIC, name).exists()) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Conflicting File Names")
+                        .setMessage("There is already a file called " + name + " in the Music folder. A suffix such as '(1)' can be appended to the file name to avoid conflicts.")
+                        .setPositiveButton("Overwrite", (dialogInterface, i) -> {
+                            args.overwrite = Commons.Pref.OverwriteMode.OVERWRITE;
+                            InitDownload(args);
+                        })
+                        .setNeutralButton("Append Suffix", (dialogInterface, i) -> {
+                            args.overwrite = Commons.Pref.OverwriteMode.APPEND;
+                            InitDownload(args);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+        } else {
+            args.overwrite = Commons.Pref.overwrite;
+            InitDownload(args);
+        }
+    }
+
+    private void InitDownload(Download args) {
         if (Commons.downloadReceiver == null) {
             Commons.downloadReceiver = new DownloadReceiver(this, true);
             LocalBroadcastManager.getInstance(this).registerReceiver(Commons.downloadReceiver, new IntentFilter(DownloadService.TAG));
@@ -328,6 +416,28 @@ public class DownloadActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
         Toast.makeText(getApplicationContext(), "Download started", Toast.LENGTH_LONG).show();
+    }
+
+    private String[] extractTitleandArtist(String title, String uploader) {
+        if (title == null) return null;
+
+        if (title.contains(" - ")) {
+            String[] split = title.trim().replaceAll("(?i)\\s*.official\\s*(?:audio|video|music\\s+video).\\s*", "").split("-");
+            split[0] = split[0].trim();
+            split[1] = split[1].trim();
+            if (split[0].matches("(?i)(?:.*\\s+|\\s*)(?:ft\\.?|feat\\.?|featuring)\\s++.+")) {
+                return new String[] { split[1], split[0]};
+            } else return split;
+        } else return new String[] { title, uploader };
+    }
+
+    private void LoadThumbnail() {
+        Picasso.get()
+                .load(query.getThumbnail(Commons.Pref.downloadImage))
+                .placeholder(R.color.SecondaryDark)
+                .centerCrop()
+                .fit()
+                .into(Image);
     }
 
     private void RefreshTimeRange() {
@@ -359,15 +469,6 @@ public class DownloadActivity extends AppCompatActivity {
         End.setText(end.toString());
     }
 
-//    @Override
-//    public void onClick(View v) {
-//        CropImage.activity()
-//                .setGuidelines(CropImageView.Guidelines.ON)
-//                .setCropShape(CropImageView.CropShape.OVAL)
-//                .setAspectRatio(1, 1)
-//                .start(this);
-//    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_download, menu);
@@ -387,23 +488,4 @@ public class DownloadActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-//            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-//            if (resultCode == RESULT_OK) {
-//                Picasso.get()
-//                        .load(result.getUri())
-//                        .transform(new RoundedTransformationBuilder()
-//                                .cornerRadiusDp(10)
-//                                .scaleType(ImageView.ScaleType.CENTER_CROP)
-//                                .oval(false)
-//                                .build())
-//                        .into(Image);
-//            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-//                result.getError().printStackTrace();
-//            }
-//        } else super.onActivityResult(requestCode, resultCode, data);
-//    }
 }

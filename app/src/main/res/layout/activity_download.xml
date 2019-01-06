@@ -27,14 +27,15 @@
             android:layout_marginRight="24dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="W,16:9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="Thumbnail"
             app:riv_border_width="0dp"
             app:riv_corner_radius="5dp"
-            app:riv_mutate_background="true"
-            app:srcCompat="@color/SecondaryDark" />
+            app:riv_mutate_background="true" />
 
         <!--<Button-->
             <!--android:id="@+id/image_edit"-->

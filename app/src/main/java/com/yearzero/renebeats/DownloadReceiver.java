@@ -24,7 +24,7 @@ import androidx.core.app.NotificationCompat;
 
 public class DownloadReceiver extends BroadcastReceiver implements Serializable {
     private static final String TAG = "DownloadReceiver";
-    private static final long serialVersionUID = -100;
+    private static final long serialVersionUID = -1000L;
 
     private static final int SERVICE_PRENOTIF_ID = 5456782;
     private static final int NOTIF_ID = -1;
@@ -56,10 +56,9 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
     private NotificationManager manager;
     private NotificationCompat.Builder builder, complete;
 
-//    private ArrayList<Download> Done = new ArrayList<>();
+    //TODO: Implement parallel/multiple downloads support
 
-    public DownloadReceiver() {
-    }
+    public DownloadReceiver() { }
 
     public DownloadReceiver(@NonNull Activity activity, boolean notifications) {
         this.activity = activity;
@@ -231,11 +230,11 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
 
                 builder.setOngoing(true);
 
-                if (data == null || data.downloadStatus() == null)
+                if (data == null || data.downloadStatus == null)
                     builder.setContentText("Processing");
                 else {
                     //region Status Main
-                    switch (data.downloadStatus()) {
+                    switch (data.downloadStatus) {
                         case QUEUED:
                             builder.setContentText("Waiting for download");
                             break;

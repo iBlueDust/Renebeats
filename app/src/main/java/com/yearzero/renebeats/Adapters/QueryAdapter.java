@@ -52,16 +52,13 @@ public class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.ViewHolder> 
         holder.setTitle(query.title);
         holder.setAuthor(query.artist);
 
-        holder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int index = holder.getAdapterPosition();
-                if(index < 0 || index >= queries.size()) return;
+        holder.setOnClickListener(v -> {
+            int index = holder.getAdapterPosition();
+            if(index < 0 || index >= queries.size()) return;
 
-                Intent intent = new Intent(context, DownloadActivity.class);
-                intent.putExtra(Commons.ARGS.DATA, queries.get(index));
-                context.startActivity(intent);
-            }
+            Intent intent = new Intent(context, DownloadActivity.class);
+            intent.putExtra(Commons.ARGS.DATA, queries.get(index));
+            context.startActivity(intent);
         });
 
     }

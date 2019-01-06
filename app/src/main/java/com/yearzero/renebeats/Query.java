@@ -18,32 +18,17 @@ public class Query implements Serializable {
     public int year, track;
     public String[] genres;
 
-    //region Thumbnail Getters
-    public String getThumbMax() {
-        return thumbMax;
-    }
-
-    public String getThumbHigh() {
-        return thumbHigh;
-    }
-
-    public String getThumbMedium() {
-        return thumbMedium;
-    }
-
-    public String getThumbDefault() {
-        return thumbDefault;
-    }
-
-    public String getThumbStandard() {
-        return thumbStandard;
-    }
-    //endregion
-
     public String thumbMax, thumbHigh, thumbMedium, thumbDefault, thumbStandard;
     public Uri thumbmap;
 
     public Query() {
+    }
+
+    public Query(String id) {
+        this.id = id;
+        year = Calendar.getInstance().get(Calendar.YEAR);
+        track = 1;
+        album = "";
     }
 
     public Query(String id, String title, String artist, String album, int year, int track, String[] genres) {
@@ -76,6 +61,28 @@ public class Query implements Serializable {
         this.thumbStandard = thumbStandard;
         this.thumbmap = thumbmap;
     }
+
+    //region Thumbnail Getters
+    public String getThumbMax() {
+        return thumbMax;
+    }
+
+    public String getThumbHigh() {
+        return thumbHigh;
+    }
+
+    public String getThumbMedium() {
+        return thumbMedium;
+    }
+
+    public String getThumbDefault() {
+        return thumbDefault;
+    }
+
+    public String getThumbStandard() {
+        return thumbStandard;
+    }
+    //endregion
 
     public static List<Query> CastList(List<SearchResult> list) {
         List<Query> result = new ArrayList<>();

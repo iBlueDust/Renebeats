@@ -17,10 +17,11 @@ public class Download extends Query implements Serializable {
     public enum DownloadStatus {
         QUEUED(0),
         RUNNING(1),
-        PAUSED(2),
-        COMPLETE(3),
-        CANCELLED(4),
-        FAILED(5);
+        NETWORK_PENDING(2),
+        PAUSED(3),
+        COMPLETE(4),
+        CANCELLED(5),
+        FAILED(6);
 
         private int state;
 
@@ -32,7 +33,7 @@ public class Download extends Query implements Serializable {
             return state;
         }
     }
-    private static final long serialVersionUID = 100;
+    private static final long serialVersionUID = 1000L;
 
     public enum ConvertStatus {
         SKIPPED(0),
@@ -65,18 +66,12 @@ public class Download extends Query implements Serializable {
     int downloadId;
     String url, down, availformat, conv, mtdt;
 
-//    private Status status = Status.NONE;
+    public Commons.Pref.OverwriteMode overwrite;
     public DownloadStatus downloadStatus;
     public ConvertStatus convertStatus;
     public Boolean metadataSuccess = null;
 
     public Date assigned, completed;
-
-    public DownloadStatus downloadStatus() {
-        return downloadStatus;
-    }
-
-    public Date completsed;
 
     YouTubeExtractor.YtFile[] sparseArray;
 
@@ -131,20 +126,27 @@ public class Download extends Query implements Serializable {
     }
 
     public int statusPack() {
-        return (downloadStatus == null ? 0 : (downloadStatus.getValue() + 1) << 20) | (convertStatus == null ? 0 : (convertStatus.getValue() + 1) << 10) | (metadataSuccess == null ? 0 : metadataSuccess.hashCode());
+        int metadata = 0;
+        if (metadataSuccess != null) {
+            if (metadataSuccess)
+                metadata = 2;
+            else metadata = 1;
+        }
+
+        return ((downloadStatus == null ? 0 : downloadStatus.getValue() + 1) << 20) | (convertStatus == null ? 0 : (convertStatus.getValue() + 1) << 10) | metadata;
     }
 
     
     public static Download statusUnpack(int pkg) {
         Boolean md = null;
         int pmd = pkg & 0x3FF;
-        if (pmd == Boolean.TRUE.hashCode())
-            md = true;
-        else if (pmd == Boolean.FALSE.hashCode())
+        if (pmd == 1)
             md = false;
+        else if (pmd == 2)
+            md = true;
 
-        int downshift = pkg >>> 20;
-        int convshift = (pkg >>> 10) & 0x3FF;
+        int downshift = pkg >> 20;
+        int convshift = (pkg >> 10) & 0x3FF;
         
         return new Download(downshift <= 0 || downshift >= Download.DownloadStatus.values().length ? null : Download.DownloadStatus.values()[downshift - 1],
                 convshift <= 0 || convshift >= Download.ConvertStatus.values().length ? null : Download.ConvertStatus.values()[(convshift - 1)],
