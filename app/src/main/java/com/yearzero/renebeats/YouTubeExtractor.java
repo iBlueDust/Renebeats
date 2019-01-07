@@ -193,7 +193,7 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
     /**
      * Start the extraction.
      *
-     * @param youtubeLink       the youtube page link or video id
+     * @param youtubeLink       the youtube page link or video youtubeID
      * @param parseDashManifest true if the dash manifest should be downloaded and parsed
      * @param includeWebM       true if WebM streams should be extracted
      */

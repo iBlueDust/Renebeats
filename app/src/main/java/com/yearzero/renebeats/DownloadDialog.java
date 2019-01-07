@@ -18,8 +18,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class DownloadDialog extends Dialog {
 
+    // TODO: Migrate to ConstraintLayout
+
     private TextView Title, Artist, Album, Genres, Year, Track;
-    private TextView Format, Bitrate, Normalize, Start, End;
+    private TextView Format, Bitrate, Normalize, Start, End, Overwrite;
     private TextView DLText, Conversion, Metadata;
     private TextView Assigned, Completed;
     private TextView YouTubeID, PRDownloaderID, URL, AvailFormat, Exception;
@@ -51,6 +53,7 @@ public class DownloadDialog extends Dialog {
         Normalize = findViewById(R.id.normalize);
         Start = findViewById(R.id.start);
         End = findViewById(R.id.end);
+        Overwrite = findViewById(R.id.overwrite);
         DLText = findViewById(R.id.download);
         Conversion = findViewById(R.id.conversion);
         Metadata = findViewById(R.id.metadata);
@@ -76,16 +79,10 @@ public class DownloadDialog extends Dialog {
         SecretSecond = findViewById(R.id.secret_second);
 
         Close = findViewById(R.id.close);
-
-        Close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
+        Close.setOnClickListener(v -> dismiss());
 
     }
-    
+
     public DownloadDialog setSecret(boolean secret) {
         int visi = secret ? View.VISIBLE : View.GONE;
 
@@ -98,7 +95,7 @@ public class DownloadDialog extends Dialog {
         return this;
     }
 
-    public DownloadDialog setSecret(boolean secret, @Nullable Download download){
+    public DownloadDialog setSecret(boolean secret, @Nullable Download download) {
         setSecret(secret);
 
         boolean redo = secret && !this.secret;
@@ -121,92 +118,44 @@ public class DownloadDialog extends Dialog {
         Normalize.setText(download == null ? "-" : (download.normalize ? "ON" : "OFF"));
         Start.setText(download == null || download.start == null ? "-" : IntegerToMinSec(download.start));
         End.setText(download == null || download.end == null ? "-" : IntegerToMinSec(download.end));
+        Overwrite.setText(download == null ? "-" : download.overwrite ? "True" : "False");
 
         DLText.setText("-");
         Conversion.setText("-");
         Metadata.setText("-");
 
+        Assigned.setText(download == null || download.assigned == null ? "-" : new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss", Locale.ENGLISH).format(download.assigned));
+        Completed.setText(download == null || download.completed == null ? "-" : new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss", Locale.ENGLISH).format(download.completed));
+
+        YouTubeID.setText(download == null ? "-" : String.valueOf(download.id));
+        PRDownloaderID.setText(download == null ? "-" : String.valueOf(download.id));
+        URL.setText(download == null || download.url == null ? "-" : download.url);
+        AvailFormat.setText(download == null || download.availformat == null ? "-" : download.availformat.toUpperCase());
+        Exception.setText(download == null || download.exception == null ? "-" : download.exception.getMessage());
+
+        UpdatePartial(download);
+        return this;
+    }
+
+    public void UpdatePartial(Download download) {
         if (download != null) {
             if (download.exception instanceof IllegalArgumentException)
                 Exception.setText("IllegalArgumentException");
             else if (download.exception instanceof DownloadService.ServiceException) {
                 if ((((DownloadService.ServiceException) download.exception).getDownload()) == null)
                     DLText.setText("");
-                else {
-                    switch (((DownloadService.ServiceException) download.exception).getDownload()) {
-                        case QUEUED:
-                            DLText.setText("QUEUED");
-                            break;
-                        case RUNNING:
-                            DLText.setText("IN PROGRESS");
-                            break;
-                        case PAUSED:
-                            DLText.setText("PAUSED");
-                            break;
-                        case COMPLETE:
-                            DLText.setText("Completed");
-                            break;
-                        case FAILED:
-                            DLText.setText("FAILED");
-                            break;
-                        default:
-                            DLText.setText("-");
-                    }
-                }
-
-                if (((DownloadService.ServiceException) download.exception).getConversion() == null)
-                    Conversion.setText("");
-                else {
-                    switch (((DownloadService.ServiceException) download.exception).getConversion()) {
-                        case SKIPPED:
-                            Conversion.setText("SKIPPED");
-                            break;
-                        case PAUSED:
-                            Conversion.setText("PAUSED");
-                            break;
-                        case QUEUED:
-                            Conversion.setText("QUEUED");
-                            break;
-                        case RUNNING:
-                            Conversion.setText("IN PROGRESS");
-                            break;
-                        case CANCELLED:
-                            Conversion.setText("CANCELLED");
-                            break;
-                        case COMPLETE:
-                            Conversion.setText("Completed");
-                            break;
-                        case FAILED:
-                            Conversion.setText("FAILED");
-                            break;
-                        default:
-                            Conversion.setText("-");
-                    }
-                }
-
-                Boolean md = ((DownloadService.ServiceException) download.exception).getMetadata();
-                if (md == null) Metadata.setText("");
-                else if (md) Metadata.setText("Completed");
-                else Metadata.setText("FAILED");
-            }
+                else UpdateStatus(download.status);
+            } else if (download.exception != null)
+                Exception.setText(download.exception.getMessage());
+            else UpdateStatus(download.status);
         }
-
-        Assigned.setText(download == null || download.assigned == null ? "-" : new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss", Locale.ENGLISH).format(download.assigned));
-        Completed.setText(download == null || download.completed == null ? "-" : new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss", Locale.ENGLISH).format(download.completed));
-
-        if (!secret) return this;
-        YouTubeID.setText(download == null ? "-" : String.valueOf(download.id));
-        PRDownloaderID.setText(download == null ? "-" : String.valueOf(download.downloadId));
-        URL.setText(download == null || download.url == null ? "-" : download.url);
-        AvailFormat.setText(download == null || download.availformat == null ? "-" : download.availformat.toUpperCase());
-        Exception.setText(download == null || download.exception == null ? "-" : download.exception.getMessage());
 
         if (download == null || download.down == null) PathDownload.setText("-");
         else {
             PathDownload.setText(download.down);
             if (new File(Commons.Directories.BIN, download.down).exists())
-                StatusDownload.setImageResource(download.metadataSuccess != null && download.metadataSuccess ? R.color.red : R.color.yellow);
-            else if (download.downloadStatus == Download.DownloadStatus.COMPLETE)
+                StatusDownload.setImageResource(download.status.metadata != null && download.status.metadata ? R.color.red : R.color.yellow);
+            else if (download.status.download == Status.Download.COMPLETE)
                 StatusDownload.setImageResource(R.color.green);
             else StatusDownload.setImageResource(R.color.SecondaryDark);
         }
@@ -215,8 +164,8 @@ public class DownloadDialog extends Dialog {
         else {
             PathConversion.setText(download.conv);
             if (new File(Commons.Directories.BIN, download.conv).exists())
-                StatusConversion.setImageResource(download.metadataSuccess != null && download.metadataSuccess ? R.color.red : R.color.yellow);
-            else if (download.convertStatus == Download.ConvertStatus.COMPLETE || download.convertStatus == Download.ConvertStatus.SKIPPED)
+                StatusConversion.setImageResource(download.status.metadata != null && download.status.metadata ? R.color.red : R.color.yellow);
+            else if (download.status.convert == Status.Convert.COMPLETE || download.status.convert == Status.Convert.SKIPPED)
                 StatusConversion.setImageResource(R.color.green);
             else StatusConversion.setImageResource(R.color.SecondaryDark);
         }
@@ -224,11 +173,70 @@ public class DownloadDialog extends Dialog {
         if (download == null || download.mtdt == null) PathMetadata.setText("-");
         else {
             PathMetadata.setText(download.mtdt);
-            if (download.metadataSuccess != null && download.metadataSuccess)
+            if (download.status.metadata != null && download.status.metadata)
                 StatusMetadata.setImageResource(new File(Commons.Directories.MUSIC, download.mtdt).exists() ? R.color.green : R.color.red);
             else StatusMetadata.setImageResource(R.color.SecondaryDark);
         }
-        return this;
+    }
+
+    public void UpdateStatus(@Nullable Status status) {
+        if (status == null || status.download == null)
+            DLText.setText("-");
+        else {
+            switch (status.download) {
+                case QUEUED:
+                    DLText.setText("QUEUED");
+                    break;
+                case RUNNING:
+                    DLText.setText("IN PROGRESS");
+                    break;
+                case PAUSED:
+                    DLText.setText("PAUSED");
+                    break;
+                case COMPLETE:
+                    DLText.setText("Completed");
+                    break;
+                case FAILED:
+                    DLText.setText("FAILED");
+                    break;
+                default:
+                    DLText.setText("-");
+            }
+        }
+
+        if (status == null || status.convert == null)
+            Conversion.setText("-");
+        else {
+            switch (status.convert) {
+                case SKIPPED:
+                    Conversion.setText("SKIPPED");
+                    break;
+                case PAUSED:
+                    Conversion.setText("PAUSED");
+                    break;
+                case QUEUED:
+                    Conversion.setText("QUEUED");
+                    break;
+                case RUNNING:
+                    Conversion.setText("IN PROGRESS");
+                    break;
+                case CANCELLED:
+                    Conversion.setText("CANCELLED");
+                    break;
+                case COMPLETE:
+                    Conversion.setText("Completed");
+                    break;
+                case FAILED:
+                    Conversion.setText("FAILED");
+                    break;
+                default:
+                    Conversion.setText("-");
+            }
+        }
+
+        if (status == null || status.metadata == null) Metadata.setText("-");
+        else if (status.metadata) Metadata.setText("Completed");
+        else Metadata.setText("FAILED");
     }
 
     private String ArrayToString(String[] strings) {

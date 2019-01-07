@@ -66,7 +66,7 @@ public class QueryActivity extends AppCompatActivity implements SwipeRefreshLayo
         OfflineMsg = findViewById(R.id.offline_msg);
         OfflineAction = findViewById(R.id.offline_action);
 
-        adapter = new QueryAdapter(this, new ArrayList<Query>());
+        adapter = new QueryAdapter(this, new ArrayList<>());
 
         List.setLayoutManager(new LinearLayoutManager(this));
         List.setAdapter(adapter);

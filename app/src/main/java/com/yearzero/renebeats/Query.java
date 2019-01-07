@@ -8,31 +8,33 @@ import com.google.api.services.youtube.model.ThumbnailDetails;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 public class Query implements Serializable {
+    // Appcode (EA50) - Class code (Query: 0E10) - Gradle version (3) - Iteration
+    private static final long serialVersionUID = 0xEA50_0E10_0003_0001L;
 
-    public String id, title, album, artist;
+    public String youtubeID, title, album, artist;
     public int year, track;
     public String[] genres;
 
     public String thumbMax, thumbHigh, thumbMedium, thumbDefault, thumbStandard;
     public Uri thumbmap;
 
-    public Query() {
-    }
+    public Query() { }
 
     public Query(String id) {
-        this.id = id;
+        this.youtubeID = id;
         year = Calendar.getInstance().get(Calendar.YEAR);
         track = 1;
         album = "";
     }
 
     public Query(String id, String title, String artist, String album, int year, int track, String[] genres) {
-        this.id = id;
+        this.youtubeID = id;
         this.title = title;
         this.artist = artist;
         this.album = album;
@@ -132,4 +134,23 @@ public class Query implements Serializable {
 
     public enum ThumbnailQuality {MaxRes, High, Medium, Default, Standard;}
 
+    public int hashCode() {
+        int result = 37;
+
+        result = 37 * result + (album == null ? 0 : album.hashCode());
+        result = 37 * result + (artist == null ? 0 : artist.hashCode());
+        result = 37 * result + (genres == null ? 0 : Arrays.hashCode(genres));
+        result = 37 * result + (thumbDefault == null ? 0 : thumbDefault.hashCode());
+        result = 37 * result + (thumbHigh == null ? 0 : thumbHigh.hashCode());
+        result = 37 * result + (thumbmap == null ? 0 : thumbmap.hashCode());
+        result = 37 * result + (thumbMax == null ? 0 : thumbMax.hashCode());
+        result = 37 * result + (thumbMedium == null ? 0 : thumbMedium.hashCode());
+        result = 37 * result + (thumbStandard == null ? 0 : thumbStandard.hashCode());
+        result = 37 * result + (title == null ? 0 : title.hashCode());
+        result = 37 * result + track;
+        result = 37 * result + year;
+        result = 37 * result + (youtubeID == null ? 0 : youtubeID.hashCode());
+
+        return result;
+    }
 }
