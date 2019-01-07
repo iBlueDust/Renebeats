@@ -11,15 +11,10 @@
         android:layout_height="wrap_content"
         tools:context=".Activities.DownloadActivity">
 
-
-        <!--android:maxWidth="150dp"-->
-        <!--android:maxHeight="150dp"-->
-        <!--android:minWidth="100dp"-->
-        <!--android:minHeight="100dp"-->
-        <com.makeramen.roundedimageview.RoundedImageView
+        <ImageView
             android:id="@+id/image"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_marginStart="24dp"
             android:layout_marginLeft="24dp"
             android:layout_marginTop="24dp"
@@ -27,15 +22,11 @@
             android:layout_marginRight="24dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="W,16:9"
+            app:layout_constraintDimensionRatio="H,16:9"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="Thumbnail"
-            app:riv_border_width="0dp"
-            app:riv_corner_radius="5dp"
-            app:riv_mutate_background="true" />
+            android:contentDescription="Thumbnail" />
 
         <!--<Button-->
             <!--android:id="@+id/image_edit"-->
@@ -150,12 +141,12 @@
             app:ms_multiline="false"
             app:ms_floatingLabelText="Bitrate"
             app:ms_errorColor="@color/red"
-            app:layout_constraintEnd_toStartOf="@+id/assigned"
+            app:layout_constraintEnd_toStartOf="@+id/format"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
         <fr.ganfra.materialspinner.MaterialSpinner
-            android:id="@+id/assigned"
+            android:id="@+id/format"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -165,7 +156,7 @@
             android:layout_weight="1"
             android:entries="@array/formats"
             app:ms_multiline="false"
-            app:ms_floatingLabelText="Bitrate"
+            app:ms_floatingLabelText="Format"
             app:ms_errorColor="@color/red"
             app:layout_constraintBottom_toBottomOf="@+id/bitrate"
             app:layout_constraintEnd_toEndOf="parent"
@@ -276,24 +267,23 @@
             <!--app:tagsCloseImageRight="@drawable/tag_close"-->
             <!--app:tagsTextColor="@color/textLight" />-->
 
-        <mabbas007.tagsedittext.TagsEditText
+        <com.hootsuite.nachos.NachoTextView
             android:id="@+id/genres"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            app:allowSpaceInTag="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="19dp"
+            android:layout_marginRight="19dp"
+            android:hint="Genres"
+            app:chipBackground="@color/SecondaryDark"
+            app:chipTextColor="#FEFEFE"
+            app:chipTextSize="16dp"
+            app:chipVerticalSpacing="3dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout5"
-            app:tagsBackground="@drawable/square"
-            app:tagsCloseImageLeft="@drawable/dot"
-            app:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"
-            app:tagsCloseImageRight="@drawable/tag_close"
-            app:tagsTextColor="#39393F"
-            app:tagsTextSize="@dimen/defaultTagsTextSize" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
 
         <CheckBox
             android:id="@+id/exception"

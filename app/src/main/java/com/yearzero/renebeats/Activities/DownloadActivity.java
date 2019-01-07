@@ -21,6 +21,9 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.hootsuite.nachos.NachoTextView;
+import com.hootsuite.nachos.terminator.ChipTerminatorHandler;
+import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.Download;
@@ -39,7 +42,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import mabbas007.tagsedittext.TagsEditText;
 
 public class DownloadActivity extends AppCompatActivity {
     private static final String TAG = "DownloadActivity";
@@ -49,7 +51,7 @@ public class DownloadActivity extends AppCompatActivity {
     private Button Start, End; //, ImageEdit, Location, Autofill;
     private Spinner Format, Bitrate;
     private TextInputEditText Title, Artist, Album, Track, Year;
-    private TagsEditText Genres;
+    private NachoTextView Genres;
     private CheckBox Normalize;
     private ImageButton NormalizeHelp;
 
@@ -79,7 +81,7 @@ public class DownloadActivity extends AppCompatActivity {
 
         Image = findViewById(R.id.image);
         Display = findViewById(R.id.display);
-        Format = findViewById(R.id.assigned);
+        Format = findViewById(R.id.format);
         Bitrate = findViewById(R.id.bitrate);
         Title = findViewById(R.id.title);
         Artist = findViewById(R.id.artist);
@@ -104,7 +106,6 @@ public class DownloadActivity extends AppCompatActivity {
             Title.setText(result[0]);
             if (result[1] != null) Artist.setText(result[1]);
         }
-
 
         if (length < 0 || sparseArray == null) {
             new YouTubeExtractor(this) {
@@ -152,8 +153,7 @@ public class DownloadActivity extends AppCompatActivity {
                         thumbnail = true;
                     }
 
-                    if (thumbnail)
-                        LoadThumbnail();
+                    if (thumbnail) LoadThumbnail();
 
                     sparseArray = data;
 
@@ -194,8 +194,8 @@ public class DownloadActivity extends AppCompatActivity {
                             }).show();
                 }
             }
-                .setTimeout(Commons.Pref.timeout)
-                .extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.id, true, false);
+                    .setTimeout(Commons.Pref.timeout)
+                    .extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.youtubeID, true, false);
 
             retrieveDialog = new Dialog(this);
             retrieveDialog.setTitle("Retrieving...");
@@ -233,7 +233,9 @@ public class DownloadActivity extends AppCompatActivity {
 
         if (query.year > 0) Year.setText(String.valueOf(query.year));
 
-        Genres.setSeparator(",");
+        Genres.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL);
+        Genres.addChipTerminator(';', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL);
+        Genres.addChipTerminator('\n', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL);
 
         Start.setOnClickListener(v -> {
             if (length <= 0) {
@@ -311,22 +313,33 @@ public class DownloadActivity extends AppCompatActivity {
     }
 
     public void Download() {
-        if (query == null || query.id == null) return;
+        if (query == null || query.youtubeID == null) return;
+
+        boolean invalid = false;
 
         if (Title.getText().toString().isEmpty()) {
             Title.setError("There must be a title");
-            return;
+            invalid = true;
         } else query.title = Title.getText().toString();
 
         if (!Artist.getText().toString().isEmpty()) query.artist = Artist.getText().toString();
         if (!Album.getText().toString().isEmpty()) query.album = Album.getText().toString();
 
+        short bitrate = Commons.Pref.bitrate;
+
+        try {
+            bitrate = Short.parseShort(((String) Bitrate.getSelectedItem()).replaceAll("\\D", ""));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            invalid = true;
+        }
+
         if (!Track.getText().toString().trim().isEmpty()) {
             try {
                 query.track = Integer.parseInt(Track.getText().toString());
             } catch (NumberFormatException ignore) {
-                Snackbar.make(findViewById(R.id.main), "Invalid Track Number", Snackbar.LENGTH_LONG);
-                Track.setText("");
+                Track.setError("Invalid Track Number");
+                invalid = true;
             }
         }
 
@@ -335,32 +348,12 @@ public class DownloadActivity extends AppCompatActivity {
                 query.year = Integer.parseInt(Year.getText().toString());
             } catch (NumberFormatException ignore) {
                 Snackbar.make(findViewById(R.id.main), "Invalid Year Number", Snackbar.LENGTH_LONG);
-                Year.setText("");
+                Year.setText("Invalid Year Number");
+                invalid = true;
             }
         }
 
-        short bitrate = Commons.Pref.bitrate;
-        short year = -1;
-        int track = 0;
-
-        try {
-            bitrate = Short.parseShort(((String) Bitrate.getSelectedItem()).replaceAll("\\D", ""));
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-        try {
-            year = Short.parseShort(Year.getText().toString().replaceAll("\\D", ""));
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-        try {
-            track = Integer.parseInt(Year.getText().toString().replaceAll("\\D", ""));
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-
-        if (track > 0) query.track = track;
-        if (year > 0) query.year = year;
+        if (invalid) return;
 
         int index = Format.getSelectedItemPosition();
         String[] formats = getResources().getStringArray(R.array.formats);
@@ -375,27 +368,26 @@ public class DownloadActivity extends AppCompatActivity {
                 end != null && end == Math.floor(length) ? null : end,
                 Normalize.isChecked()
         );
+        args.genres = Genres.getChipAndTokenValues().toArray(new String[0]);
 
         String name = String.format("%s%s.%s", query.artist == null ? "" : query.artist + " - ", query.title, format);
 
-        if (Commons.Pref.overwrite == Commons.Pref.OverwriteMode.PROMPT) {
-            if (new File(Commons.Directories.MUSIC, name).exists()) {
-                new AlertDialog.Builder(this)
-                        .setTitle("Conflicting File Names")
-                        .setMessage("There is already a file called " + name + " in the Music folder. A suffix such as '(1)' can be appended to the file name to avoid conflicts.")
-                        .setPositiveButton("Overwrite", (dialogInterface, i) -> {
-                            args.overwrite = Commons.Pref.OverwriteMode.OVERWRITE;
-                            InitDownload(args);
-                        })
-                        .setNeutralButton("Append Suffix", (dialogInterface, i) -> {
-                            args.overwrite = Commons.Pref.OverwriteMode.APPEND;
-                            InitDownload(args);
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
-            }
+        if (Commons.Pref.overwrite == Commons.Pref.OverwriteMode.PROMPT && new File(Commons.Directories.MUSIC, name).exists()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Conflicting File Names")
+                    .setMessage("There is already a file called " + name + " in the Music folder. A suffix such as '(1)' can be appended to the file name to avoid conflicts.")
+                    .setPositiveButton("Overwrite", (dialogInterface, i) -> {
+                        args.overwrite = true;
+                        InitDownload(args);
+                    })
+                    .setNeutralButton("Cancel", null)
+                    .setNegativeButton("Append Suffix", (dialogInterface, i) -> {
+                        args.overwrite = false;
+                        InitDownload(args);
+                    })
+                    .show();
         } else {
-            args.overwrite = Commons.Pref.overwrite;
+            args.overwrite = true;
             InitDownload(args);
         }
     }
@@ -426,15 +418,19 @@ public class DownloadActivity extends AppCompatActivity {
             split[0] = split[0].trim();
             split[1] = split[1].trim();
             if (split[0].matches("(?i)(?:.*\\s+|\\s*)(?:ft\\.?|feat\\.?|featuring)\\s++.+")) {
-                return new String[] { split[1], split[0]};
+                return new String[]{split[1], split[0]};
             } else return split;
-        } else return new String[] { title, uploader };
+        } else return new String[]{title, uploader};
     }
 
     private void LoadThumbnail() {
         Picasso.get()
                 .load(query.getThumbnail(Commons.Pref.downloadImage))
                 .placeholder(R.color.SecondaryDark)
+                .transform(new RoundedTransformationBuilder()
+                        .cornerRadiusDp(16)
+                        .oval(false)
+                        .build())
                 .centerCrop()
                 .fit()
                 .into(Image);

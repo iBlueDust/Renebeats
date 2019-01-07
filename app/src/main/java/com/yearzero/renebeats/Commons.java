@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
@@ -40,6 +41,12 @@ public class Commons extends Application {
     static final String INTL_DATE_FORMAT = "yyyy-mm-ddThh:mm:sszzz";
 
     public static final int PERM_REQUEST = 0x24D1;
+
+    // SERIALIZABLE UID CLASS CODES
+    // Query    - 0E10
+    // Download - D01D
+    // Status   - 55A5
+
 
     public static DownloadReceiver downloadReceiver;
     public static Fetch fetch;
@@ -81,10 +88,13 @@ public class Commons extends Application {
     }
 
     public static class Pref {
-        public enum OverwriteMode {
+        public enum OverwriteMode implements Serializable {
             PROMPT(0),
             APPEND(1),
             OVERWRITE(2);
+
+            // Appcode (EA50) - Class code (OverwriteMode: 0ED9) - Gradle version (3) - Iteration
+            private static final long serialVersionUID = 0x0ED9_D01D_0003_0000L;
 
             public static int versionID = 0;
             private int state;
@@ -301,6 +311,7 @@ public class Commons extends Application {
     static class Notif {
         static final String DOWNLOAD_PROGRESS = "com.yearzero.renebeats/download/progress";
         static final String DOWNLOAD_COMPLETE = "com.yearzero.renebeats/download/complete";
+        static final int DOWNLOAD_BASE_ID = 0xDB00_0000;
     }
 
 //    public static class DownloadQueuePackage implements Serializable {

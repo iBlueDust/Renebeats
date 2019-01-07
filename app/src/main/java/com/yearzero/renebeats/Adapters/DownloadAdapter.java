@@ -20,6 +20,7 @@ import com.yearzero.renebeats.Download;
 import com.yearzero.renebeats.DownloadDialog;
 import com.yearzero.renebeats.DownloadService;
 import com.yearzero.renebeats.R;
+import com.yearzero.renebeats.Status;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -40,6 +41,8 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     private DownloadService service;
     private RecyclerView recycler;
 
+    // TODO: Sort downloads or separate, placing those in progress at the top
+
     public DownloadAdapter(Context context, DownloadService service, RecyclerView recycler) {
         this.context = context;
         this.service = service;
@@ -49,7 +52,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     @NonNull
     @Override
     public BasicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int vht = getViewHolderType(Download.statusUnpack(viewType));
+        int vht = getViewHolderType(Status.Unpack(viewType));
 
         switch (vht) {
             case QueueViewHolder.LocalID:
@@ -77,8 +80,8 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
         if (position < 0 || position >= all.length) return;
 
         int type = getItemViewType(position, all);
-        Download.DownloadStatus dl = type >>> 20 >= Download.DownloadStatus.values().length ? null : Download.DownloadStatus.values()[type >>> 20];
-        Download.ConvertStatus cv = ((type >>> 10) & 0x3FF) >= Download.ConvertStatus.values().length ? null : Download.ConvertStatus.values()[(type >>> 10) & 0x3FF];
+        Status.Download dl = type >>> 20 >= Status.Download.values().length ? null : Status.Download.values()[type >>> 20];
+        Status.Convert cv = ((type >>> 10) & 0x3FF) >= Status.Convert.values().length ? null : Status.Convert.values()[(type >>> 10) & 0x3FF];
         Boolean md = null;
         int i = type & 0x3FF;
         if (i == Boolean.TRUE.hashCode())
@@ -86,20 +89,20 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
         else if (i == Boolean.FALSE.hashCode())
             md = false;
 
-        if (!(dl == all[position].downloadStatus || cv == all[position].convertStatus || md == all[position].metadataSuccess)) Log.w(TAG, "ViewHolder type does not match Download type. Defaulting to follow ViewHolder type");
+        if (!(dl == all[position].status.download || cv == all[position].status.convert || md == all[position].status.metadata)) Log.w(TAG, "ViewHolder type does not match Download type. Defaulting to follow ViewHolder type");
 
         InitializeViewHolder(holder, all[position], type);
     }
 
     private void InitializeViewHolder(BasicViewHolder holder, Download args) {
-        InitializeViewHolder(holder, args, args.statusPack());
+        InitializeViewHolder(holder, args, args.status.Pack());
     }
 
     private void InitializeViewHolder(BasicViewHolder holder, final Download args, int status) {
         holder.setTitle(args.title + (args.title == null || args.title.isEmpty() || args.artist == null || args.artist.isEmpty() ? "" : " - ") + args.artist);
 //        holder.setIsRecyclable(true);
 
-        Download pack = Download.statusUnpack(status);
+        Status pack = Status.Unpack(status);
 
         if (pack.isFailed()) {
             //region FailedViewHolder
@@ -159,7 +162,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                             n.setStatus("An exception occurred while download was paused");
                         break;
                     default:
-                        switch(((DownloadService.ServiceException) args.exception).getConversion()) {
+                        switch(((DownloadService.ServiceException) args.exception).getConvert()) {
                             case QUEUED:
                                 n.setStatus("An exception occurred while queueing for conversion");
                                 break;
@@ -220,11 +223,11 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
             //endregion
         } else if (pack.isCancelled())
             ((QueueViewHolder) holder).setStatus("Cancelled");
-        else if (pack.downloadStatus != null) {
+        else if (pack.download != null) {
 
             try {
                 //region Status Main
-                switch (pack.downloadStatus) {
+                switch (pack.download) {
                     case QUEUED:
                         QueueViewHolder g = (QueueViewHolder) holder;
                         g.setStatus("Waiting for download");
@@ -257,8 +260,8 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                         m.setProgress(args.current, args.total, args.indeterminate);
                         break;
                     case COMPLETE:
-                        if (pack.convertStatus == null) break;
-                        switch (pack.convertStatus) {
+                        if (pack.convert == null) break;
+                        switch (pack.convert) {
                             case QUEUED:
                                 QueueViewHolder h = (QueueViewHolder) holder;
                                 h.setStatus("Download Completed, waiting for conversion");
@@ -285,7 +288,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                                 break;
                             case SKIPPED:
                             case COMPLETE:
-                                if (pack.metadataSuccess == null) {
+                                if (pack.metadata == null) {
                                     RunningViewHolder n = (RunningViewHolder) holder;
                                     n.setStatus("Applying metadata");
                                     n.setProgress(0, 0, true);
@@ -301,7 +304,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                                     yesterday.add(Calendar.DAY_OF_YEAR, -1);
 
                                     if (DateUtils.isToday(args.getCompleteDate().getTime()))
-                                        o.setDate("Assigned at " + new SimpleDateFormat("hh:mm:ss tt", Locale.ENGLISH).format(args.getCompleteDate()));
+                                        o.setDate("Assigned at " + new SimpleDateFormat("hh:mm:ss a", Locale.ENGLISH).format(args.getCompleteDate()));
                                     else if (yesterday.get(Calendar.YEAR) == ass.get(Calendar.YEAR) && yesterday.get(Calendar.DAY_OF_YEAR) == ass.get(Calendar.DAY_OF_YEAR))
                                         o.setDate("Assigned yesterday");
                                     else
@@ -350,20 +353,20 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
 
     @Override
     public void onDone(Download args, boolean successful, Exception e) {
-//        Download[] array = getServiceDownloads();
-//
-//        int index = -1;
-//
-//        for (int i = 0; i < array.length; i++) {
-//            if (array[i].hashCode() == args.hashCode()) {
-//                index = i;
-//                break;
-//            }
-//        }
-//
-//        if (index < 0) notifyDataSetChanged();
-//        else notifyItemChanged(index);
-        notifyDataSetChanged();
+        Download[] array = getServiceDownloads();
+
+        int index = -1;
+
+        for (int i = 0; i < array.length; i++) {
+            if (array[i].hashCode() == args.hashCode()) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index < 0) notifyDataSetChanged();
+        else notifyItemChanged(index);
+//        notifyDataSetChanged();
     }
 
     @Override
@@ -379,18 +382,18 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
             notifyDataSetChanged();
             return -1;
         }
-        return array[position].statusPack();
+        return array[position].status.Pack();
     }
 
-    private int getViewHolderType(Download pack) {
+    private int getViewHolderType(Status pack) {
         if (pack.isFailed())
             return FailedViewHolder.LocalID;
-        else if (pack.downloadStatus == Download.DownloadStatus.COMPLETE && (pack.convertStatus == Download.ConvertStatus.COMPLETE || pack.convertStatus == Download.ConvertStatus.SKIPPED))
-            return pack.metadataSuccess == null ? RunningViewHolder.LocalID : SuccessViewHolder.LocalID;
+        else if (pack.download == Status.Download.COMPLETE && (pack.convert == Status.Convert.COMPLETE || pack.convert == Status.Convert.SKIPPED))
+            return pack.metadata == null ? RunningViewHolder.LocalID : SuccessViewHolder.LocalID;
         else if (pack.isCancelled() || pack.isQueued())
             return QueueViewHolder.LocalID;
-        else if (pack.downloadStatus == Download.DownloadStatus.RUNNING || pack.downloadStatus == Download.DownloadStatus.PAUSED ||
-                pack.convertStatus == Download.ConvertStatus.RUNNING || pack.convertStatus == Download.ConvertStatus.PAUSED)
+        else if (pack.download == Status.Download.RUNNING || pack.download == Status.Download.PAUSED ||
+                pack.convert == Status.Convert.RUNNING || pack.convert == Status.Convert.PAUSED)
             return RunningViewHolder.LocalID;
         else return BasicViewHolder.LocalID;
     }
