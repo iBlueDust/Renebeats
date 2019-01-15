@@ -106,7 +106,7 @@
             app:layout_constraintTop_toBottomOf="@+id/image" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/cardView"
+            android:id="@+id/search_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -143,7 +143,7 @@
             app:ms_errorColor="@color/red"
             app:layout_constraintEnd_toStartOf="@+id/format"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView" />
+            app:layout_constraintTop_toBottomOf="@+id/search_container" />
 
         <fr.ganfra.materialspinner.MaterialSpinner
             android:id="@+id/format"
@@ -323,7 +323,7 @@
             android:layout_marginRight="8dp"
             android:fontFamily="@font/medium"
             android:text="Start"
-            android:textColor="@color/textDarkGray"
+            android:textColor="@color/textGray"
             android:textAllCaps="true"
             app:layout_constraintEnd_toEndOf="@+id/download"
             app:layout_constraintStart_toStartOf="@+id/download"
@@ -339,7 +339,7 @@
             android:layout_marginRight="8dp"
             android:fontFamily="@font/medium"
             android:text="End"
-            android:textColor="@color/textDarkGray"
+            android:textColor="@color/textGray"
             android:textAllCaps="true"
             app:layout_constraintBottom_toBottomOf="@+id/textView"
             app:layout_constraintEnd_toEndOf="@+id/conversion"

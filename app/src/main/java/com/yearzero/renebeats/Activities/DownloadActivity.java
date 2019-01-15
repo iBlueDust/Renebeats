@@ -23,7 +23,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.hootsuite.nachos.NachoTextView;
 import com.hootsuite.nachos.terminator.ChipTerminatorHandler;
-import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.Download;
@@ -42,6 +41,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class DownloadActivity extends AppCompatActivity {
     private static final String TAG = "DownloadActivity";
@@ -104,7 +104,8 @@ public class DownloadActivity extends AppCompatActivity {
 
             String[] result = extractTitleandArtist(query.title, query.artist);
             Title.setText(result[0]);
-            if (result[1] != null) Artist.setText(result[1]);
+            Artist.setText(result[1]);
+            query.artist = result[1];
         }
 
         if (length < 0 || sparseArray == null) {
@@ -117,18 +118,18 @@ public class DownloadActivity extends AppCompatActivity {
                         return;
                     }
 
-                    if (query.artist == null) {
-                        query.artist = videoMeta.getAuthor();
-                        Artist.setText(query.artist);
-                    }
-
                     if (query.title == null) {
                         query.title = videoMeta.getTitle();
                         Display.setText(query.title);
 
                         String[] result = extractTitleandArtist(query.title, query.artist);
                         Title.setText(result[0]);
-                        if (result[1] != null) Artist.setText(result[1]);
+                        Artist.setText(result[1]);
+
+                        if (query.artist == null) query.artist = result[1];
+                    } else if (query.artist == null) {
+                        query.artist = videoMeta.getAuthor();
+                        Artist.setText(query.artist);
                     }
 
                     boolean thumbnail = false;
@@ -402,7 +403,7 @@ public class DownloadActivity extends AppCompatActivity {
         service.putExtra(Commons.ARGS.DATA, args);
         startService(service);
 
-        Intent intent = new Intent(this, NewMainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("page", 0);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -410,27 +411,23 @@ public class DownloadActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Download started", Toast.LENGTH_LONG).show();
     }
 
+    // TODO: Set default title artist orientation (Here is Title - Artist) as a preference
     private String[] extractTitleandArtist(String title, String uploader) {
         if (title == null) return null;
 
         if (title.contains(" - ")) {
-            String[] split = title.trim().replaceAll("(?i)\\s*.official\\s*(?:audio|video|music\\s+video).\\s*", "").split("-");
+            String[] split = title.replaceAll("(?i)[(\\[}](official)?\\s*(?:audio|video|(?:music|lyrics?)\\s+video)[)\\]}]", "").trim().split("-");
             split[0] = split[0].trim();
             split[1] = split[1].trim();
-            if (split[0].matches("(?i)(?:.*\\s+|\\s*)(?:ft\\.?|feat\\.?|featuring)\\s++.+")) {
-                return new String[]{split[1], split[0]};
-            } else return split;
-        } else return new String[]{title, uploader};
+            return split[1].matches("(?i)(?:.*\\s+|\\s*)(?:ft\\.?|feat\\.?|featuring)\\s++.+") ? new String[]{split[1], split[0]} : split;
+        } else return new String[]{title, uploader.replace("VEVO", "")};
     }
 
     private void LoadThumbnail() {
         Picasso.get()
                 .load(query.getThumbnail(Commons.Pref.downloadImage))
                 .placeholder(R.color.SecondaryDark)
-                .transform(new RoundedTransformationBuilder()
-                        .cornerRadiusDp(16)
-                        .oval(false)
-                        .build())
+                .transform(new RoundedCornersTransformation(16, 0))
                 .centerCrop()
                 .fit()
                 .into(Image);

@@ -12,7 +12,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.yearzero.renebeats.Activities.NewMainActivity;
+import com.yearzero.renebeats.Activities.MainActivity;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -87,7 +87,7 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
         if (notifications)
             if (builders.get(data.id) == null) {
                 builders.append(data.id, new NotificationCompat.Builder(activity, Commons.Notif.DOWNLOAD_PROGRESS)
-                        .setContentIntent(PendingIntent.getActivity(activity, 0, new Intent(context, NewMainActivity.class), 0))
+                        .setContentIntent(PendingIntent.getActivity(activity, 0, new Intent(context, MainActivity.class), 0))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setSmallIcon(R.mipmap.ic_launcher_round)
                 );

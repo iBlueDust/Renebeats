@@ -1,41 +1,46 @@
 <resources>
 
-    <style name="AppTheme.Dark" parent="Theme.AppCompat">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/Primary</item>
         <item name="colorPrimaryDark">@color/PrimaryDark</item>
         <item name="colorAccent">@color/Accent</item>
-        <item name="android:textColorPrimary">@color/textLight</item>
-        <item name="android:textColorSecondary">@color/textLightGray</item>
-        <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="AppTheme.Dark.NoActionBar" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <item name="colorPrimary">@color/Primary</item>
         <item name="colorPrimaryDark">@color/PrimaryDark</item>
-        <item name="android:windowBackground">@color/Primary</item>
         <item name="colorAccent">@color/Accent</item>
-        <item name="android:textColorPrimary">@color/textLight</item>
-        <item name="android:textColorSecondary">@color/textLightGray</item>
-        <item name="android:textSize">14sp</item>
     </style>
+    
+    <!--<style name="ClearGrayTextInput" parent="Widget.MaterialComponents.TextInputEditText.FilledBox" >-->
+        <!--<item name="boxBackgroundColor">@color/ClearGray</item>-->
+        <!--<item name="hintTextColor">@color/textDark</item>-->
+        <!--<item name="boxStrokeColor">@color/Accent</item>-->
+        <!--<item name="android:paddingLeft">8dp</item>-->
+        <!--<item name="android:paddingStart">8dp</item>-->
+        <!--<item name="android:paddingRight">8dp</item>-->
+        <!--<item name="android:paddingEnd">8dp</item>-->
+    <!--</style>-->
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <item name="colorPrimary">@color/Secondary</item>
-        <item name="colorPrimaryDark">@color/SecondaryDark</item>
-        <item name="colorAccent">@color/Accent</item>
-        <item name="android:textColorPrimary">@color/textDark</item>
-        <item name="android:textColorSecondary">@color/textDarkGray</item>
-        <item name="android:textSize">14sp</item>
-    </style>
+    <!--<style name="AppTheme" parent="Theme.AppCompat.Light">-->
+        <!--<item name="colorPrimary">@color/Secondary</item>-->
+        <!--<item name="colorPrimaryDark">@color/SecondaryDark</item>-->
+        <!--<item name="colorAccent">@color/Accent</item>-->
+        <!--<item name="android:textColorPrimary">@color/textDark</item>-->
+        <!--<item name="android:textColorSecondary">@color/textGray</item>-->
+        <!--<item name="android:textSize">14sp</item>-->
+    <!--</style>-->
 
-    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/Secondary</item>
-        <item name="colorPrimaryDark">@color/SecondaryDark</item>
-        <item name="colorAccent">@color/Accent</item>
-        <item name="android:textColorPrimary">@color/textDark</item>
-        <item name="android:textColorSecondary">@color/textDarkGray</item>
-        <item name="android:textSize">14sp</item>
-    </style>
+    <!--<style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">-->
+        <!--<item name="colorPrimary">@color/Secondary</item>-->
+        <!--<item name="colorPrimaryDark">@color/SecondaryDark</item>-->
+        <!--<item name="colorAccent">@color/Accent</item>-->
+        <!--<item name="android:textColorPrimary">@color/textDark</item>-->
+        <!--<item name="android:textColorSecondary">@color/textGray</item>-->
+        <!--<item name="android:textSize">14sp</item>-->
+    <!--</style>-->
 
     <!--<style name="AppTheme.NoActionBar">-->
         <!--<item name="windowActionBar">false</item>-->
