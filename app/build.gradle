@@ -24,9 +24,14 @@ android {
 }
 
 dependencies {
+//    def nav_version = "1.0.0-alpha09"
+//
+//    implementation 'android.arch.navigation:navigation-fragment:$nav_version'
+//    implementation 'android.arch.navigation:navigation-ui:$nav_version'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
-    implementation 'com.google.android.material:material:1.1.0-alpha02'
+    implementation 'com.google.android.material:material:1.0.0'
+//    implementation 'com.google.android.material:material:1.1.0-alpha02'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'androidx.cardview:cardview:1.0.0'
@@ -37,15 +42,15 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
     }
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'pub.devrel:easypermissions:0.3.0'
-    implementation 'com.github.mabbas007:TagsEditText:1.0.5'
-    implementation 'com.makeramen:roundedimageview:2.3.0'
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
+    implementation 'jp.wasabeef:picasso-transformations:2.2.1'
 //    implementation 'com.github.michael-rapp:android-preference-activity:7.0.1'
     implementation "com.tonyodev.fetch2:fetch2:2.3.4"
     implementation 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
-    implementation 'com.github.ybq:Android-SpinKit:1.2.0'
     implementation 'com.github.ganfra:material-spinner:2.0.0'
+    implementation 'com.hootsuite.android:nachos:1.1.1'
+    implementation 'jp.wasabeef:blurry:3.0.0'
     implementation 'com.google.code.gson:gson:2.8.5'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'

@@ -50,7 +50,7 @@
         android:layout_marginLeft="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
-        android:textColor="@color/textDarkGray"
+        android:textColor="@color/textGray"
         android:fontFamily="@font/medium"
         android:text="It seems that we can't connect to YouTube. Please check your connection and try again later."
         android:textAlignment="center"
