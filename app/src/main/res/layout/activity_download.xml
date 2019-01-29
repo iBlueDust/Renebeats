@@ -11,22 +11,49 @@
         android:layout_height="wrap_content"
         tools:context=".Activities.DownloadActivity">
 
+        <ImageButton
+            android:id="@+id/home"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="@+id/download"
+            app:layout_constraintDimensionRatio="H,"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/download"
+            app:srcCompat="@drawable/ic_close_gray_24dp"
+            tools:ignore="VectorDrawableCompat" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/download"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="Download"
+            app:icon="@drawable/ic_file_download_dark_24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="24dp"
             android:layout_marginLeft="24dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
             android:layout_marginRight="24dp"
             android:adjustViewBounds="true"
+            android:contentDescription="Thumbnail"
             android:scaleType="centerCrop"
             app:layout_constraintDimensionRatio="H,16:9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="Thumbnail" />
+            app:layout_constraintTop_toBottomOf="@+id/download" />
 
         <!--<Button-->
             <!--android:id="@+id/image_edit"-->
@@ -97,7 +124,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:ellipsize="end"
-            android:fontFamily="@font/bold"
+
             android:maxLines="3"
             android:textColor="@color/textDark"
             android:textSize="18sp"
@@ -292,7 +319,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="8dp"
-            android:fontFamily="@font/semibold"
+
             android:text="Normalize"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/genres" />
@@ -321,12 +348,12 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:fontFamily="@font/medium"
+
             android:text="Start"
             android:textColor="@color/textGray"
             android:textAllCaps="true"
-            app:layout_constraintEnd_toEndOf="@+id/download"
-            app:layout_constraintStart_toStartOf="@+id/download"
+            app:layout_constraintEnd_toEndOf="@+id/start"
+            app:layout_constraintStart_toStartOf="@+id/start"
             app:layout_constraintTop_toBottomOf="@+id/exception" />
 
         <TextView
@@ -337,17 +364,18 @@
             android:layout_marginLeft="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:fontFamily="@font/medium"
+
             android:text="End"
             android:textColor="@color/textGray"
             android:textAllCaps="true"
             app:layout_constraintBottom_toBottomOf="@+id/textView"
-            app:layout_constraintEnd_toEndOf="@+id/conversion"
-            app:layout_constraintStart_toStartOf="@+id/conversion"
+            app:layout_constraintEnd_toEndOf="@+id/end"
+            app:layout_constraintStart_toStartOf="@+id/end"
             app:layout_constraintTop_toTopOf="@+id/textView" />
 
         <Button
-            android:id="@+id/download"
+            android:id="@+id/start"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -355,12 +383,13 @@
             android:layout_marginBottom="16dp"
             android:background="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/conversion"
+            app:layout_constraintEnd_toStartOf="@+id/end"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
 
         <Button
-            android:id="@+id/conversion"
+            android:id="@+id/end"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -369,8 +398,8 @@
             android:layout_marginRight="8dp"
             android:background="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/download"
-            app:layout_constraintTop_toTopOf="@+id/download" />
+            app:layout_constraintStart_toEndOf="@+id/start"
+            app:layout_constraintTop_toTopOf="@+id/start" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
