@@ -4,11 +4,13 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,13 +18,18 @@ import android.widget.TextView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.api.services.youtube.model.SearchResult;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.yearzero.renebeats.Adapters.DownloadAdapter;
+import com.yearzero.renebeats.Adapters.QueryAdapter;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.Download;
 import com.yearzero.renebeats.DownloadService;
 import com.yearzero.renebeats.Query;
 import com.yearzero.renebeats.R;
+import com.yearzero.renebeats.YoutubeQueryTask;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +41,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection, DownloadService.ClientCallbacks, View.OnClickListener, View.OnKeyListener {
     private static final String TAG = "MainActivity";
+
+    private SlidingUpPanelLayout SlideUp;
 
     private TextInputEditText Search;
     private ImageButton QueryBtn, SettingsBtn, HistoryBtn;
@@ -50,9 +59,19 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private DownloadAdapter adapter;
     private DownloadService service;
 
+
+    private ImageButton Refresh, Dismiss;
+    private RecyclerView QueryList;
+    private ImageView OfflineImg;
+    private TextView OfflineMsg;
+    private Button OfflineAction;
+
+    private QueryAdapter queryAdapter;
+
     //TODO: Implement Download Header Features
     //TODO: History Activity and support
     //TODO: Preference Activity
+    //TODO: Use XD QueryAdapter ViewHolder redesign
 
     @Override
     protected void onStart() {
@@ -64,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SlideUp = findViewById(R.id.slide_up);
 
         Search = findViewById(R.id.search);
         SettingsBtn = findViewById(R.id.settings);
@@ -81,6 +102,27 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         List = findViewById(R.id.list);
 
+        Refresh = findViewById(R.id.refresh);
+        Dismiss = findViewById(R.id.dismiss);
+        QueryList = findViewById(R.id.query_list);
+
+        OfflineImg = findViewById(R.id.offline_img);
+        OfflineMsg = findViewById(R.id.offline_msg);
+        OfflineAction = findViewById(R.id.offline_action);
+
+        queryAdapter = new QueryAdapter(this, new ArrayList<>());
+
+        List.setLayoutManager(new LinearLayoutManager(this));
+        List.setAdapter(adapter);
+
+        QueryList.setLayoutManager(new LinearLayoutManager(this));
+        QueryList.setAdapter(queryAdapter);
+
+//        OfflineAction.setOnClickListener(v -> {
+//            Swipe.setRefreshing(true);
+//            onRefresh();
+//        });
+
         Search.requestFocus();
 
         try {
@@ -96,8 +138,65 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             e.printStackTrace();
         }
 
+        SlideUp.setAnchorPoint(0.85f);
+        SlideUp.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+
+        Dismiss.setOnClickListener(view -> SlideUp.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN));
+
         Search.setOnKeyListener(this);
         QueryBtn.setOnClickListener(this);
+    }
+
+    private void Query(final String query) {
+        new YoutubeQueryTask(new YoutubeQueryTask.Callbacks() {
+            @Override
+            public void onComplete(java.util.List<SearchResult> results) {
+                int visi = View.GONE;
+                if (results == null) {
+                    visi = View.VISIBLE;
+
+                    OfflineImg.setImageResource(R.drawable.ic_cloud_off_secondarydark_96dp);
+                    OfflineMsg.setText("It seems that we can't connect to YouTube. Please check your connection and try again later.");
+                    OfflineAction.setText("Retry");
+                    OfflineAction.setOnClickListener(v -> {
+                        //                        Swipe.setRefreshing(true);
+                        Query(query);
+                    });
+                } else if (results.size() <= 0) {
+                    visi = View.VISIBLE;
+
+                    OfflineImg.setImageResource(R.drawable.ic_search_lightgray_96dp);
+                    OfflineMsg.setText("Your search didn't come out with any results");
+                    OfflineAction.setText("Back");
+                    OfflineAction.setOnClickListener(v -> onBackPressed());
+                } else queryAdapter.resetList(Query.CastList(results));
+
+                OfflineImg.setVisibility(visi);
+                OfflineMsg.setVisibility(visi);
+                OfflineAction.setVisibility(visi);
+
+                //                Swipe.setRefreshing(false);
+            }
+
+            @Override
+            public void onTimeout() {
+                OfflineImg.setImageResource(R.drawable.ic_timer_lightgray_96dp);
+                OfflineImg.setVisibility(View.VISIBLE);
+                OfflineMsg.setText("Request timed out");
+                OfflineMsg.setVisibility(View.VISIBLE);
+                OfflineAction.setVisibility(View.VISIBLE);
+                OfflineAction.setText("Retry");
+                OfflineAction.setOnClickListener(v -> {
+                    //                    Swipe.setRefreshing(true);
+                    Query(query);
+                });
+            }
+        }, getPackageName())
+                .setTimeout(Commons.Pref.timeout)
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
+
+        queryAdapter.resetList();
+        Refresh.setOnClickListener(view -> Query(query));
     }
 
     @Override
@@ -166,14 +265,19 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             intent.putExtra(Commons.ARGS.DATA, new Query(matcher.group(1)));
             startActivity(intent);
         } else {
-            Intent intent = new Intent(this, QueryActivity.class);
-            intent.putExtra(Commons.ARGS.DATA, query);
-            startActivity(intent);
+//            Intent intent = new Intent(this, QueryActivity.class);
+//            intent.putExtra(Commons.ARGS.DATA, query);
+//            startActivity(intent);
+            Query(query);
+            SlideUp.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         }
     }
 
     @Override
-    public void onBackPressed() { }
+    public void onBackPressed() {
+        if (SlideUp != null && (SlideUp.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED || SlideUp.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED))
+            SlideUp.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+    }
 
     @Override
     public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {

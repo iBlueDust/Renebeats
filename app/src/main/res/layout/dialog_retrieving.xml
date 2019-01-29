@@ -25,7 +25,6 @@
         android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:fontFamily="@font/regular"
         android:text="Please wait, video parameters are being retrieved."
         android:textColor="@color/textDark"
         app:layout_constraintBottom_toBottomOf="@+id/progress"
@@ -33,15 +32,15 @@
         app:layout_constraintStart_toEndOf="@+id/progress"
         app:layout_constraintTop_toTopOf="@+id/progress" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/info"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:background="@android:color/transparent"
-        android:fontFamily="@font/semibold"
         android:text="Cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

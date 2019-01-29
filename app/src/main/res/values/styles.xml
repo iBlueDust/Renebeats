@@ -9,9 +9,47 @@
     <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
         <item name="colorPrimary">@color/Primary</item>
         <item name="colorPrimaryDark">@color/PrimaryDark</item>
         <item name="colorAccent">@color/Accent</item>
+    </style>
+
+    <style name="Text" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/segoeui</item>
+    </style>
+
+    <style name="Text.SemiLight" parent="Text">
+        <item name="android:fontFamily">@font/segoeui_semilight</item>
+    </style>
+
+    <style name="Text.BoldAccent" parent="Text">
+        <item name="android:textColor">@color/Accent</item>
+        <item name="android:fontFamily">@font/segoeui_semibold</item>
+    </style>
+
+    <style name="Text.Section" parent="Text.SemiLight">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="Text.Header" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:fontFamily">@font/montserrat_semibold</item>
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="Text.HeaderSmall" parent="Text.Header">
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:fontFamily">@font/montserrat_semibold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Text.HeaderHuge" parent="Text.Header">
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:fontFamily">@font/montserrat_semibold</item>
+        <item name="android:textSize">60sp</item>
     </style>
     
     <!--<style name="ClearGrayTextInput" parent="Widget.MaterialComponents.TextInputEditText.FilledBox" >-->

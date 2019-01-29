@@ -51,6 +51,7 @@ dependencies {
     implementation 'com.github.ganfra:material-spinner:2.0.0'
     implementation 'com.hootsuite.android:nachos:1.1.1'
     implementation 'jp.wasabeef:blurry:3.0.0'
+    implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'com.google.code.gson:gson:2.8.5'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'

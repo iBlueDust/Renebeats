@@ -69,6 +69,11 @@ public class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
+    public void resetList() {
+        queries.clear();
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         private View Main;

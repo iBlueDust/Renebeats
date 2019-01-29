@@ -42,6 +42,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     private RecyclerView recycler;
 
     // TODO: Sort downloads or separate, placing those in progress at the top
+    // TODO: Slide ViewHolders for more options
 
     public DownloadAdapter(Context context, DownloadService service, RecyclerView recycler) {
         this.context = context;

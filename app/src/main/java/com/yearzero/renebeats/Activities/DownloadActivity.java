@@ -8,8 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -63,6 +61,9 @@ public class DownloadActivity extends AppCompatActivity {
     private Integer start, end;
     private int length = -1;
 
+    //TODO: Implement swapping title and artist
+    //TODO: Chip Choice bitrate and format
+
     @SuppressLint({"StaticFieldLeak", "WrongViewCast"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,8 +90,8 @@ public class DownloadActivity extends AppCompatActivity {
         Year = findViewById(R.id.year);
         Track = findViewById(R.id.track);
         Genres = findViewById(R.id.genres);
-        Start = findViewById(R.id.download);
-        End = findViewById(R.id.conversion);
+        Start = findViewById(R.id.start);
+        End = findViewById(R.id.end);
         Normalize = findViewById(R.id.exception);
         NormalizeHelp = findViewById(R.id.normalize_help);
 
@@ -462,23 +463,23 @@ public class DownloadActivity extends AppCompatActivity {
         End.setText(end.toString());
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_download, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            case R.id.menu_download:
-                Download();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_download, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case android.R.id.home:
+//                onBackPressed();
+//                return true;
+//            case R.id.menu_download:
+//                Download();
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//    }
 }

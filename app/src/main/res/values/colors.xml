@@ -12,10 +12,12 @@
     <color name="textGray">#707070</color>
     <color name="textDark">#000</color>
 
+    <color name="gray">#707070</color>
     <color name="dirtyWhite">#DDD</color>
     <color name="staleYellow">#BFA055</color>
     <color name="yellow">#ffd54f</color>
     <color name="blue">#448aff</color>
     <color name="red">#b71c1c</color>
     <color name="green">#4caf50</color>
+    <color name="lightgray">#E4E4E4</color>
 </resources>
