@@ -8,15 +8,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.hootsuite.nachos.NachoTextView;
@@ -32,8 +34,6 @@ import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.YouTubeExtractor;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -44,10 +44,14 @@ import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 public class DownloadActivity extends AppCompatActivity {
     private static final String TAG = "DownloadActivity";
 
+    private ImageButton Home;
+    private Button Download;
+
     private ImageView Image;
     private TextView Display;
-    private Button Start, End; //, ImageEdit, Location, Autofill;
-    private Spinner Format, Bitrate;
+    private Button Start, End, Swap;
+    private ChipGroup FormatGroup, BitrateGroup;
+    private Chip[] Bitrates, Formats;
     private TextInputEditText Title, Artist, Album, Track, Year;
     private NachoTextView Genres;
     private CheckBox Normalize;
@@ -63,6 +67,7 @@ public class DownloadActivity extends AppCompatActivity {
 
     //TODO: Implement swapping title and artist
     //TODO: Chip Choice bitrate and format
+    //TODO: Add button to go directly to Youtube
 
     @SuppressLint({"StaticFieldLeak", "WrongViewCast"})
     @Override
@@ -71,6 +76,7 @@ public class DownloadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_download);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) actionBar.setDisplayShowTitleEnabled(false);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle == null || bundle.getSerializable(Commons.ARGS.DATA) == null || !(bundle.getSerializable(Commons.ARGS.DATA) instanceof Query)) {
@@ -80,12 +86,13 @@ public class DownloadActivity extends AppCompatActivity {
 
         query = (Query) bundle.getSerializable(Commons.ARGS.DATA);
 
+        Home = findViewById(R.id.home);
+        Download = findViewById(R.id.download);
         Image = findViewById(R.id.image);
         Display = findViewById(R.id.display);
-        Format = findViewById(R.id.format);
-        Bitrate = findViewById(R.id.bitrate);
         Title = findViewById(R.id.title);
-        Artist = findViewById(R.id.artist);
+        Swap = findViewById(R.id.swap);
+        Artist = findViewById(R.id.author);
         Album = findViewById(R.id.album);
         Year = findViewById(R.id.year);
         Track = findViewById(R.id.track);
@@ -94,6 +101,28 @@ public class DownloadActivity extends AppCompatActivity {
         End = findViewById(R.id.end);
         Normalize = findViewById(R.id.exception);
         NormalizeHelp = findViewById(R.id.normalize_help);
+
+        FormatGroup = findViewById(R.id.format_group);
+        BitrateGroup = findViewById(R.id.bitrate_group);
+
+//        Bitrate64 = findViewById(R.id.bitrate_64);
+//        Bitrate96 = findViewById(R.id.bitrate_96);
+//        Bitrate128 = findViewById(R.id.bitrate_128);
+//        Bitrate192 = findViewById(R.id.bitrate_192);
+//        Bitrate256 = findViewById(R.id.bitrate_256);
+//        Bitrate320 = findViewById(R.id.bitrate_320);
+//        Bitrates = new Chip[] { Bitrate64, Bitrate96, Bitrate128, Bitrate192, Bitrate256, Bitrate320 };
+
+//        FormatAAC = findViewById(R.id.format_aac);
+//        FormatFLAC = findViewById(R.id.format_flac);
+//        FormatM4A = findViewById(R.id.format_m4a);
+//        FormatMP3 = findViewById(R.id.format_mp3);
+//        FormatWAV = findViewById(R.id.format_wav);
+//        FormatWMA = findViewById(R.id.format_wma);
+//        Formats = new Chip[] { FormatAAC, FormatFLAC, FormatM4A, FormatMP3, FormatWAV, FormatWMA };
+
+        Home.setOnClickListener(v -> onBackPressed());
+        Download.setOnClickListener(v -> Download());
 
         if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null)
             LoadThumbnail();
@@ -172,15 +201,34 @@ public class DownloadActivity extends AppCompatActivity {
                     for (int i = 0; i < data.size(); i++)
                         maxbit = Math.max(data.get(data.keyAt(i)).getFormat().getAudioBitrate(), maxbit);
 
-                    int i = 0;
-                    while (i < Commons.Pref.BITRATES.length && Commons.Pref.BITRATES[i] <= maxbit)
-                        i++;
+//                    for (Chip chip : Bitrates)
+//                        chip.setVisibility(View.GONE);
 
-                    List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.bitrates));
+                    int cnt = 0;
+                    for (int i = 0; i < Commons.Pref.BITRATES.length && Commons.Pref.BITRATES[i] <= maxbit; i++) cnt++;
 
-                    Bitrate.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, bitrates.subList(0, i)));
-                    if (Commons.Pref.bitrate < Commons.Pref.BITRATES[i])
-                        Bitrate.setSelection(bitrates.indexOf(Commons.Pref.bitrate + "kbps"));
+                    Bitrates = new Chip[cnt];
+                    String[] barr = getResources().getStringArray(R.array.bitrates);
+
+                    for (int i = 0; i < cnt; i++) {
+                        Chip chip = new Chip(DownloadActivity.this, null, R.style.Widget_MaterialComponents_Chip_Choice);
+                        chip.setText(barr[i]);
+                        chip.setCheckable(true);
+                        chip.setChipStrokeColorResource(R.color.Accent);
+                        chip.setChipStrokeWidth(1f);
+//                        chip.setChipBackgroundColorResource(R.color.ClearGray);
+                        chip.setOnClickListener(v -> ((Chip) v).setChecked(true));
+                        Bitrates[i] = chip;
+                        BitrateGroup.addView(chip, i, new ChipGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    }
+                    BitrateGroup.check(Bitrates[Bitrates.length - 1].getId());
+
+//                    List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.bitrates));
+//
+//                    BitrateGroup.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, bitrates.subList(0, i)));
+//                    if (Commons.Pref.bitrate < Commons.Pref.BITRATES[i])
+//                        BitrateGroup.setSelection(bitrates.indexOf(Commons.Pref.bitrate + "kbps"));
+
                 }
 
                 @Override
@@ -203,33 +251,38 @@ public class DownloadActivity extends AppCompatActivity {
             retrieveDialog.setTitle("Retrieving...");
             retrieveDialog.setCanceledOnTouchOutside(false);
             retrieveDialog.setContentView(R.layout.dialog_retrieving);
-            retrieveDialog.findViewById(R.id.info).setOnClickListener(v -> {
+            retrieveDialog.findViewById(R.id.cancel).setOnClickListener(v -> {
                 retrieveDialog.dismiss();
                 onBackPressed();
             });
             retrieveDialog.show();
-        } else {
-            RefreshTimeRange();
-
-            int maxbit = 64;
-            for (int i = 0; i < sparseArray.size(); i++)
-                maxbit = Math.max(sparseArray.get(sparseArray.keyAt(i)).getFormat().getAudioBitrate(), maxbit);
-
-            int i = 0;
-            while (i < Commons.Pref.BITRATES.length && Commons.Pref.BITRATES[i] <= maxbit)
-                i++;
-
-            List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.bitrates));
-
-            Bitrate.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, bitrates.subList(0, i)));
-            if (Commons.Pref.bitrate < Commons.Pref.BITRATES[i])
-                Bitrate.setSelection(bitrates.indexOf(Commons.Pref.bitrate + "kbps"));
         }
 
-        String[] formats = getResources().getStringArray(R.array.formats);
-        Format.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, formats));
-        int index = Arrays.asList(formats).indexOf(Commons.Pref.format);
-        Format.setSelection(index < 0 ? 0 : index);
+//        FormatGroup.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, formats));
+        String[] farr = getResources().getStringArray(R.array.formats);
+        int index = -1;
+        for (int i = 0; i < farr.length; i++) {
+            if (farr[i].toUpperCase().trim().equals(Commons.Pref.format.toUpperCase())) {
+                index = i;
+                break;
+            }
+        }
+        index = index < 0 ? 0 : index;
+
+        Formats = new Chip[farr.length];
+
+        for (int i = 0; i < farr.length; i++) {
+            Chip chip = new Chip(this, null, R.style.Widget_MaterialComponents_Chip_Choice);
+            chip.setText(farr[i].toUpperCase());
+            chip.setCheckable(true);
+            chip.setChipStrokeColorResource(R.color.Accent);
+            chip.setChipStrokeWidth(1f);
+//            chip.setChipBackgroundColorResource(R.color.ClearGray);
+            chip.setOnClickListener(v -> ((Chip) v).setChecked(true));
+            Formats[i] = chip;
+            FormatGroup.addView(chip, i, new ChipGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+        FormatGroup.check(Formats[index].getId());
 
         if (query.artist != null) Artist.setText(query.artist);
 
@@ -308,6 +361,13 @@ public class DownloadActivity extends AppCompatActivity {
             dialog.show();
         });
 
+        Swap.setOnClickListener(view -> {
+            if (Title.getText() == null || Artist.getText() == null) return;
+            String temp = Title.getText().toString();
+            Title.setText(Artist.getText().toString());
+            Artist.setText(temp);
+        });
+
         Normalize.setChecked(Commons.Pref.normalize);
         NormalizeHelp.setOnClickListener(v -> new AlertDialog.Builder(DownloadActivity.this)
                 .setMessage("Some audio/videos may have a quieter audio than other audios. This is because sometimes an audio/video file does not use the full volume range available and thus resulting in its audio being very quiet. Normalization will increase the audio's volume in such that it will utilize the whole available volume range though it may take more time.")
@@ -329,11 +389,15 @@ public class DownloadActivity extends AppCompatActivity {
 
         short bitrate = Commons.Pref.bitrate;
 
-        try {
-            bitrate = Short.parseShort(((String) Bitrate.getSelectedItem()).replaceAll("\\D", ""));
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            invalid = true;
+        Chip chip = findViewById(BitrateGroup.getCheckedChipId());
+        if (chip != null) {
+            String s = chip.getText().toString();
+            try {
+                bitrate = Short.parseShort(s.substring(0, s.length() - 5));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                invalid = true;
+            }
         }
 
         if (!Track.getText().toString().trim().isEmpty()) {
@@ -357,9 +421,7 @@ public class DownloadActivity extends AppCompatActivity {
 
         if (invalid) return;
 
-        int index = Format.getSelectedItemPosition();
-        String[] formats = getResources().getStringArray(R.array.formats);
-        String format = index < 0 || index >= formats.length ? Commons.Pref.format : formats[index];
+        String format = ((Chip) findViewById(FormatGroup.getCheckedChipId())).getText().toString().toLowerCase().trim();
 
         Download args = new Download(
                 query,
@@ -405,7 +467,7 @@ public class DownloadActivity extends AppCompatActivity {
         startService(service);
 
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("page", 0);
+        intent.putExtra(Commons.ARGS.INDEX, 0);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
@@ -428,7 +490,7 @@ public class DownloadActivity extends AppCompatActivity {
         Picasso.get()
                 .load(query.getThumbnail(Commons.Pref.downloadImage))
                 .placeholder(R.color.SecondaryDark)
-                .transform(new RoundedCornersTransformation(16, 0))
+                .transform(new RoundedCornersTransformation((int) getResources().getDimension(R.dimen.thumbnail_radius), 0))
                 .centerCrop()
                 .fit()
                 .into(Image);

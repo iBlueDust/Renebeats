@@ -70,7 +70,8 @@
         app:layout_constraintTop_toBottomOf="@+id/numbers" />
 
     <Button
-        android:id="@+id/info"
+        android:id="@+id/cancel"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -78,6 +79,7 @@
         android:layout_marginRight="16dp"
         android:background="@android:color/transparent"
         android:text="Cancel"
+        android:textColor="@color/textGray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/ok"
         app:layout_constraintHorizontal_bias="0.0"
@@ -86,11 +88,12 @@
 
     <Button
         android:id="@+id/ok"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:text="OK"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/info" />
+        app:layout_constraintTop_toTopOf="@+id/cancel" />
 </androidx.constraintlayout.widget.ConstraintLayout>

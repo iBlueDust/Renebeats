@@ -66,7 +66,7 @@
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
-                    android:id="@+id/artist"
+                    android:id="@+id/author"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
@@ -607,8 +607,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_weight="2"
-                    android:ellipsize="end"
                     android:maxLines="2"
+                    android:ellipsize="end"
                     android:textAlignment="textEnd"
                     android:textAppearance="@style/Text.SemiLight" />
             </TableRow>

@@ -136,7 +136,7 @@ public class Commons extends Application {
         public static String format = "mp3";
         public static File location = new File(Environment.getExternalStorageDirectory() + "/Music");
 
-        public static Query.ThumbnailQuality queryImage = Query.ThumbnailQuality.Default;
+        public static Query.ThumbnailQuality queryImage = Query.ThumbnailQuality.High;
         public static Query.ThumbnailQuality downloadImage = Query.ThumbnailQuality.High;
 
         public static void Save() {
@@ -178,7 +178,6 @@ public class Commons extends Application {
         public static final int FAILED = 0;
         public static final int PROGRESS = 1;
         public static final int CANCELLED = 9;
-        public static final int MISC = -10;
 
         public static final String REMAINING = "remaining";
         public static final String REQUEST = "request";
@@ -188,7 +187,6 @@ public class Commons extends Application {
         public static final String TOTAL = "total";
         public static final String CURRENT = "current";
         public static final String INDETERMINATE = "indeterminate";
-//        public static final String STATUS = "status";
         public static final String EXCEPTION = "exception";
         public static final String INDEX = "index";
         public static final String LOAD = "load";
@@ -217,7 +215,8 @@ public class Commons extends Application {
         Pref.Load();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Directories.MAIN = getExternalCacheDirs()[Pref.sdcard && getExternalCacheDirs().length > 1 ? 1 : 0];
+            File[] files = getExternalCacheDirs();
+            Directories.MAIN = files[Pref.sdcard && files.length > 1 && files[1] != null ? 1 : 0];
             Directories.BIN = new File(Directories.MAIN, "/bin/");
             Directories.DOWNLOADS = new File(Directories.MAIN, "/queue.dat");
         }

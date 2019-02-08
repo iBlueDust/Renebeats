@@ -7,12 +7,16 @@
     android:layout_height="match_parent"
     android:gravity="bottom"
     tools:context=".Activities.MainActivity"
-    app:umanoPanelHeight="70dp"
+    app:umanoPanelHeight="64dp"
+    app:umanoAnchorPoint="0.75"
+    app:umanoScrollableView="@id/query_list"
+    app:umanoInitialState="hidden"
     app:umanoShadowHeight="0dp" >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/main"
         android:layout_width="match_parent"
@@ -34,7 +38,7 @@
                 app:srcCompat="@drawable/background_vinyl" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/search_container"
+                android:id="@+id/textInputLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -63,8 +67,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:layout_constraintStart_toStartOf="@+id/search_container"
-                app:layout_constraintTop_toBottomOf="@+id/search_container"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
                 app:srcCompat="@drawable/ic_settings_gray_24dp"
                 tools:ignore="VectorDrawableCompat" />
 
@@ -76,7 +80,7 @@
                 android:layout_marginLeft="8dp"
                 android:background="@android:color/transparent"
                 app:layout_constraintStart_toEndOf="@+id/settings"
-                app:layout_constraintTop_toBottomOf="@+id/search_container"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
                 app:srcCompat="@drawable/ic_history_gray_24dp"
                 tools:ignore="VectorDrawableCompat" />
 
@@ -89,10 +93,10 @@
                 android:background="@drawable/rounded_accent"
                 android:contentDescription="Search"
                 android:src="@drawable/ic_search_light_24dp"
-                app:layout_constraintEnd_toEndOf="@+id/search_container"
+                app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toEndOf="@+id/history"
-                app:layout_constraintTop_toBottomOf="@+id/search_container" />
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/error_card"
@@ -100,13 +104,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="8dp"
                 android:visibility="gone"
-                app:layout_constraintBottom_toTopOf="@+id/info"
+                app:layout_constraintBottom_toTopOf="@+id/scroll_img"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/query"
+                app:layout_constraintVertical_bias="1.0">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -169,8 +176,19 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <ImageView
+                android:id="@+id/scroll_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/ic_scroll_down_mixed_24dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/cancel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/info"
+                android:id="@+id/cancel"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="16dp"
@@ -180,7 +198,7 @@
                 android:layout_marginRight="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/search_container">
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -218,7 +236,7 @@
                 android:layout_marginRight="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/info" />
+                app:layout_constraintTop_toBottomOf="@+id/cancel" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

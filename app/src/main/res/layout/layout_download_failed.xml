@@ -23,7 +23,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:textColor="@color/textDark"
-            app:layout_constraintEnd_toStartOf="@+id/info"
+            app:layout_constraintEnd_toStartOf="@+id/cancel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -56,7 +56,7 @@
             tools:ignore="VectorDrawableCompat" />
 
         <ImageButton
-            android:id="@+id/info"
+            android:id="@+id/cancel"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@android:color/transparent"

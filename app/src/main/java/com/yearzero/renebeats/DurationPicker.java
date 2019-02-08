@@ -26,12 +26,7 @@ public class DurationPicker extends Dialog {
     private short maxH, maxM, maxS;
     private Callbacks callbacks;
 
-    private static final NumberPicker.Formatter formatter = new NumberPicker.Formatter() {
-        @Override
-        public String format(int i) {
-            return String.format(Locale.ENGLISH, "%02d", i);
-        }
-    };
+    private static final NumberPicker.Formatter formatter = i -> String.format(Locale.ENGLISH, "%02d", i);
 
     public DurationPicker(@NonNull Context context) {
         super(context);
@@ -49,28 +44,20 @@ public class DurationPicker extends Dialog {
         Minute.setFormatter(formatter);
         Second.setFormatter(formatter);
 
-        Cancel = findViewById(R.id.info);
+        Cancel = findViewById(R.id.cancel);
         OK = findViewById(R.id.ok);
 
-        Cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
+        Cancel.setOnClickListener(v -> dismiss());
 
-        OK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Error.setText("");
-                int time = getTime();
-                if (callbacks != null) {
-                    String error = callbacks.Validate(time);
-                    if (error == null) {
-                        callbacks.onSubmit(time);
-                        dismiss();
-                    } else Error.setText(error);
-                }
+        OK.setOnClickListener(v -> {
+            Error.setText("");
+            int time = getTime();
+            if (callbacks != null) {
+                String error = callbacks.Validate(time);
+                if (error == null) {
+                    callbacks.onSubmit(time);
+                    dismiss();
+                } else Error.setText(error);
             }
         });
     }
@@ -97,19 +84,9 @@ public class DurationPicker extends Dialog {
         Second.setMinValue(0);
         Second.setMaxValue(59);
 
-        Hour.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                Minute.setMaxValue(newVal >= maxH ? maxM : 59);
-            }
-        });
+        Hour.setOnValueChangedListener((picker, oldVal, newVal) -> Minute.setMaxValue(newVal >= maxH ? maxM : 59));
 
-        Minute.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                Second.setMaxValue(newVal >= maxM ? maxS : 59);
-            }
-        });
+        Minute.setOnValueChangedListener((picker, oldVal, newVal) -> Second.setMaxValue(newVal >= maxM ? maxS : 59));
     }
 
     public void setMaxTime(int kiloms) {

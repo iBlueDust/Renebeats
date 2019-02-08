@@ -13,8 +13,8 @@
 
         <ImageButton
             android:id="@+id/home"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:background="@android:color/transparent"
@@ -133,7 +133,7 @@
             app:layout_constraintTop_toBottomOf="@+id/image" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/search_container"
+            android:id="@+id/textInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -154,41 +154,18 @@
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <fr.ganfra.materialspinner.MaterialSpinner
-            android:id="@+id/bitrate"
-            android:layout_width="0dp"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/swap"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_weight="1"
-            android:entries="@array/bitrates"
-            app:ms_multiline="false"
-            app:ms_floatingLabelText="Bitrate"
-            app:ms_errorColor="@color/red"
-            app:layout_constraintEnd_toStartOf="@+id/format"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_container" />
-
-        <fr.ganfra.materialspinner.MaterialSpinner
-            android:id="@+id/format"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_weight="1"
-            android:entries="@array/formats"
-            app:ms_multiline="false"
-            app:ms_floatingLabelText="Format"
-            app:ms_errorColor="@color/red"
-            app:layout_constraintBottom_toBottomOf="@+id/bitrate"
+            android:text="Swap"
+            app:icon="@drawable/ic_swap_vert_accent_24dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/bitrate"
-            app:layout_constraintTop_toTopOf="@+id/bitrate" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+            app:strokeColor="@color/Accent" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout2"
@@ -201,16 +178,86 @@
             android:layout_marginRight="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bitrate">
+            app:layout_constraintTop_toBottomOf="@+id/swap">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/artist"
+                android:id="@+id/author"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:hint="Artist"
-                android:inputType="text|textCapWords|textPersonName"
+                android:inputType="text"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="8dp"
+            android:text="Bitrate"
+            android:textAppearance="@style/Text.BoldAccent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:paddingStart="16dp"
+            android:paddingLeft="16dp"
+            android:paddingEnd="16dp"
+            android:paddingRight="16dp"
+            android:scrollbars="none"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/bitrate_group"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:chipSpacingHorizontal="8dp"
+                app:singleLine="true"
+                app:singleSelection="true" />
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Format"
+            android:textAppearance="@style/Text.BoldAccent"
+            app:layout_constraintStart_toStartOf="@+id/textView3"
+            app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView4" />
+
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:paddingStart="16dp"
+            android:paddingLeft="16dp"
+            android:paddingEnd="16dp"
+            android:paddingRight="16dp"
+            android:scrollbars="none"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView4">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/format_group"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:chipSpacingHorizontal="8dp"
+                app:singleLine="true"
+                app:singleSelection="true" />
+        </HorizontalScrollView>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout3"
@@ -218,11 +265,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+            app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView5">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/album"
@@ -304,7 +352,7 @@
             android:layout_marginEnd="19dp"
             android:layout_marginRight="19dp"
             android:hint="Genres"
-            app:chipBackground="@color/SecondaryDark"
+            app:chipBackground="@color/Accent"
             app:chipTextColor="#FEFEFE"
             app:chipTextSize="16dp"
             app:chipVerticalSpacing="3dp"
@@ -319,7 +367,6 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="8dp"
-
             android:text="Normalize"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/genres" />
@@ -348,10 +395,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-
             android:text="Start"
-            android:textColor="@color/textGray"
-            android:textAllCaps="true"
+            android:textAppearance="@style/Text.BoldAccent"
             app:layout_constraintEnd_toEndOf="@+id/start"
             app:layout_constraintStart_toStartOf="@+id/start"
             app:layout_constraintTop_toBottomOf="@+id/exception" />
@@ -366,8 +411,7 @@
             android:layout_marginRight="8dp"
 
             android:text="End"
-            android:textColor="@color/textGray"
-            android:textAllCaps="true"
+            android:textAppearance="@style/Text.BoldAccent"
             app:layout_constraintBottom_toBottomOf="@+id/textView"
             app:layout_constraintEnd_toEndOf="@+id/end"
             app:layout_constraintStart_toStartOf="@+id/end"
@@ -375,7 +419,7 @@
 
         <Button
             android:id="@+id/start"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -389,7 +433,7 @@
 
         <Button
             android:id="@+id/end"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"

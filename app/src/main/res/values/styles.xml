@@ -14,6 +14,10 @@
         <item name="colorPrimaryDark">@color/PrimaryDark</item>
         <item name="colorAccent">@color/Accent</item>
     </style>
+    
+    <!--<style name="CheckableChip" parent="Widget.MaterialComponents.Chip.Choice">-->
+        <!--<item name="chipBackgroundColor">@drawable/chip_selection</item>-->
+    <!--</style>-->
 
     <style name="Text" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">@font/segoeui</item>
@@ -21,6 +25,10 @@
 
     <style name="Text.SemiLight" parent="Text">
         <item name="android:fontFamily">@font/segoeui_semilight</item>
+    </style>
+
+    <style name="Text.SemiLight.Italic" parent="Text">
+        <item name="android:fontFamily">@font/segoeui_semilightitalic</item>
     </style>
 
     <style name="Text.BoldAccent" parent="Text">
@@ -50,6 +58,11 @@
         <item name="android:textColor">@color/gray</item>
         <item name="android:fontFamily">@font/montserrat_semibold</item>
         <item name="android:textSize">60sp</item>
+    </style>
+
+    <style name="Text.SemiBold.Italic" parent="Text">
+        <item name="android:textColor">@color/textDark</item>
+        <item name="android:fontFamily">@font/segoeui_semibolditalic</item>
     </style>
     
     <!--<style name="ClearGrayTextInput" parent="Widget.MaterialComponents.TextInputEditText.FilledBox" >-->
