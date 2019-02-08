@@ -90,6 +90,7 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
                         .setContentIntent(PendingIntent.getActivity(activity, 0, new Intent(context, MainActivity.class), 0))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setSmallIcon(R.mipmap.ic_launcher_round)
+                        .setContentTitle(data.title)
                 );
             }
 
@@ -114,7 +115,7 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
                 if (data.assigned == null || data.completed == null)
                     builder.setContentText("");
                 else {
-                    String text = "Took ";
+                    String text = "Succeeded after ";
 
                     long elapsed = data.completed.getTime() - data.assigned.getTime();
                     short hour = (short) (elapsed / 3600_000);
@@ -139,7 +140,6 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
 
                 builder.setAutoCancel(true);
                 builder.setOngoing(false);
-                builder.setContentTitle(data.title + " has succeeded");
                 break;
             case Commons.ARGS.FAILED:
                 Snackbar.make(activity.findViewById(R.id.main), "Failed to download", Snackbar.LENGTH_LONG).show();
@@ -152,8 +152,7 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
                 if (!intent.getBooleanExtra(Commons.ARGS.REMAINING, false))
                     manager.cancel(NOTIF_ID);
                 else if (notifications) {
-                    builder.setProgress(0, 0, false)
-                            .setContentTitle("Failed");
+                    builder.setProgress(0, 0, false);
 
                     if (data.exception instanceof IllegalArgumentException)
                         builder.setContentText("Download request is invalid");
@@ -263,8 +262,6 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
                             builder.setOngoing(true);
                             break;
                         case RUNNING:
-                            builder.setContentTitle("Downloading");
-
                             double c = intent.getLongExtra(Commons.ARGS.CURRENT, 0L);
                             double t = intent.getLongExtra(Commons.ARGS.TOTAL, 0L);
                             if (intent.getBooleanExtra(Commons.ARGS.PAUSED, false))
@@ -283,7 +280,7 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
                                         t /= 1000;
                                         b++;
                                     }
-                                    builder.setContentText(String.format(Locale.ENGLISH, "%.2f%s of %.2f%s", c, Commons.suffix[a], t, Commons.suffix[b]));
+                                    builder.setContentText(String.format(Locale.ENGLISH, "Downloading %.2f%s of %.2f%s", c, Commons.suffix[a], t, Commons.suffix[b]));
                                 }
                             }
                             builder.setAutoCancel(false);
@@ -305,8 +302,6 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
                                         builder.setOngoing(true);
                                         break;
                                     case RUNNING:
-                                        builder.setContentTitle("Converting");
-
                                         double size = intent.getLongExtra(Commons.ARGS.CURRENT, -1L);
                                         int d = 0;
                                         while (d < Commons.suffix.length && size >= 1000) {
@@ -325,14 +320,12 @@ public class DownloadReceiver extends BroadcastReceiver implements Serializable 
                                         break;
                                     case FAILED:
                                         Exception x = (Exception) intent.getSerializableExtra(Commons.ARGS.EXCEPTION);
-                                        builder.setContentTitle("Failed");
-                                        builder.setContentText(x == null ? "Unknown Error" : x.getMessage());
+                                        builder.setContentText("Failed, " + (x == null ? "Unknown Error" : x.getMessage()));
                                         builder.setAutoCancel(true);
                                         builder.setOngoing(false);
                                     case SKIPPED:
                                     case COMPLETE:
                                         if (data.status.metadata == null) {
-                                            builder.setContentTitle("Finishing");
                                             builder.setContentText("Applying Metadata");
                                             break;
                                         }

@@ -3,6 +3,7 @@ package com.yearzero.renebeats.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +17,16 @@ import com.yearzero.renebeats.Query;
 import com.yearzero.renebeats.R;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
-public class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.ViewHolder> {
+public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public Context context;
-    public ArrayList<Query> queries;
+    private Context context;
+    private ArrayList<Query> queries;
 
     public QueryAdapter(Context context, ArrayList<Query> queries) {
         this.context = context;
@@ -33,8 +35,14 @@ public class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.ViewHolder> 
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_query, parent, false));
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        switch (viewType) {
+            case 0:
+                return new ShimmerViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > 400f ? R.layout.layout_query_shimmer_large : R.layout.layout_query_shimmer, parent, false));
+            default:
+                return new ViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > 400f ? R.layout.layout_query_large : R.layout.layout_query, parent, false));
+        }
     }
 
     @Override
@@ -43,27 +51,30 @@ public class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder h, int position) {
         Query query = queries.get(position);
 
-        if(query.thumbmap != null) holder.setThumbnail(query.thumbmap);
-        else if(query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null) holder.setThumbnail(query.getThumbnail(Commons.Pref.queryImage));
+        if (h instanceof ViewHolder) {
+            ViewHolder holder = (ViewHolder) h;
+            if (query.thumbmap != null) holder.setThumbnail(query.thumbmap);
+            else if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null)
+                holder.setThumbnail(query.getThumbnail(Commons.Pref.queryImage));
 
-        holder.setTitle(query.title);
-        holder.setAuthor(query.artist);
+            holder.setTitle(query.title);
+            holder.setAuthor(query.artist);
 
-        holder.setOnClickListener(v -> {
-            int index = holder.getAdapterPosition();
-            if(index < 0 || index >= queries.size()) return;
+            holder.setOnClickListener(v -> {
+                int index = holder.getAdapterPosition();
+                if (index < 0 || index >= queries.size()) return;
 
-            Intent intent = new Intent(context, DownloadActivity.class);
-            intent.putExtra(Commons.ARGS.DATA, queries.get(index));
-            context.startActivity(intent);
-        });
-
+                Intent intent = new Intent(context, DownloadActivity.class);
+                intent.putExtra(Commons.ARGS.DATA, queries.get(index));
+                context.startActivity(intent);
+            });
+        }
     }
 
-    public void resetList(List<Query> list){
+    public void resetList(Collection<Query> list){
         queries.clear();
         queries.addAll(list);
         notifyDataSetChanged();
@@ -74,44 +85,63 @@ public class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    @Override
+    public int getItemViewType(int position) {
+        return queries.get(position) == null ? 0 : 1;
+    }
+
+    private class ViewHolder extends RecyclerView.ViewHolder{
 
         private View Main;
         private ImageView Thumbnail;
         private TextView Title, Author;
 
-        public ViewHolder(View itemView) {
+        protected ViewHolder(View itemView) {
             super(itemView);
 
             Main = itemView;
             Thumbnail = itemView.findViewById(R.id.thumbnail);
             Title = itemView.findViewById(R.id.title);
-            Author = itemView.findViewById(R.id.artist);
-
+            Author = itemView.findViewById(R.id.author);
         }
 
-        public void setOnClickListener(View.OnClickListener listener){
+        protected void setOnClickListener(View.OnClickListener listener){
             Main.setOnClickListener(listener);
             Thumbnail.setOnClickListener(listener);
             Title.setOnClickListener(listener);
             Author.setOnClickListener(listener);
         }
 
-        public void setThumbnail(String url){
-            Picasso.get().load(url).into(Thumbnail);
+        protected void setThumbnail(String url){
+            if (url != null)
+                Picasso.get()
+                    .load(url)
+                    .placeholder(R.drawable.shimmer_rounded)
+                    .transform(new RoundedCornersTransformation((int) context.getResources().getDimension(R.dimen.thumbnail_radius), 0))
+                    .centerCrop()
+                    .fit()
+                    .into(Thumbnail);
         }
 
-        public void setThumbnail(Uri image){
-            Thumbnail.setImageURI(image);
+        protected void setThumbnail(Uri image){
+            if (image != null) Thumbnail.setImageURI(image);
+//            ShimmerThumbnail.stopShimmer();
+//            ShimmerThumbnail.setVisibility(View.GONE);
         }
 
-        public void setTitle(String title){
+        protected void setTitle(String title){
             if(title != null) Title.setText(title);
         }
 
-        public void setAuthor(String author){
+        protected void setAuthor(String author){
             if(author != null) Author.setText(author);
         }
+    }
 
+    private class ShimmerViewHolder extends RecyclerView.ViewHolder{
+
+        public ShimmerViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
     }
 }

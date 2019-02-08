@@ -41,7 +41,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     private DownloadService service;
     private RecyclerView recycler;
 
-    // TODO: Sort downloads or separate, placing those in progress at the top
+    // TODO: Implement pause and cancel
     // TODO: Slide ViewHolders for more options
 
     public DownloadAdapter(Context context, DownloadService service, RecyclerView recycler) {
@@ -487,7 +487,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                 Constraint.setBackgroundResource(R.drawable.background_layout_paused);
                 Status.setText("PAUSED");
             } else {
-                Constraint.setBackgroundResource(R.drawable.background_layout_running_0);
+                Constraint.setBackgroundResource(R.drawable.background_layout_running);
                 UpdateAnimation();
             }
         }
@@ -528,7 +528,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
         FailedViewHolder(View itemView) {
             super(itemView);
 
-            Info = itemView.findViewById(R.id.info);
+            Info = itemView.findViewById(R.id.cancel);
         }
 
         void setInfoOnClickListener(View.OnClickListener listener) {

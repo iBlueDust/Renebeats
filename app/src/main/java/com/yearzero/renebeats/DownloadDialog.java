@@ -14,6 +14,7 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class DownloadDialog extends Dialog {
@@ -43,7 +44,7 @@ public class DownloadDialog extends Dialog {
         setContentView(R.layout.dialog_download);
 
         Title = findViewById(R.id.title);
-        Artist = findViewById(R.id.artist);
+        Artist = findViewById(R.id.author);
         Album = findViewById(R.id.album);
         Genres = findViewById(R.id.genres);
         Year = findViewById(R.id.year);
@@ -129,9 +130,19 @@ public class DownloadDialog extends Dialog {
 
         YouTubeID.setText(download == null ? "-" : String.valueOf(download.id));
         PRDownloaderID.setText(download == null ? "-" : String.valueOf(download.id));
-        URL.setText(download == null || download.url == null ? "-" : download.url);
+//        URL.setText(download == null || download.url == null ? "-" : download.url);
         AvailFormat.setText(download == null || download.availformat == null ? "-" : download.availformat.toUpperCase());
         Exception.setText(download == null || download.exception == null ? "-" : download.exception.getMessage());
+
+        if (download == null || download.url == null || download.url.isEmpty())
+            URL.setText('-');
+        else {
+            URL.setText("Tap to Reveal");
+            URL.setOnClickListener(view -> new AlertDialog.Builder(getContext())
+                    .setTitle("URL")
+                    .setMessage(download.url)
+                    .show());
+        }
 
         UpdatePartial(download);
         return this;
