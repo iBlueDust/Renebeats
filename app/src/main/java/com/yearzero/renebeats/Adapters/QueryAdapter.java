@@ -27,16 +27,17 @@ public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private Context context;
     private ArrayList<Query> queries;
+    private DisplayMetrics metrics;
 
     public QueryAdapter(Context context, ArrayList<Query> queries) {
         this.context = context;
         this.queries = queries;
+        metrics = context.getResources().getDisplayMetrics();
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         switch (viewType) {
             case 0:
                 return new ShimmerViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > 400f ? R.layout.layout_query_shimmer_large : R.layout.layout_query_shimmer, parent, false));
@@ -57,8 +58,9 @@ public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (h instanceof ViewHolder) {
             ViewHolder holder = (ViewHolder) h;
             if (query.thumbmap != null) holder.setThumbnail(query.thumbmap);
-            else if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null)
-                holder.setThumbnail(query.getThumbnail(Commons.Pref.queryImage));
+            else if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null) {
+                holder.setThumbnail(query.getThumbnail(metrics.widthPixels / metrics.density > 400f ? Commons.Pref.queryImageLarge : Commons.Pref.queryImage));
+            }
 
             holder.setTitle(query.title);
             holder.setAuthor(query.artist);

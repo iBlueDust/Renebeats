@@ -2,8 +2,10 @@ package com.yearzero.renebeats.Activities;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,7 +43,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
-public class DownloadActivity extends AppCompatActivity {
+public class DownloadActivity extends AppCompatActivity implements YouTubeExtractor.Callbacks {
     private static final String TAG = "DownloadActivity";
 
     private ImageButton Home;
@@ -49,7 +51,7 @@ public class DownloadActivity extends AppCompatActivity {
 
     private ImageView Image;
     private TextView Display;
-    private Button Start, End, Swap;
+    private Button Start, End, Swap, Youtube;
     private ChipGroup FormatGroup, BitrateGroup;
     private Chip[] Bitrates, Formats;
     private TextInputEditText Title, Artist, Album, Track, Year;
@@ -57,17 +59,13 @@ public class DownloadActivity extends AppCompatActivity {
     private CheckBox Normalize;
     private ImageButton NormalizeHelp;
 
-    private Dialog retrieveDialog;
+    private static Dialog retrieveDialog;
+    private static SparseArray<YouTubeExtractor.YtFile> sparseArray;
+    private static YouTubeExtractor.VideoMeta videoMeta;
+    private static int length = -1;
 
     private Query query;
-    private SparseArray<YouTubeExtractor.YtFile> sparseArray;
-
     private Integer start, end;
-    private int length = -1;
-
-    //TODO: Implement swapping title and artist
-    //TODO: Chip Choice bitrate and format
-    //TODO: Add button to go directly to Youtube
 
     @SuppressLint({"StaticFieldLeak", "WrongViewCast"})
     @Override
@@ -92,6 +90,7 @@ public class DownloadActivity extends AppCompatActivity {
         Display = findViewById(R.id.display);
         Title = findViewById(R.id.title);
         Swap = findViewById(R.id.swap);
+        Youtube = findViewById(R.id.youtube);
         Artist = findViewById(R.id.author);
         Album = findViewById(R.id.album);
         Year = findViewById(R.id.year);
@@ -139,111 +138,8 @@ public class DownloadActivity extends AppCompatActivity {
         }
 
         if (length < 0 || sparseArray == null) {
-            new YouTubeExtractor(this) {
-                @Override
-                protected void onExtractionComplete(SparseArray<YtFile> data, VideoMeta videoMeta) {
-                    if (videoMeta.getVideoLength() <= 0) {
-                        onBackPressed();
-                        Toast.makeText(DownloadActivity.this, "Invalid video ID", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-
-                    if (query.title == null) {
-                        query.title = videoMeta.getTitle();
-                        Display.setText(query.title);
-
-                        String[] result = extractTitleandArtist(query.title, query.artist);
-                        Title.setText(result[0]);
-                        Artist.setText(result[1]);
-
-                        if (query.artist == null) query.artist = result[1];
-                    } else if (query.artist == null) {
-                        query.artist = videoMeta.getAuthor();
-                        Artist.setText(query.artist);
-                    }
-
-                    boolean thumbnail = false;
-                    if (query.thumbMax == null) {
-                        query.thumbMax = videoMeta.getMaxResImageUrl();
-                        thumbnail = true;
-                    }
-                    if (query.thumbHigh == null) {
-                        query.thumbHigh = videoMeta.getHqImageUrl();
-                        thumbnail = true;
-                    }
-                    if (query.thumbMedium == null) {
-                        query.thumbMedium = videoMeta.getMqImageUrl();
-                        thumbnail = true;
-                    }
-                    if (query.thumbDefault == null) {
-                        query.thumbDefault = videoMeta.getThumbUrl();
-                        thumbnail = true;
-                    }
-                    if (query.thumbStandard == null) {
-                        query.thumbStandard = videoMeta.getSdImageUrl();
-                        thumbnail = true;
-                    }
-
-                    if (thumbnail) LoadThumbnail();
-
-                    sparseArray = data;
-
-                    int maxbit = 64;
-                    start = null;
-                    end = null;
-                    length = (int) videoMeta.getVideoLength();
-
-                    retrieveDialog.dismiss();
-
-                    RefreshTimeRange();
-
-                    if (data == null) return;
-                    for (int i = 0; i < data.size(); i++)
-                        maxbit = Math.max(data.get(data.keyAt(i)).getFormat().getAudioBitrate(), maxbit);
-
-//                    for (Chip chip : Bitrates)
-//                        chip.setVisibility(View.GONE);
-
-                    int cnt = 0;
-                    for (int i = 0; i < Commons.Pref.BITRATES.length && Commons.Pref.BITRATES[i] <= maxbit; i++) cnt++;
-
-                    Bitrates = new Chip[cnt];
-                    String[] barr = getResources().getStringArray(R.array.bitrates);
-
-                    for (int i = 0; i < cnt; i++) {
-                        Chip chip = new Chip(DownloadActivity.this, null, R.style.Widget_MaterialComponents_Chip_Choice);
-                        chip.setText(barr[i]);
-                        chip.setCheckable(true);
-                        chip.setChipStrokeColorResource(R.color.Accent);
-                        chip.setChipStrokeWidth(1f);
-//                        chip.setChipBackgroundColorResource(R.color.ClearGray);
-                        chip.setOnClickListener(v -> ((Chip) v).setChecked(true));
-                        Bitrates[i] = chip;
-                        BitrateGroup.addView(chip, i, new ChipGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    }
-                    BitrateGroup.check(Bitrates[Bitrates.length - 1].getId());
-
-//                    List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.bitrates));
-//
-//                    BitrateGroup.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, bitrates.subList(0, i)));
-//                    if (Commons.Pref.bitrate < Commons.Pref.BITRATES[i])
-//                        BitrateGroup.setSelection(bitrates.indexOf(Commons.Pref.bitrate + "kbps"));
-
-                }
-
-                @Override
-                protected void onTimeout() {
-                    if (retrieveDialog != null) retrieveDialog.dismiss();
-
-                    new AlertDialog.Builder(DownloadActivity.this)
-                            .setTitle("Timeout")
-                            .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
-                            .setPositiveButton("OK", (dialogInterface, i) -> {
-                                dialogInterface.dismiss();
-                                onBackPressed();
-                            }).show();
-                }
-            }
+            new YouTubeExtractor(this)
+                    .setCallbacks(this)
                     .setTimeout(Commons.Pref.timeout)
                     .extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.youtubeID, true, false);
 
@@ -256,7 +152,7 @@ public class DownloadActivity extends AppCompatActivity {
                 onBackPressed();
             });
             retrieveDialog.show();
-        }
+        } else onExtractionComplete(sparseArray, videoMeta);
 
 //        FormatGroup.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, formats));
         String[] farr = getResources().getStringArray(R.array.formats);
@@ -306,8 +202,8 @@ public class DownloadActivity extends AppCompatActivity {
                 dialog.setEnabled(DurationPicker.Mode.Minute);
             else dialog.setEnabled(DurationPicker.Mode.Second);
 
-            dialog.setMaxTime(length);
             dialog.setTime(start == null ? 0 : start);
+            dialog.setMaxTime(length);
             dialog.setCallbacks(new DurationPicker.Callbacks() {
                 @Override
                 public String Validate(int time) {
@@ -340,8 +236,8 @@ public class DownloadActivity extends AppCompatActivity {
                 dialog.setEnabled(DurationPicker.Mode.Minute);
             else dialog.setEnabled(DurationPicker.Mode.Second);
 
-            dialog.setMaxTime(length);
             dialog.setTime(end == null ? length : end);
+            dialog.setMaxTime(length);
             dialog.setCallbacks(new DurationPicker.Callbacks() {
                 @Override
                 public String Validate(int time) {
@@ -368,10 +264,118 @@ public class DownloadActivity extends AppCompatActivity {
             Artist.setText(temp);
         });
 
+        Youtube.setOnClickListener(v -> {
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + query.youtubeID));
+            Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://www.youtube.com/watch?v=" + query.youtubeID));
+            try {
+                startActivity(appIntent);
+            } catch (ActivityNotFoundException ex) {
+                startActivity(webIntent);
+            }
+        });
+
         Normalize.setChecked(Commons.Pref.normalize);
         NormalizeHelp.setOnClickListener(v -> new AlertDialog.Builder(DownloadActivity.this)
                 .setMessage("Some audio/videos may have a quieter audio than other audios. This is because sometimes an audio/video file does not use the full volume range available and thus resulting in its audio being very quiet. Normalization will increase the audio's volume in such that it will utilize the whole available volume range though it may take more time.")
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss()).show());
+    }
+
+    @Override
+    public void onExtractionComplete(SparseArray<YouTubeExtractor.YtFile> data, YouTubeExtractor.VideoMeta videoMeta) {
+        sparseArray = data;
+        DownloadActivity.videoMeta = videoMeta;
+
+        if (videoMeta.getVideoLength() <= 0) {
+            onBackPressed();
+            Toast.makeText(DownloadActivity.this, "Invalid video ID", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (query.title == null) {
+            query.title = videoMeta.getTitle();
+            Display.setText(query.title);
+
+            String[] result = extractTitleandArtist(query.title, query.artist);
+            Title.setText(result[0]);
+            Artist.setText(result[1]);
+
+            if (query.artist == null) query.artist = result[1];
+        } else if (query.artist == null) {
+            query.artist = videoMeta.getAuthor();
+            Artist.setText(query.artist);
+        }
+
+        boolean thumbnail = false;
+        if (query.thumbMax == null) {
+            query.thumbMax = videoMeta.getMaxResImageUrl();
+            thumbnail = true;
+        }
+        if (query.thumbHigh == null) {
+            query.thumbHigh = videoMeta.getHqImageUrl();
+            thumbnail = true;
+        }
+        if (query.thumbMedium == null) {
+            query.thumbMedium = videoMeta.getMqImageUrl();
+            thumbnail = true;
+        }
+        if (query.thumbDefault == null) {
+            query.thumbDefault = videoMeta.getThumbUrl();
+            thumbnail = true;
+        }
+        if (query.thumbStandard == null) {
+            query.thumbStandard = videoMeta.getSdImageUrl();
+            thumbnail = true;
+        }
+
+        if (thumbnail) LoadThumbnail();
+
+        sparseArray = data;
+
+        int maxbit = 64;
+        start = null;
+        end = null;
+        length = (int) videoMeta.getVideoLength();
+
+        retrieveDialog.dismiss();
+
+        RefreshTimeRange();
+
+        if (data == null) return;
+        for (int i = 0; i < data.size(); i++)
+            maxbit = Math.max(data.get(data.keyAt(i)).getFormat().getAudioBitrate(), maxbit);
+
+        int cnt = 0;
+        for (int i = 0; i < Commons.Pref.BITRATES.length && Commons.Pref.BITRATES[i] <= maxbit; i++) cnt++;
+
+        Bitrates = new Chip[cnt];
+        String[] barr = getResources().getStringArray(R.array.bitrates);
+
+        for (int i = 0; i < cnt; i++) {
+            Chip chip = new Chip(DownloadActivity.this, null, R.style.Widget_MaterialComponents_Chip_Choice);
+            chip.setText(barr[i]);
+            chip.setCheckable(true);
+            chip.setChipStrokeColorResource(R.color.Accent);
+            chip.setChipStrokeWidth(1f);
+            chip.setOnClickListener(v -> ((Chip) v).setChecked(true));
+            Bitrates[i] = chip;
+            BitrateGroup.addView(chip, i, new ChipGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+        BitrateGroup.check(Bitrates[Bitrates.length - 1].getId());
+
+    }
+
+    @Override
+    public void onTimeout() {
+        if (retrieveDialog != null) retrieveDialog.dismiss();
+
+        new AlertDialog.Builder(DownloadActivity.this)
+                .setTitle("Timeout")
+                .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
+                .setPositiveButton("OK", (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    onBackPressed();
+                }).show();
     }
 
     public void Download() {
@@ -379,13 +383,13 @@ public class DownloadActivity extends AppCompatActivity {
 
         boolean invalid = false;
 
-        if (Title.getText().toString().isEmpty()) {
+        if (Title.getText() == null || Title.getText().toString().isEmpty()) {
             Title.setError("There must be a title");
             invalid = true;
         } else query.title = Title.getText().toString();
 
-        if (!Artist.getText().toString().isEmpty()) query.artist = Artist.getText().toString();
-        if (!Album.getText().toString().isEmpty()) query.album = Album.getText().toString();
+        if (!(Artist.getText() == null || Artist.getText().toString().isEmpty())) query.artist = Artist.getText().toString();
+        if (!(Album.getText() == null || Album.getText().toString().isEmpty())) query.album = Album.getText().toString();
 
         short bitrate = Commons.Pref.bitrate;
 
@@ -400,7 +404,7 @@ public class DownloadActivity extends AppCompatActivity {
             }
         }
 
-        if (!Track.getText().toString().trim().isEmpty()) {
+        if (!(Track.getText() == null || Track.getText().toString().trim().isEmpty())) {
             try {
                 query.track = Integer.parseInt(Track.getText().toString());
             } catch (NumberFormatException ignore) {
@@ -409,7 +413,7 @@ public class DownloadActivity extends AppCompatActivity {
             }
         }
 
-        if (!Year.getText().toString().isEmpty()) {
+        if (!(Year.getText() == null || Year.getText().toString().isEmpty())) {
             try {
                 query.year = Integer.parseInt(Year.getText().toString());
             } catch (NumberFormatException ignore) {
@@ -432,9 +436,9 @@ public class DownloadActivity extends AppCompatActivity {
                 end != null && end == Math.floor(length) ? null : end,
                 Normalize.isChecked()
         );
-        args.genres = Genres.getChipAndTokenValues().toArray(new String[0]);
 
-        String name = String.format("%s%s.%s", query.artist == null ? "" : query.artist + " - ", query.title, format);
+        args.genres = Genres.getChipAndTokenValues().toArray(new String[0]);
+        String name = args.makeFile() + '.' + args.format;
 
         if (Commons.Pref.overwrite == Commons.Pref.OverwriteMode.PROMPT && new File(Commons.Directories.MUSIC, name).exists()) {
             new AlertDialog.Builder(this)
@@ -451,7 +455,7 @@ public class DownloadActivity extends AppCompatActivity {
                     })
                     .show();
         } else {
-            args.overwrite = true;
+            args.overwrite = false;
             InitDownload(args);
         }
     }
@@ -479,7 +483,7 @@ public class DownloadActivity extends AppCompatActivity {
         if (title == null) return null;
 
         if (title.contains(" - ")) {
-            String[] split = title.replaceAll("(?i)[(\\[}](official)?\\s*(?:audio|video|(?:music|lyrics?)\\s+video)[)\\]}]", "").trim().split("-");
+            String[] split = title.replaceAll("(?i)[(\\[}](official)?\\s*(?:audio|video|(?:music|lyrics?)\\s+video)[)\\]}]", "").replaceAll("(?i)\\(?lyrics\\)", "").trim().split("-");
             split[0] = split[0].trim();
             split[1] = split[1].trim();
             return split[1].matches("(?i)(?:.*\\s+|\\s*)(?:ft\\.?|feat\\.?|featuring)\\s++.+") ? new String[]{split[1], split[0]} : split;
@@ -500,12 +504,12 @@ public class DownloadActivity extends AppCompatActivity {
         StringBuilder start = new StringBuilder();
         StringBuilder end = new StringBuilder();
 
-        short sh = this.start == null ? 0 : (short) Math.floor(this.start / 3600);
-        short sm = this.start == null ? 0 : (short) (Math.floor(this.start / 60) % 60);
+        short sh = this.start == null ? 0 : (short) Math.floor(this.start / 3600f);
+        short sm = this.start == null ? 0 : (short) (Math.floor(this.start / 60f) % 60);
         short ss = this.start == null ? 0 : (short) (this.start % 60);
 
-        short eh = (short) Math.floor((this.end == null ? length : this.end) / 3600);
-        short em = (short) (Math.floor((this.end == null ? length : this.end) / 60) % 60);
+        short eh = (short) Math.floor((this.end == null ? length : this.end) / 3600f);
+        short em = (short) (Math.floor((this.end == null ? length : this.end) / 60f) % 60);
         short es = (short) ((this.end == null ? length : this.end) % 60);
 
         if (eh > 0) {
@@ -525,23 +529,12 @@ public class DownloadActivity extends AppCompatActivity {
         End.setText(end.toString());
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.menu_download, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                onBackPressed();
-//                return true;
-//            case R.id.menu_download:
-//                Download();
-//                return true;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//    }
+    @Override
+    protected void onDestroy() {
+        if (retrieveDialog != null) retrieveDialog.dismiss();
+        length = -1;
+        sparseArray = null;
+        videoMeta = null;
+        super.onDestroy();
+    }
 }

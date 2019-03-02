@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private DownloadAdapter adapter;
     private DownloadService service;
 
-
     private ImageButton Refresh, Dismiss;
     private RecyclerView QueryList;
 //    private ProgressBar QueryLoading;
@@ -86,15 +85,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     //TODO: Implement Download Header Features
     //TODO: History Activity and support
     //TODO: Preference Activity
-    //TODO: Use XD QueryAdapter ViewHolder redesign
-    //TODO: Scroll to ViewHolder after closing DownloadActivity
     //TODO: Change icon mipmap
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        bindService(new Intent(this, DownloadService.class), this, 0);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         Commons.PERM_REQUEST,
                         perms
                 );
-
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -180,6 +170,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             manager.startSmoothScroll(smoothScroller);
         }
 
+//        int id = getIntent().getIntExtra(Commons.ARGS.NOTIF_CANCEL, -1);
+//        if (id > 0) {
+//            Intent intent = new Intent(TAG);
+//            intent.putExtra(Commons.ARGS.NOTIF_CANCEL, id);
+//            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+//        }
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         Search.findFocus();
 
@@ -205,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         Title.setText(query);
         Refresh.setOnClickListener(view -> Query());
+        if (QueryList.getLayoutManager() != null) QueryList.getLayoutManager().scrollToPosition(0);
     }
 
     public void onComplete(java.util.List<SearchResult> results) {
@@ -253,16 +251,30 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         if (service != null) {
             if (service.removeCallbacks(this)) Log.i(TAG, "Service callback has been removed");
             else Log.e(TAG, "Failed to remove service callback");
+
+            getApplication().onTerminate();
         }
-        unbindService(this);
+//        unbindService(this);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        unbindService(this);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bindService(new Intent(this, DownloadService.class), this, 0);
     }
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
         service = ((DownloadService.LocalBinder) iBinder).getService();
         service.addCallbacks(this);
-        adapter = new DownloadAdapter(this, service, List);
+        adapter = new DownloadAdapter(this, service, List, getSupportFragmentManager());
         List.setLayoutManager(manager);
         List.setAdapter(adapter);
         ScrollImg.setVisibility(View.VISIBLE);

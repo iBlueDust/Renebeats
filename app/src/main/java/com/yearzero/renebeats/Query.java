@@ -153,4 +153,8 @@ public class Query implements Serializable {
 
         return result;
     }
+
+    public String makeFile() {
+        return ((artist == null ? "" : artist.trim() + " - ") + title.trim()).replaceAll("(?:\\||\\\\|\\?|\\*|<|\"|:|>|\\+|\\[|]|/')", "_");
+    }
 }

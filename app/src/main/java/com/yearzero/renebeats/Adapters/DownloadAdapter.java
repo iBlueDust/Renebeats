@@ -32,6 +32,7 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicViewHolder> implements DownloadService.ClientCallbacks {
@@ -40,14 +41,17 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     private Context context;
     private DownloadService service;
     private RecyclerView recycler;
+    private DownloadDialog dialog;
+    private FragmentManager manager;
 
     // TODO: Implement pause and cancel
     // TODO: Slide ViewHolders for more options
 
-    public DownloadAdapter(Context context, DownloadService service, RecyclerView recycler) {
+    public DownloadAdapter(Context context, DownloadService service, RecyclerView recycler, FragmentManager manager) {
         this.context = context;
         this.service = service;
         this.recycler = recycler;
+        this.manager = manager;
     }
 
     @NonNull
@@ -105,7 +109,10 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
 
         Status pack = Status.Unpack(status);
 
-        if (pack.isFailed()) {
+        if (pack.isInvalid()) {
+            FailedViewHolder n = (FailedViewHolder) holder;
+            n.setStatus("Invalid download parameters. Please try again.");
+        } else if (pack.isFailed()) {
             //region FailedViewHolder
             FailedViewHolder n = (FailedViewHolder) holder;
             n.setStatus("Failed");
@@ -321,15 +328,17 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
             }
         }
 
-        holder.setOnClickListener(v -> new DownloadDialog(context)
-                .setDownload(args)
-                .show());
+        holder.setOnClickListener(v -> {
+            dialog = new DownloadDialog()
+                    .setDownload(args);
+            dialog.show(manager, TAG);
+        });
 
         holder.setOnLongClickListener(v -> {
-            new DownloadDialog(context)
+            dialog = new DownloadDialog()
                     .setDownload(args)
-                    .setSecret(true)
-                    .show();
+                    .setSecret(true);
+            dialog.show(manager, TAG);
             return true;
         });
     }
@@ -350,6 +359,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
         if (index < 0)
             notifyDataSetChanged();
         else UpdateAtPosition(index, args);
+        if (dialog != null) dialog.UpdatePartial(args);
     }
 
     @Override
@@ -367,7 +377,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
 
         if (index < 0) notifyDataSetChanged();
         else notifyItemChanged(index);
-//        notifyDataSetChanged();
+        if (dialog != null) dialog.UpdatePartial(args);
     }
 
     @Override
@@ -387,7 +397,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     }
 
     private int getViewHolderType(Status pack) {
-        if (pack.isFailed())
+        if (pack.isFailed() || pack.isInvalid())
             return FailedViewHolder.LocalID;
         else if (pack.download == Status.Download.COMPLETE && (pack.convert == Status.Convert.COMPLETE || pack.convert == Status.Convert.SKIPPED))
             return pack.metadata == null ? RunningViewHolder.LocalID : SuccessViewHolder.LocalID;
@@ -399,14 +409,14 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
         else return BasicViewHolder.LocalID;
     }
 
-    public Download[] getServiceDownloads() {
+    private Download[] getServiceDownloads() {
         service.Sanitize();
         Download[] array = service.getAll().toArray(new Download[0]);
-        Arrays.sort(array, (a, b) -> a.assigned == null || b.assigned == null ? 0 : a.assigned.compareTo(b.assigned));
+        Arrays.sort(array, (a, b) -> a.assigned == null || b.assigned == null ? 0 : b.assigned.compareTo(a.assigned));
         return array;
     }
 
-    public void UpdateAtPosition(int position, Download download) {
+    private void UpdateAtPosition(int position, Download download) {
         RecyclerView.ViewHolder holder = recycler.findViewHolderForAdapterPosition(position);
         if (holder instanceof BasicViewHolder) InitializeViewHolder((BasicViewHolder) holder, download);
     }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.LongSparseArray;
 import android.util.SparseArray;
 
 import com.tonyodev.fetch2.EnqueueAction;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,9 +44,8 @@ public class DownloadService extends Service {
 
     public static final String TAG = "DownloadService";
     public static final String MISSING_IN_MAP = "Request Queue: A Download in Fetch is not in HashMap (IGNORED)";
+    public static final long ID_HEADER = 0x80860000L;
     //    public static final String DONT_LOAD = "dont_load";
-
-    // TODO: Check Runtime post-disaster
 
     private FetchListener fetchListener = new FetchListener() {
         @Override
@@ -234,6 +235,7 @@ public class DownloadService extends Service {
 
             Exception v = Validate(current);
             if (v != null) {
+                current.status.invalid = true;
                 onFinish(current, false, v);
                 Log.e(TAG, "Invalid Argument: " + v.getMessage());
                 return START_STICKY;
@@ -253,7 +255,7 @@ public class DownloadService extends Service {
     }
 
     private void LoadPackage(Download[] pkg) {
-        SparseArray<Download> paused = new SparseArray<>();
+        LongSparseArray<Download> paused = new LongSparseArray<>();
 
         for (Download d : pkg) {
             if (d.status.download == null) continue;
@@ -325,41 +327,43 @@ public class DownloadService extends Service {
             }
         }
 
-        List<Integer> ids = new ArrayList<>();
+        List<Long> ids = new ArrayList<>();
         for (int i = 0; i < paused.size(); i++) ids.add(paused.get(paused.keyAt(i)).id);
 
-        Commons.fetch.getDownloads(ids, result -> {
-            for (com.tonyodev.fetch2.Download d : result) {
-                switch (d.getStatus()) {
-                    case ADDED:
-                    case QUEUED:
-                        paused.get(d.getId()).status.download = Status.Download.QUEUED;
-                        break;
-                    case DOWNLOADING:
-                        paused.get(d.getId()).status.download = Status.Download.RUNNING;
-                        break;
-                    case PAUSED:
-                        paused.get(d.getId()).status.download = Status.Download.PAUSED;
-                        break;
-                    case CANCELLED:
-                    case DELETED:
-                    case REMOVED:
-                        paused.get(d.getId()).status.download = Status.Download.CANCELLED;
-                        break;
-                    case FAILED:
-                        paused.get(d.getId()).status.download = Status.Download.FAILED;
-                        break;
-                    case COMPLETED:
-                        Download p = paused.get(d.getId());
-                        p.status.download = Status.Download.COMPLETE;
-                        if (p.convert) convertQueue.add(p);
-                        else Metadata(p);
-                        break;
-                    default:
-                        Download(paused.get(d.getId()));
+        for (long id : ids) {
+            Commons.fetch.getDownloadsByRequestIdentifier(id, result -> {
+                for (com.tonyodev.fetch2.Download d : result) {
+                    switch (d.getStatus()) {
+                        case ADDED:
+                        case QUEUED:
+                            paused.get(d.getId()).status.download = Status.Download.QUEUED;
+                            break;
+                        case DOWNLOADING:
+                            paused.get(d.getId()).status.download = Status.Download.RUNNING;
+                            break;
+                        case PAUSED:
+                            paused.get(d.getId()).status.download = Status.Download.PAUSED;
+                            break;
+                        case CANCELLED:
+                        case DELETED:
+                        case REMOVED:
+                            paused.get(d.getId()).status.download = Status.Download.CANCELLED;
+                            break;
+                        case FAILED:
+                            paused.get(d.getId()).status.download = Status.Download.FAILED;
+                            break;
+                        case COMPLETED:
+                            Download p = paused.get(d.getId());
+                            p.status.download = Status.Download.COMPLETE;
+                            if (p.convert) convertQueue.add(p);
+                            else Metadata(p);
+                            break;
+                        default:
+                            Download(paused.get(d.getId()));
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private Exception Validate(Download args) {
@@ -407,7 +411,8 @@ public class DownloadService extends Service {
         request.setNetworkType(NetworkType.ALL);
         request.setPriority(Priority.HIGH);
         request.setEnqueueAction(EnqueueAction.REPLACE_EXISTING);
-        current.id = request.getId();
+        current.id = UUID.randomUUID().getLeastSignificantBits();
+        request.setIdentifier(current.id);
         downloadMap.put(request.getId(), current);
         Commons.fetch.enqueue(request, null, null);
     }
@@ -453,6 +458,7 @@ public class DownloadService extends Service {
                                 converter = null;
                             }
                             convertProgress = null;
+                            current.status.convert = Status.Convert.FAILED;
 
                             e.printStackTrace();
                             onFinish(current, false, e);
@@ -474,9 +480,11 @@ public class DownloadService extends Service {
 
     private void Metadata(Download current) {
         if (current.conv == null) {
+            current.status.invalid = true;
             onFinish(current, false, new IllegalArgumentException("conv is null"));
             return;
         } else if (current.conv.isEmpty()) {
+            current.status.invalid = true;
             onFinish(current, false, new IllegalArgumentException("conv is empty"));
             return;
         }
@@ -490,10 +498,10 @@ public class DownloadService extends Service {
             e.printStackTrace();
         }
 
-        if (current.overwrite) current.mtdt = ((current.artist == null ? "" : current.artist.trim() + " - ") + current.title.trim() + '.' + current.format).replaceAll("[|\\\\?*<\":>+\\[\\]/']", "_");
+        if (current.overwrite) current.mtdt = current.makeFile() + '.' + current.format;
         else {
             short w = 1;
-            String mtdt = (current.artist == null ? "" : current.artist.trim() + " - ") + current.title.trim().replaceAll("[|\\\\?*<\":>+\\[\\]/']", "_");
+            String mtdt = current.makeFile();
             String offset = mtdt;
 
             while (new File(Commons.Directories.BIN, offset + '.' + current.format).exists()) {
@@ -619,6 +627,7 @@ public class DownloadService extends Service {
 
         Intent intent = new Intent(TAG);
         intent.putExtra(Commons.ARGS.RESULT, Commons.ARGS.DESTROY);
+        intent.putExtra(Commons.ARGS.DATA, getAll().toArray(new Download[0]));
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
         Commons.fetch.removeListener(fetchListener);
@@ -677,10 +686,6 @@ public class DownloadService extends Service {
                 args.status.download = null;
         }
     }
-
-    //    private void UpdateProgress(@NonNull com.tonyodev.fetch2.Download download, @Nullable Download.DownloadStatus status) {
-    //        UpdateProgress(download, "", status);
-    //    }
 
     private void UpdateProgress(@NonNull com.tonyodev.fetch2.Download download, @NonNull String tagPrefix, @Nullable Status.Download status) {
         Download args = downloadMap.get(download.getRequest().getId());
