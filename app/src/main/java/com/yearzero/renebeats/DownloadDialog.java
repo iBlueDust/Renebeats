@@ -1,10 +1,11 @@
 package com.yearzero.renebeats;
 
-import android.app.Dialog;
-import android.content.Context;
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -15,17 +16,16 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DownloadDialog extends Dialog {
-
-    // TODO: Migrate to ConstraintLayout
+public class DownloadDialog extends DialogFragment {
 
     private TextView Title, Artist, Album, Genres, Year, Track;
     private TextView Format, Bitrate, Normalize, Start, End, Overwrite;
     private TextView DLText, Conversion, Metadata;
     private TextView Assigned, Completed;
-    private TextView YouTubeID, PRDownloaderID, URL, AvailFormat, Exception;
+    private TextView YouTubeID, ID, URL, AvailFormat, Exception;
     private TextView PathDownload, PathConversion, PathMetadata;
     private CircleImageView StatusDownload, StatusConversion, StatusMetadata;
 
@@ -34,57 +34,57 @@ public class DownloadDialog extends Dialog {
     private View SecretView;
 
     private Button Close;
+    private ImageButton Dismiss;
 
     private boolean secret;
+    private Download download;
 
-    public DownloadDialog(@NonNull Context context) {
-        super(context);
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        View dialog = inflater.inflate(R.layout.dialog_download, parent, false);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.dialog_download);
+        Title = dialog.findViewById(R.id.title);
+        Artist = dialog.findViewById(R.id.author);
+        Album = dialog.findViewById(R.id.album);
+        Genres = dialog.findViewById(R.id.genres);
+        Year = dialog.findViewById(R.id.year);
+        Track = dialog.findViewById(R.id.track);
+        Format = dialog.findViewById(R.id.format);
+        Bitrate = dialog.findViewById(R.id.bitrate);
+        Normalize = dialog.findViewById(R.id.normalize);
+        Start = dialog.findViewById(R.id.start);
+        End = dialog.findViewById(R.id.end);
+        Overwrite = dialog.findViewById(R.id.overwrite);
+        DLText = dialog.findViewById(R.id.download);
+        Conversion = dialog.findViewById(R.id.conversion);
+        Metadata = dialog.findViewById(R.id.metadata);
+        Assigned = dialog.findViewById(R.id.assigned);
+        Completed = dialog.findViewById(R.id.completed);
 
-        Title = findViewById(R.id.title);
-        Artist = findViewById(R.id.author);
-        Album = findViewById(R.id.album);
-        Genres = findViewById(R.id.genres);
-        Year = findViewById(R.id.year);
-        Track = findViewById(R.id.track);
-        Format = findViewById(R.id.format);
-        Bitrate = findViewById(R.id.bitrate);
-        Normalize = findViewById(R.id.normalize);
-        Start = findViewById(R.id.start);
-        End = findViewById(R.id.end);
-        Overwrite = findViewById(R.id.overwrite);
-        DLText = findViewById(R.id.download);
-        Conversion = findViewById(R.id.conversion);
-        Metadata = findViewById(R.id.metadata);
-        Assigned = findViewById(R.id.assigned);
-        Completed = findViewById(R.id.completed);
+        YouTubeID = dialog.findViewById(R.id.ytid);
+        ID = dialog.findViewById(R.id.downloadid);
+        URL = dialog.findViewById(R.id.url);
+        AvailFormat = dialog.findViewById(R.id.availformat);
+        Exception = dialog.findViewById(R.id.exception);
+        PathDownload = dialog.findViewById(R.id.path_download);
+        PathConversion = dialog.findViewById(R.id.path_conversion);
+        PathMetadata = dialog.findViewById(R.id.path_metadata);
+        StatusDownload = dialog.findViewById(R.id.status_download);
+        StatusConversion = dialog.findViewById(R.id.status_conversion);
+        StatusMetadata = dialog.findViewById(R.id.status_metadata);
 
-        YouTubeID = findViewById(R.id.ytid);
-        PRDownloaderID = findViewById(R.id.downloadid);
-        URL = findViewById(R.id.url);
-        AvailFormat = findViewById(R.id.availformat);
-        Exception = findViewById(R.id.exception);
-        PathDownload = findViewById(R.id.path_download);
-        PathConversion = findViewById(R.id.path_conversion);
-        PathMetadata = findViewById(R.id.path_metadata);
-        StatusDownload = findViewById(R.id.status_download);
-        StatusConversion = findViewById(R.id.status_conversion);
-        StatusMetadata = findViewById(R.id.status_metadata);
+        SecretLabel = dialog.findViewById(R.id.secret_lbl);
+        SecretView = dialog.findViewById(R.id.secret_view);
+        SecretMain = dialog.findViewById(R.id.secret_main);
+        SecretPaths = dialog.findViewById(R.id.secret_paths);
+        SecretSecond = dialog.findViewById(R.id.secret_second);
 
-        SecretLabel = findViewById(R.id.secret_lbl);
-        SecretView = findViewById(R.id.secret_view);
-        SecretMain = findViewById(R.id.secret_main);
-        SecretPaths = findViewById(R.id.secret_paths);
-        SecretSecond = findViewById(R.id.secret_second);
-
-        Close = findViewById(R.id.close);
+        Close = dialog.findViewById(R.id.close);
+        Dismiss = dialog.findViewById(R.id.dismiss);
         Close.setOnClickListener(v -> dismiss());
+        Dismiss.setOnClickListener(v -> dismiss());
 
-    }
-
-    public DownloadDialog setSecret(boolean secret) {
         int visi = secret ? View.VISIBLE : View.GONE;
 
         SecretLabel.setVisibility(visi);
@@ -93,21 +93,22 @@ public class DownloadDialog extends Dialog {
         SecretPaths.setVisibility(visi);
         SecretSecond.setVisibility(visi);
 
-        return this;
+        Update();
+
+        return dialog;
     }
 
-    public DownloadDialog setSecret(boolean secret, @Nullable Download download) {
-        setSecret(secret);
-
-        boolean redo = secret && !this.secret;
-
+    public DownloadDialog setSecret(boolean secret) {
         this.secret = secret;
-
-        if (redo) setDownload(download);
         return this;
     }
 
     public DownloadDialog setDownload(Download download) {
+        this.download = download;
+        return this;
+    }
+
+    private void Update() {
         Title.setText(download == null || download.title == null ? "-" : download.title);
         Artist.setText(download == null || download.artist == null ? "-" : download.artist);
         Album.setText(download == null || download.album == null ? "-" : download.album);
@@ -128,9 +129,9 @@ public class DownloadDialog extends Dialog {
         Assigned.setText(download == null || download.assigned == null ? "-" : new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss", Locale.ENGLISH).format(download.assigned));
         Completed.setText(download == null || download.completed == null ? "-" : new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss", Locale.ENGLISH).format(download.completed));
 
-        YouTubeID.setText(download == null ? "-" : String.valueOf(download.id));
-        PRDownloaderID.setText(download == null ? "-" : String.valueOf(download.id));
-//        URL.setText(download == null || download.url == null ? "-" : download.url);
+        YouTubeID.setText(download == null ? "-" : download.youtubeID);
+        ID.setText(download == null ? "-" : Long.toHexString(download.id));
+        //        URL.setText(download == null || download.url == null ? "-" : download.url);
         AvailFormat.setText(download == null || download.availformat == null ? "-" : download.availformat.toUpperCase());
         Exception.setText(download == null || download.exception == null ? "-" : download.exception.getMessage());
 
@@ -143,12 +144,15 @@ public class DownloadDialog extends Dialog {
                     .setMessage(download.url)
                     .show());
         }
-
-        UpdatePartial(download);
-        return this;
+        UpdatePartial();
     }
 
     public void UpdatePartial(Download download) {
+        this.download = download;
+        UpdatePartial();
+    }
+
+    private void UpdatePartial() {
         if (download != null) {
             if (download.exception instanceof IllegalArgumentException)
                 Exception.setText("IllegalArgumentException");
@@ -190,7 +194,7 @@ public class DownloadDialog extends Dialog {
         }
     }
 
-    public void UpdateStatus(@Nullable Status status) {
+    private void UpdateStatus(@Nullable Status status) {
         if (status == null || status.download == null)
             DLText.setText("-");
         else {
@@ -253,15 +257,15 @@ public class DownloadDialog extends Dialog {
     private String ArrayToString(String[] strings) {
         if (strings.length <= 0) return "";
         StringBuilder builder = new StringBuilder(strings[0]);
-        for (int i = 0; i < strings.length; i++) builder.append(',').append(strings[i]);
+        for (String string : strings) builder.append(',').append(string);
         return builder.toString();
     }
 
     private String IntegerToMinSec(int i) {
         StringBuilder str = new StringBuilder();
 
-        short h = (short) Math.floor(i / 3600);
-        short m = (short) (Math.floor(i / 60) % 60);
+        short h = (short) Math.floor(i / 3600f);
+        short m = (short) (Math.floor(i / 60f) % 60);
         short s = (short) (i % 60);
 
         if (h > 0) {

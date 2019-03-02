@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:gravity="bottom"
     tools:context=".Activities.MainActivity"
-    app:umanoPanelHeight="64dp"
+    app:umanoPanelHeight="96dp"
     app:umanoAnchorPoint="0.75"
     app:umanoScrollableView="@id/query_list"
     app:umanoInitialState="hidden"

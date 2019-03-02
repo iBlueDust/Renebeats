@@ -42,7 +42,14 @@ import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 
-public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YouTubeExtractor.YtFile>> {
+public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YouTubeExtractor.YtFile>> {
+
+    public interface Callbacks {
+        void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta);
+        void onTimeout();
+    }
+
+    private Callbacks callbacks;
 
     private final static boolean CACHING = true;
 
@@ -170,7 +177,7 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
 
     @Override
     protected void onPostExecute(SparseArray<YtFile> ytFiles) {
-        onExtractionComplete(ytFiles, videoMeta);
+        if (callbacks != null) callbacks.onExtractionComplete(ytFiles, videoMeta);
     }
 
     @Override
@@ -182,7 +189,7 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
             @Override
             public void onFinish() {
                 if (getStatus() == Status.RUNNING) {
-                    onTimeout();
+                    if (callbacks != null) callbacks.onTimeout();
                     cancel();
                 }
             }
@@ -210,9 +217,6 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
         this.executeOnExecutor(executor, youtubeLink);
         return this;
     }
-
-    protected abstract void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta);
-    protected abstract void onTimeout();
 
     @Override
     protected SparseArray<YouTubeExtractor.YtFile> doInBackground(String... params) {
@@ -297,8 +301,7 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
                         }
                     }
                 } finally {
-                    if (reader != null)
-                        reader.close();
+                    reader.close();
                     urlConnection.disconnect();
                 }
 
@@ -351,8 +354,7 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
                     }
                 }
             } finally {
-                if (reader != null)
-                    reader.close();
+                reader.close();
                 urlConnection.disconnect();
             }
             encSignatures = new SparseArray<>();
@@ -739,6 +741,11 @@ public abstract class YouTubeExtractor extends AsyncTask<String, Void, SparseArr
 
     public YouTubeExtractor setTimeout(int timeout) {
         this.timeout = timeout;
+        return this;
+    }
+
+    public YouTubeExtractor setCallbacks(Callbacks callbacks) {
+        this.callbacks = callbacks;
         return this;
     }
 

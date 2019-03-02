@@ -49,6 +49,7 @@ public class Status implements Serializable {
     public Download download;
     public Convert convert;
     public Boolean metadata;
+    public boolean invalid;
 
     public Status() { }
 
@@ -72,6 +73,10 @@ public class Status implements Serializable {
 
     public boolean isFailed() {
         return download == Download.FAILED || convert == Convert.FAILED || (metadata != null && !metadata);
+    }
+
+    public boolean isInvalid() {
+        return invalid;
     }
 
     public int Pack() {

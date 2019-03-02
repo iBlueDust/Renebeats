@@ -24,7 +24,7 @@ public class Download extends Query implements Serializable {
     public Exception exception;
 
     boolean normalize, convert;
-    int id;
+    long id;
     String url, down, availformat, conv, mtdt;
 
     public boolean overwrite;
@@ -95,18 +95,18 @@ public class Download extends Query implements Serializable {
     public int hashCode() {
         int result = 1369 + super.hashCode();
 
-        result = 37 * result + (int)(assigned.getTime() * (assigned.getTime() >>> 32));
+        result = 37 * result + (int)(assigned.getTime() ^ (assigned.getTime() >>> 32));
         result = 37 * result + (availformat == null ? 0 : availformat.hashCode());
         result = 37 * result + bitrate;
         result = 37 * result + (conv == null ? 0 : conv.hashCode());
         result = 37 * result + (convert ? 0 : 1);
         result = 37 * result + current;
-        result = 37 * result + (completed == null ? 0 : (int)(completed.getTime() * (completed.getTime() >>> 32)));
+        result = 37 * result + (completed == null ? 0 : (int)(completed.getTime() ^ (completed.getTime() >>> 32)));
         result = 37 * result + (down == null ? 0 : down.hashCode());
         result = 37 * result + (end == null ? 0 : end + 1);
         result = 37 * result + (exception == null ? 0 : exception.hashCode());
         result = 37 * result + (format == null ? 0 : format.hashCode());
-        result = 37 * result + id;
+        result = 37 * result + (int) (id ^ (id >>> 32));
         result = 37 * result + (indeterminate ? 0 : 1);
         result = 37 * result + (mtdt == null ? 0 : mtdt.hashCode());
         result = 37 * result + (normalize ? 0 : 1);

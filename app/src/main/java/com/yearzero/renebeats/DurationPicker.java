@@ -55,6 +55,9 @@ public class DurationPicker extends Dialog {
             if (callbacks != null) {
                 String error = callbacks.Validate(time);
                 if (error == null) {
+                    Hour.clearFocus();
+                    Minute.clearFocus();
+                    Second.clearFocus();
                     callbacks.onSubmit(time);
                     dismiss();
                 } else Error.setText(error);
@@ -91,8 +94,8 @@ public class DurationPicker extends Dialog {
 
     public void setMaxTime(int kiloms) {
         setMaxTime(
-                (short) (Math.floor(kiloms / 3600) % 3600),
-                (short) (Math.floor(kiloms / 60) % 60),
+                (short) Math.floor(kiloms / 3600f),
+                (short) (Math.floor(kiloms / 60f) % 60),
                 (short) (kiloms % 60)
         );
     }
@@ -108,8 +111,8 @@ public class DurationPicker extends Dialog {
     }
 
     public void setTime(int kiloms) {
-        setTime((short) Math.floor((kiloms % 3600) / 3600),
-                (short) Math.floor((kiloms % 60) / 60),
+        setTime((short) Math.floor(kiloms / 3600f),
+                (short) (Math.floor(kiloms / 60f) % 60),
                 (short) (kiloms % 60));
     }
 

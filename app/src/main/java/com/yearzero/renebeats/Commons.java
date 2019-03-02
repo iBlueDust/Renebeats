@@ -123,8 +123,6 @@ public class Commons extends Application {
 
         private static final String location_overwrite_version = "overwrite mode version";
 
-        public static short notif_done_limit = 3;
-
         public static OverwriteMode overwrite = OverwriteMode.PROMPT;
         public static int timeout = 30_000;
         public static short query_amount = 25;
@@ -137,6 +135,7 @@ public class Commons extends Application {
         public static File location = new File(Environment.getExternalStorageDirectory() + "/Music");
 
         public static Query.ThumbnailQuality queryImage = Query.ThumbnailQuality.High;
+        public static Query.ThumbnailQuality queryImageLarge = Query.ThumbnailQuality.Medium;
         public static Query.ThumbnailQuality downloadImage = Query.ThumbnailQuality.High;
 
         public static void Save() {
@@ -191,6 +190,7 @@ public class Commons extends Application {
         public static final String INDEX = "index";
         public static final String LOAD = "load";
         public static final String PAUSED = "paused";
+//        public static final String NOTIF_CANCEL = "notifications.cancel";
 
         public static final int DESTROY = 0xDDDFF;
         public static final int ERR_LOAD = 0xEE0001;
@@ -243,6 +243,13 @@ public class Commons extends Application {
         }
 
     }
+
+//    @Override
+//    public void onTerminate() {
+//        Log.w(TAG, "onTerminate");
+//        if (downloadReceiver != null) downloadReceiver.onTerminate();
+//        super.onTerminate();
+//    }
 
     protected static boolean SaveQueue(Download[] array) {
         if (!Directories.DOWNLOADS.getParentFile().exists())
@@ -310,7 +317,7 @@ public class Commons extends Application {
     static class Notif {
         static final String DOWNLOAD_PROGRESS = "com.yearzero.renebeats/download/progress";
         static final String DOWNLOAD_COMPLETE = "com.yearzero.renebeats/download/complete";
-        static final int DOWNLOAD_BASE_ID = 0xDB00_0000;
+        static final int DOWNLOAD_BASE_ID = 0x7B00_0000;
     }
 
 //    public static class DownloadQueuePackage implements Serializable {
