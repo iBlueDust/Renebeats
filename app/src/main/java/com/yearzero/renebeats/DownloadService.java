@@ -15,6 +15,8 @@ import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2.Priority;
 import com.tonyodev.fetch2.Request;
 import com.tonyodev.fetch2core.DownloadBlock;
+import com.yearzero.renebeats.classes.Download;
+import com.yearzero.renebeats.classes.Status;
 
 import org.cmc.music.common.ID3WriteException;
 import org.cmc.music.metadata.MusicMetadata;
@@ -247,6 +249,7 @@ public class DownloadService extends Service {
                 current.status.download = Status.Download.QUEUED;
                 current.status.convert = null;
                 current.status.metadata = null;
+                new Commons.History.AppendNowTask().execute(current);
                 onProgress(0, 0, true, current);
                 Download(current);
             }

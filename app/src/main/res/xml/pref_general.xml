@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.ListPreference
+        android:key="@string/pref_defaults_timeout"
+        android:title="Query Timeout" />
+
+    <androidx.preference.ListPreference
+        android:key="@string/pref_defaults_queryamount"
+        android:title="Query Amount" />
+
+    <androidx.preference.ListPreference
+        android:key="@string/pref_defaults_concurrent"
+        android:title="Concurrent Downloads" />
+
+    <androidx.preference.ListPreference
+        android:key="@string/pref_guesser_modes"
+        android:icon="@drawable/ic_prediction_black_24dp"
+        android:title="Guess Modes" />
+    <!--android:entries="@array/guesser" />-->
+
+    <androidx.preference.PreferenceCategory
+        android:title="Defaults" >
+
+        <androidx.preference.ListPreference
+            android:key="@string/pref_defaults_format"
+            android:title="Format" />
+        <!--android:entries="@array/formats"-->
+
+        <androidx.preference.ListPreference
+            android:key="@string/pref_defaults_bitrate"
+            android:title="Bitrate" />
+            <!--android:entries="@array/bitrates" />-->
+
+        <androidx.preference.ListPreference
+            android:key="@string/pref_defaults_overwrite"
+            android:title="Overwrite" />
+            <!--android:entries="@array/overwrite" />-->
+
+        <androidx.preference.CheckBoxPreference
+            android:key="@string/pref_defaults_normalize"
+            android:title="Normalize" />
+
+        <androidx.preference.ListPreference
+            android:key="DefaultFileName"
+            android:title="File Name Format" />
+            <!--android:entries="@array/file_name" />-->
+
+    </androidx.preference.PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

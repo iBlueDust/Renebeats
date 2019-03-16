@@ -1,4 +1,4 @@
-package com.yearzero.renebeats.Adapters;
+package com.yearzero.renebeats.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,10 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.yearzero.renebeats.Activities.DownloadActivity;
 import com.yearzero.renebeats.Commons;
-import com.yearzero.renebeats.Query;
 import com.yearzero.renebeats.R;
+import com.yearzero.renebeats.activities.DownloadActivity;
+import com.yearzero.renebeats.classes.Query;
 
 import java.util.ArrayList;
 import java.util.Collection;

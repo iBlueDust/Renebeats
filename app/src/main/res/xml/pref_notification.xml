@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.SwitchPreference
+        android:key="@string/pref_notification_master"
+        android:title="Notifications" />
+
+    <androidx.preference.CheckBoxPreference
+        android:key="@string/pref_notification_queue"
+        android:title="Queue"
+        android:summary="Show notifications of queued downloads" />
+
+    <androidx.preference.CheckBoxPreference
+        android:key="NotificationRunning"
+        android:title="Running"
+        android:summary="Show notifications of running downloads" />
+
+    <androidx.preference.CheckBoxPreference
+        android:key="@string/pref_notification_completed"
+        android:title="Completed"
+        android:summary="Show notifications of completed downloads" />
+
+</androidx.preference.PreferenceScreen>

@@ -44,7 +44,7 @@ public class DurationPicker extends Dialog {
         Minute.setFormatter(formatter);
         Second.setFormatter(formatter);
 
-        Cancel = findViewById(R.id.cancel);
+        Cancel = findViewById(R.id.negative);
         OK = findViewById(R.id.ok);
 
         Cancel.setOnClickListener(v -> dismiss());

@@ -1,4 +1,4 @@
-package com.yearzero.renebeats;
+package com.yearzero.renebeats.classes;
 
 import android.net.Uri;
 
