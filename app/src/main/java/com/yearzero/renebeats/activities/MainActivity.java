@@ -1,4 +1,4 @@
-package com.yearzero.renebeats.Activities;
+package com.yearzero.renebeats.activities;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -23,18 +23,19 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.api.services.youtube.model.SearchResult;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.yearzero.renebeats.Adapters.DownloadAdapter;
-import com.yearzero.renebeats.Adapters.QueryAdapter;
 import com.yearzero.renebeats.Commons;
-import com.yearzero.renebeats.Download;
 import com.yearzero.renebeats.DownloadService;
-import com.yearzero.renebeats.Query;
 import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.YoutubeQueryTask;
+import com.yearzero.renebeats.adapters.DownloadAdapter;
+import com.yearzero.renebeats.adapters.QueryAdapter;
+import com.yearzero.renebeats.classes.Download;
+import com.yearzero.renebeats.classes.Query;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -170,6 +171,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             manager.startSmoothScroll(smoothScroller);
         }
 
+//        HistoryBtn.setOnClickListener(v -> new Commons.History.RetrieveRangeTask().setCallback(new Commons.History.Callback<Integer, List<HistoryLog[]>>() {
+//            @Override
+//            public void onComplete(java.util.List<HistoryLog[]> data) {
+//                Log.d(TAG, data.size() < 1 ? "RETRIEVE INVALID LENGTH" : "RETRIEVE > " + new GsonBuilder().setPrettyPrinting().create().toJson(data.get(0)));
+//            }
+//
+//            @Override
+//            public void onError(Integer location, Exception e) {
+//                Log.e(TAG, String.format(Locale.ENGLISH, "RETRIEVE ERROR at %d-%d.%s", location >> 4, location & 0xF, Commons.History.EXTENSION));
+//            }
+//        }).execute());
+
+        SettingsBtn.setOnClickListener(v -> startActivity(new Intent(this, PreferenceActivity.class)));
+
 //        int id = getIntent().getIntExtra(Commons.ARGS.NOTIF_CANCEL, -1);
 //        if (id > 0) {
 //            Intent intent = new Intent(TAG);
@@ -185,6 +200,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             Refresh.setOnClickListener(view -> Query());
             onComplete(queries);
         }
+
+        UpdateInfo();
     }
 
     private void Query() {
@@ -203,6 +220,30 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Title.setText(query);
         Refresh.setOnClickListener(view -> Query());
         if (QueryList.getLayoutManager() != null) QueryList.getLayoutManager().scrollToPosition(0);
+    }
+
+    private void UpdateInfo() {
+        if (service != null) {
+            int running = service.getRunning().size();
+            if (running > 0) {
+                InfoTitle.setText(String.format(Locale.ENGLISH, "%d download%s running", running, running == 1 ? " is" : "s are"));
+                return;
+            }
+
+            int completed = service.getCompleted().size();
+            if (completed > 0) {
+                InfoTitle.setText(String.format(Locale.ENGLISH, "%d download%s completed", completed, completed == 1 ? " has" : "s have"));
+                return;
+            }
+
+            int queued = service.getQueue().size();
+            if (queued > 0) {
+                InfoTitle.setText(String.format(Locale.ENGLISH, "%d download%s queued", queued, queued == 1 ? " is" : "s are"));
+                return;
+            }
+        }
+
+        InfoTitle.setText("No downloads are running currently");
     }
 
     public void onComplete(java.util.List<SearchResult> results) {
@@ -313,11 +354,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void onProgress(Download args, long progress, long max, boolean indeterminate) {
         adapter.onProgress(args, progress, max, indeterminate);
+        UpdateInfo();
     }
 
     @Override
     public void onDone(Download args, boolean successful, Exception e) {
         adapter.onDone(args, successful, e);
+        UpdateInfo();
     }
 
     @Override
@@ -329,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     @Override
     public void onClick(View view) {
-        if(Search.getText().toString().trim().isEmpty()) return;
+        if(Search.getText() == null || Search.getText().toString().trim().isEmpty()) return;
 
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         View v = getCurrentFocus();

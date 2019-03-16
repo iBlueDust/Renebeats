@@ -33,7 +33,7 @@
         app:layout_constraintTop_toTopOf="@+id/progress" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/cancel"
+        android:id="@+id/negative"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

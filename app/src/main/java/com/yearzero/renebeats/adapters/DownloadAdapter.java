@@ -1,10 +1,9 @@
-package com.yearzero.renebeats.Adapters;
+package com.yearzero.renebeats.adapters;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,18 +15,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yearzero.renebeats.Commons;
-import com.yearzero.renebeats.Download;
 import com.yearzero.renebeats.DownloadDialog;
 import com.yearzero.renebeats.DownloadService;
 import com.yearzero.renebeats.R;
-import com.yearzero.renebeats.Status;
+import com.yearzero.renebeats.classes.Download;
+import com.yearzero.renebeats.classes.Status;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -304,19 +301,41 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                                     SuccessViewHolder o = (SuccessViewHolder) holder;
                                     o.setStatus("SUCCESS");
 
-                                    Calendar ass = Calendar.getInstance();
-                                    ass.setTime(args.getCompleteDate());
+                                    if (!(args.assigned == null || args.completed == null)) {
+                                        String text = "Succeeded after ";
 
-                                    Calendar yesterday = Calendar.getInstance();
-                                    yesterday.setTimeInMillis(System.currentTimeMillis());
-                                    yesterday.add(Calendar.DAY_OF_YEAR, -1);
+                                        long elapsed = args.completed.getTime() - args.assigned.getTime();
+                                        short hour = (short) (elapsed / 3600_000);
+                                        short minute = (short) ((elapsed / 60_000) % 60);
+                                        short second = (short) ((elapsed / 1000) % 60);
 
-                                    if (DateUtils.isToday(args.getCompleteDate().getTime()))
-                                        o.setDate("Assigned at " + new SimpleDateFormat("hh:mm:ss a", Locale.ENGLISH).format(args.getCompleteDate()));
-                                    else if (yesterday.get(Calendar.YEAR) == ass.get(Calendar.YEAR) && yesterday.get(Calendar.DAY_OF_YEAR) == ass.get(Calendar.DAY_OF_YEAR))
-                                        o.setDate("Assigned yesterday");
-                                    else
-                                        o.setDate("Assigned on " + new SimpleDateFormat("EEE, d MMMM yyyy", Locale.ENGLISH).format(args.getCompleteDate()));
+                                        if (hour > 0) {
+                                            text += hour + "h ";
+                                            if (minute < 10) text += "0";
+                                            text += minute + "m ";
+                                            if (second < 10) text += "0";
+                                        } else if (minute > 0) {
+                                            text += minute + "m ";
+                                            if (second < 10) text += "0";
+                                        }
+                                        text += second + "s";
+
+                                        o.setDate(text);
+                                    }
+
+//                                    Calendar ass = Calendar.getInstance();
+//                                    ass.setTime(args.getCompleteDate());
+//
+//                                    Calendar yesterday = Calendar.getInstance();
+//                                    yesterday.setTimeInMillis(System.currentTimeMillis());
+//                                    yesterday.add(Calendar.DAY_OF_YEAR, -1);
+//
+//                                    if (DateUtils.isToday(args.getCompleteDate().getTime()))
+//                                        o.setDate("Assigned at " + new SimpleDateFormat("hh:mm:ss a", Locale.ENGLISH).format(args.getCompleteDate()));
+//                                    else if (yesterday.get(Calendar.YEAR) == ass.get(Calendar.YEAR) && yesterday.get(Calendar.DAY_OF_YEAR) == ass.get(Calendar.DAY_OF_YEAR))
+//                                        o.setDate("Assigned yesterday");
+//                                    else
+//                                        o.setDate("Assigned on " + new SimpleDateFormat("EEE, d MMMM yyyy", Locale.ENGLISH).format(args.getCompleteDate()));
                                 }
                         }
 
@@ -538,7 +557,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
         FailedViewHolder(View itemView) {
             super(itemView);
 
-            Info = itemView.findViewById(R.id.cancel);
+            Info = itemView.findViewById(R.id.negative);
         }
 
         void setInfoOnClickListener(View.OnClickListener listener) {

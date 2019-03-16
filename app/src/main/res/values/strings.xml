@@ -1,6 +1,33 @@
 <resources>
     <string name="app_name">Renebeats</string>
 
+    <string name="pref_data_downloadusing">DownloadUsing</string>
+    <string name="pref_data_clearcache">ClearCache</string>
+    <string name="pref_data_clearpaused">ClearPaused</string>
+    <string name="pref_data_outputdirectory">OutputDirectory</string>
+    <string name="pref_data_deletehistory">DeleteHistory</string>
+    <string name="pref_data_restoresettings">RestoreSettings</string>
+    <string name="pref_defaults_timeout">QueryTimeout</string>
+    <string name="pref_defaults_queryamount">QueryAmount</string>
+    <string name="pref_defaults_concurrent">ConcurrentDownloads</string>
+    <string name="pref_defaults_format">DefaultFormat</string>
+    <string name="pref_defaults_bitrate">DefaultFormat</string>
+    <string name="pref_defaults_overwrite">DefaultOverwrite</string>
+    <string name="pref_defaults_normalize">DefaultNormalize</string>
+    <string name="pref_notification_master">NotificationMaster</string>
+    <string name="pref_notification_queue">NotificationQueue</string>
+    <string name="pref_notification_completed">NotificationCompleted</string>
+    <string name="pref_guesser_modes">GuesserModes</string>
+
+    <string-array name="formats">
+        <item>aac</item>
+        <item>flac</item>
+        <item>m4a</item>
+        <item>mp3</item>
+        <item>wav</item>
+        <item>wma</item>
+    </string-array>
+
     <string-array name="bitrates">
         <item>64 kbps</item>
         <item>96 kbps</item>
@@ -10,14 +37,25 @@
         <item>320 kbps</item>
     </string-array>
 
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="overwrite">
+        <item>Prompt</item>
+        <item>Append Distinguisher</item>
+        <item>Always Overwrite</item>
+    </string-array>
 
-    <string-array name="formats">
-        <item>aac</item>
-        <item>flac</item>
-        <item>m4a</item>
-        <item>mp3</item>
-        <item>wav</item>
-        <item>wma</item>
+    <string-array name="data">
+        <item>Wifi Only</item>
+        <item>Wifi and Mobile Data</item>
+    </string-array>
+
+    <string-array name="guesser">
+        <item>Off</item>
+        <item>Use video title and uploader</item>
+        <item>Guess title and artist from title</item>
+    </string-array>
+
+    <string-array name="file_name">
+        <item>[Title] - [Artist]</item>
+        <item>[Artist] - [Title]</item>
     </string-array>
 </resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <de.mrapp.android.preference.activity.NavigationPreference
+        android:fragment="com.yearzero.renebeats.fragments.preferences.PrefGeneralFragment"
+        android:title="General"
+        android:icon="@drawable/ic_settings_black_24dp" />
+
+    <de.mrapp.android.preference.activity.NavigationPreference
+        android:fragment="com.yearzero.renebeats.fragments.preferences.PrefNotificationFragment"
+        android:title="Notifications"
+        android:icon="@drawable/ic_notifications_black_24dp" />
+
+    <de.mrapp.android.preference.activity.NavigationPreference
+        android:fragment="com.yearzero.renebeats.fragments.preferences.PrefDataFragment"
+        android:title="Data &amp; Storage"
+        android:icon="@drawable/ic_data_black_24dp" />
+
+    <!--<de.mrapp.android.preference.activity.NavigationPreference-->
+        <!--android:fragment="com.yearzero.renebeats.fragments.preferences.PrefPredictionFragment"-->
+        <!--android:title="Title Artist Prediction"-->
+        <!--android:icon="@drawable/ic_prediction_black_24dp" />-->
+
+    <androidx.preference.PreferenceCategory
+        android:title="Miscellaneous" >
+
+        <de.mrapp.android.preference.activity.NavigationPreference
+            android:fragment="com.yearzero.renebeats.fragments.AboutFragment"
+            android:title="About"
+            android:icon="@drawable/ic_info_outline_black_24dp" />
+
+    </androidx.preference.PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

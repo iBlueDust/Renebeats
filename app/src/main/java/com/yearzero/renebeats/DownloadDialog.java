@@ -9,6 +9,9 @@ import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.yearzero.renebeats.classes.Download;
+import com.yearzero.renebeats.classes.Status;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;

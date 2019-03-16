@@ -842,6 +842,8 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YouTub
         private boolean isDashContainer;
         private boolean isHlsContent;
 
+        Format() {}
+
         Format(int itag, String ext, int height, VCodec vCodec, ACodec aCodec, boolean isDashContainer) {
             this.itag = itag;
             this.ext = ext;
@@ -1126,6 +1128,8 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YouTub
 
         private Format format;
         private String url = "";
+
+        YtFile() {}
 
         YtFile(Format format, String url) {
             this.format = format;
