@@ -1,6 +1,8 @@
-package com.yearzero.renebeats;
+package com.yearzero.renebeats.classes;
 
 import android.util.SparseArray;
+
+import com.yearzero.renebeats.YouTubeExtractor;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -19,19 +21,19 @@ public class Download extends Query implements Serializable {
     public short bitrate;
     public Integer start, end;
     public boolean indeterminate = true;
+    public boolean normalize, convert;
     public int current, total;
     public String format;
     public Exception exception;
-
-    boolean normalize, convert;
-    long id;
-    String url, down, availformat, conv, mtdt;
-
+    public long id;
+    public String url, down, availformat, conv, mtdt;
     public boolean overwrite;
     public Status status;
     public Date assigned, completed;
+    public YouTubeExtractor.YtFile[] sparseArray;
 
-    YouTubeExtractor.YtFile[] sparseArray;
+    public Download() {
+    }
 
     public Download(@NonNull Query query, short bitrate, String format) {
         super(query.youtubeID, query.title, query.artist, query.album, query.year, query.track, query.genres, query.getThumbMax(), query.getThumbHigh(), query.getThumbMedium(), query.getThumbDefault(), query.getThumbStandard(), query.thumbmap);
@@ -75,7 +77,7 @@ public class Download extends Query implements Serializable {
         return clone;
     }
 
-    void extractFromSparse() {
+    public void extractFromSparse() {
         int high_bit = -1;
         int i = 0;
 

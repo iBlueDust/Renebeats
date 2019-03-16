@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    tools:context=".Activities.MainActivity"
+    tools:context=".activities.MainActivity"
     app:umanoPanelHeight="96dp"
     app:umanoAnchorPoint="0.75"
     app:umanoScrollableView="@id/query_list"
@@ -183,12 +183,12 @@
                 android:layout_marginBottom="8dp"
                 android:src="@drawable/ic_scroll_down_mixed_24dp"
                 android:visibility="invisible"
-                app:layout_constraintBottom_toTopOf="@+id/cancel"
+                app:layout_constraintBottom_toTopOf="@+id/negative"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cancel"
+                android:id="@+id/negative"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="16dp"
@@ -196,9 +196,12 @@
                 android:layout_marginTop="256dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/lightgray"
+                app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout" >
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -236,7 +239,7 @@
                 android:layout_marginRight="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cancel" />
+                app:layout_constraintTop_toBottomOf="@+id/negative" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

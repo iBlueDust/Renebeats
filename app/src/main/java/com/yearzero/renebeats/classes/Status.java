@@ -1,4 +1,4 @@
-package com.yearzero.renebeats;
+package com.yearzero.renebeats.classes;
 
 import java.io.Serializable;
 
@@ -101,8 +101,8 @@ public class Status implements Serializable {
         int downshift = pkg >> 20;
         int convshift = (pkg >> 10) & 0x3FF;
 
-        return new Status(downshift <= 0 || downshift >= Download.values().length ? null : Download.values()[downshift - 1],
-                convshift <= 0 || convshift >= Convert.values().length ? null : Convert.values()[(convshift - 1)],
+        return new Status(downshift <= 0 || downshift > Download.values().length ? null : Download.values()[downshift - 1],
+                convshift <= 0 || convshift > Convert.values().length ? null : Convert.values()[(convshift - 1)],
                 md);
     }
 }

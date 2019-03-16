@@ -17,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <service
             android:name=".DownloadService"
             android:stopWithTask="false" />
@@ -24,29 +25,29 @@
         <receiver android:name=".DownloadReceiver" />
 
         <activity
-            android:name=".Activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:name=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".Activities.QueryActivity"
+            android:name=".activities.DownloadActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Activities.MainActivity" />
+                android:value=".activities.MainActivity" />
         </activity>
         <activity
-            android:name=".Activities.DownloadActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".activities.PreferenceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="Preferences" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Activities.QueryActivity" />
+                android:value=".activities.MainActivity" />
         </activity>
-
     </application>
 
 </manifest>

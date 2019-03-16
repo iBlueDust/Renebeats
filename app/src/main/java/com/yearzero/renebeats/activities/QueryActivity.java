@@ -1,4 +1,4 @@
-package com.yearzero.renebeats.Activities;
+package com.yearzero.renebeats.activities;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,11 +10,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.api.services.youtube.model.SearchResult;
-import com.yearzero.renebeats.Adapters.QueryAdapter;
 import com.yearzero.renebeats.Commons;
-import com.yearzero.renebeats.Query;
 import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.YoutubeQueryTask;
+import com.yearzero.renebeats.adapters.QueryAdapter;
+import com.yearzero.renebeats.classes.Query;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <androidx.preference.ListPreference
+        android:key="@string/pref_data_downloadusing"
+        android:title="Download using" />
+        <!--android:entries="@array/data" />-->
+
+    <androidx.preference.Preference
+        android:key="@string/pref_data_outputdirectory"
+        android:title="Output Location" />
+
+    <androidx.preference.PreferenceCategory
+        android:title="Delete" >
+
+        <androidx.preference.Preference
+            android:key="@string/pref_data_clearcache"
+            android:title="Clear Cache"
+            android:summary="No downloads must be performing to clear cache" />
+
+        <androidx.preference.Preference
+            android:key="@string/pref_data_clearpaused"
+            android:title="Clear Paused"
+            android:summary="All paused downloads will be cancelled" />
+
+        <androidx.preference.Preference
+            android:key="@string/pref_data_deletehistory"
+            android:title="Delete History"
+            android:summary="Download history will be cleared permanently" />
+
+        <androidx.preference.Preference
+            android:key="@string/pref_data_restoresettings"
+            android:title="Restore All Preferences"
+            android:summary="All preferences will be reverted to their initial state" />
+
+    </androidx.preference.PreferenceCategory>
+</androidx.preference.PreferenceScreen>

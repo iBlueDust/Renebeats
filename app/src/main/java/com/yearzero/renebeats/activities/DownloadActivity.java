@@ -1,4 +1,4 @@
-package com.yearzero.renebeats.Activities;
+package com.yearzero.renebeats.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -27,13 +27,13 @@ import com.hootsuite.nachos.NachoTextView;
 import com.hootsuite.nachos.terminator.ChipTerminatorHandler;
 import com.squareup.picasso.Picasso;
 import com.yearzero.renebeats.Commons;
-import com.yearzero.renebeats.Download;
 import com.yearzero.renebeats.DownloadReceiver;
 import com.yearzero.renebeats.DownloadService;
 import com.yearzero.renebeats.DurationPicker;
-import com.yearzero.renebeats.Query;
 import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.YouTubeExtractor;
+import com.yearzero.renebeats.classes.Download;
+import com.yearzero.renebeats.classes.Query;
 
 import java.io.File;
 
@@ -147,7 +147,7 @@ public class DownloadActivity extends AppCompatActivity implements YouTubeExtrac
             retrieveDialog.setTitle("Retrieving...");
             retrieveDialog.setCanceledOnTouchOutside(false);
             retrieveDialog.setContentView(R.layout.dialog_retrieving);
-            retrieveDialog.findViewById(R.id.cancel).setOnClickListener(v -> {
+            retrieveDialog.findViewById(R.id.negative).setOnClickListener(v -> {
                 retrieveDialog.dismiss();
                 onBackPressed();
             });
@@ -461,10 +461,11 @@ public class DownloadActivity extends AppCompatActivity implements YouTubeExtrac
     }
 
     private void InitDownload(Download args) {
-        if (Commons.downloadReceiver == null) {
-            Commons.downloadReceiver = new DownloadReceiver(this, true);
-            LocalBroadcastManager.getInstance(this).registerReceiver(Commons.downloadReceiver, new IntentFilter(DownloadService.TAG));
-        }
+//        if (Commons.downloadReceiver == null) {
+//            Commons.downloadReceiver = new DownloadReceiver(this, true);
+//            LocalBroadcastManager.getInstance(this).registerReceiver(Commons.downloadReceiver, new IntentFilter(DownloadService.TAG));
+//        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(new DownloadReceiver(this, true), new IntentFilter(DownloadService.TAG));
 
         Intent service = new Intent(this, DownloadService.class);
         service.putExtra(Commons.ARGS.DATA, args);

@@ -12,7 +12,8 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.yearzero.renebeats.Activities.MainActivity;
+import com.yearzero.renebeats.activities.MainActivity;
+import com.yearzero.renebeats.classes.Download;
 
 import java.util.Locale;
 

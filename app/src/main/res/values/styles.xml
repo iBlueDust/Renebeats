@@ -2,7 +2,7 @@
 
     <style name="AppTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/Primary</item>
-        <item name="colorPrimaryDark">@color/PrimaryDark</item>
+        <item name="colorPrimaryDark">@color/Primary</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <item name="colorAccent">@color/Accent</item>
     </style>
@@ -10,9 +10,11 @@
     <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:elevation" tools:targetApi="lollipop">0dp</item>
+        <item name="elevation">0dp</item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="colorPrimary">@color/Primary</item>
-        <item name="colorPrimaryDark">@color/PrimaryDark</item>
+        <item name="colorPrimaryDark">@color/Primary</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <item name="colorAccent">@color/Accent</item>
     </style>
