@@ -3,8 +3,8 @@ package com.yearzero.renebeats.classes;
 import java.io.Serializable;
 
 public class Status implements Serializable {
-    // Appcode (EA50) - Class code (Status: 55A5) - Gradle version (3) - Iteration
-    private static final long serialVersionUID = 0xEA50_55A5_0003_0000L;
+    // Appcode (EA50) - "Class" (ClA5) - Class ID (515A_1500)
+    private static final long serialVersionUID = 0xEA50_C1A5_515A_1500L;
 
     public enum Download {
         QUEUED(0),
@@ -64,7 +64,11 @@ public class Status implements Serializable {
     }
 
     public boolean isQueued() {
-        return (download == Download.QUEUED || convert == Convert.QUEUED) && metadata == null;
+        return (download == Download.QUEUED || download == Download.NETWORK_PENDING || convert == Convert.QUEUED) && metadata == null;
+    }
+
+    public boolean isPaused() {
+        return (download == Download.PAUSED || download == Download.NETWORK_PENDING || convert == Convert.PAUSED) && metadata == null;
     }
 
     public boolean isCancelled() {

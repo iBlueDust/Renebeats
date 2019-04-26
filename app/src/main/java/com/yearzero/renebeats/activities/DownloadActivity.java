@@ -19,6 +19,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
@@ -35,12 +40,10 @@ import com.yearzero.renebeats.YouTubeExtractor;
 import com.yearzero.renebeats.classes.Download;
 import com.yearzero.renebeats.classes.Query;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.io.File;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class DownloadActivity extends AppCompatActivity implements YouTubeExtractor.Callbacks {
@@ -103,22 +106,6 @@ public class DownloadActivity extends AppCompatActivity implements YouTubeExtrac
 
         FormatGroup = findViewById(R.id.format_group);
         BitrateGroup = findViewById(R.id.bitrate_group);
-
-//        Bitrate64 = findViewById(R.id.bitrate_64);
-//        Bitrate96 = findViewById(R.id.bitrate_96);
-//        Bitrate128 = findViewById(R.id.bitrate_128);
-//        Bitrate192 = findViewById(R.id.bitrate_192);
-//        Bitrate256 = findViewById(R.id.bitrate_256);
-//        Bitrate320 = findViewById(R.id.bitrate_320);
-//        Bitrates = new Chip[] { Bitrate64, Bitrate96, Bitrate128, Bitrate192, Bitrate256, Bitrate320 };
-
-//        FormatAAC = findViewById(R.id.format_aac);
-//        FormatFLAC = findViewById(R.id.format_flac);
-//        FormatM4A = findViewById(R.id.format_m4a);
-//        FormatMP3 = findViewById(R.id.format_mp3);
-//        FormatWAV = findViewById(R.id.format_wav);
-//        FormatWMA = findViewById(R.id.format_wma);
-//        Formats = new Chip[] { FormatAAC, FormatFLAC, FormatM4A, FormatMP3, FormatWAV, FormatWMA };
 
         Home.setOnClickListener(v -> onBackPressed());
         Download.setOnClickListener(v -> Download());
@@ -243,8 +230,8 @@ public class DownloadActivity extends AppCompatActivity implements YouTubeExtrac
                 public String Validate(int time) {
                     if (start != null && time <= start)
                         return "End time cannot be equal or be less than the start time";
-                    else if (end != null && end > length)
-                        return "End time cannot exceed the video's length";
+                    if (end != null && end > length)
+                        return "End time cannot exceed the video's size";
                     return null;
                 }
 
@@ -293,7 +280,7 @@ public class DownloadActivity extends AppCompatActivity implements YouTubeExtrac
         }
 
         if (query.title == null) {
-            query.title = videoMeta.getTitle();
+            query.title = StringEscapeUtils.unescapeXml(videoMeta.getTitle());
             Display.setText(query.title);
 
             String[] result = extractTitleandArtist(query.title, query.artist);
@@ -434,7 +421,8 @@ public class DownloadActivity extends AppCompatActivity implements YouTubeExtrac
                 sparseArray,
                 start,
                 end != null && end == Math.floor(length) ? null : end,
-                Normalize.isChecked()
+                Normalize.isChecked(),
+                length
         );
 
         args.genres = Genres.getChipAndTokenValues().toArray(new String[0]);
@@ -479,7 +467,7 @@ public class DownloadActivity extends AppCompatActivity implements YouTubeExtrac
         Toast.makeText(getApplicationContext(), "Download started", Toast.LENGTH_LONG).show();
     }
 
-    // TODO: Set default title artist orientation (Here is Title - Artist) as a preference
+    // String[] format is [title, artist]
     private String[] extractTitleandArtist(String title, String uploader) {
         if (title == null) return null;
 
@@ -487,7 +475,10 @@ public class DownloadActivity extends AppCompatActivity implements YouTubeExtrac
             String[] split = title.replaceAll("(?i)[(\\[}](official)?\\s*(?:audio|video|(?:music|lyrics?)\\s+video)[)\\]}]", "").replaceAll("(?i)\\(?lyrics\\)", "").trim().split("-");
             split[0] = split[0].trim();
             split[1] = split[1].trim();
-            return split[1].matches("(?i)(?:.*\\s+|\\s*)(?:ft\\.?|feat\\.?|featuring)\\s++.+") ? new String[]{split[1], split[0]} : split;
+            if (split[0].matches("(?i)(?:.*\\s+|\\s*)(?:ft\\.?|feat\\.?|featuring)\\s++.+") || Commons.Pref.artistfirst)
+                return new String[]{split[1], split[0]};
+            else //if (split[1].matches("(?i)(?:.*\\s+|\\s*)(?:ft\\.?|feat\\.?|featuring)\\s++.+"))
+                return split;
         } else return new String[]{title, uploader.replace("VEVO", "")};
     }
 

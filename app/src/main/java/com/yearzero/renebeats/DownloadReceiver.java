@@ -1,8 +1,6 @@
 package com.yearzero.renebeats;
 
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,19 +9,19 @@ import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.yearzero.renebeats.activities.MainActivity;
 import com.yearzero.renebeats.classes.Download;
 
 import java.util.Locale;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
+//TODO: Check icons on older Android versions for incorrect scaling and/or trimming
 
 public class DownloadReceiver extends BroadcastReceiver {
     private static final String TAG = "DownloadReceiver";
-//    private static final long serialVersionUID = -1000L;
-    private static final String CHANNEL_ID = "DownloadChannel";
 
 //    private final BroadcastReceiver dismissReceiver = new BroadcastReceiver() {
 //        @Override
@@ -44,11 +42,7 @@ public class DownloadReceiver extends BroadcastReceiver {
 //    };
 
     private Activity activity;
-
     private boolean notifications;
-    private NotificationManager manager;
-
-    //TODO: Completed notifications are replaced once service restarts
 
     public DownloadReceiver() { }
 
@@ -65,20 +59,20 @@ public class DownloadReceiver extends BroadcastReceiver {
             case Commons.ARGS.DESTROY:
                 Log.w(TAG, "Service was destroyed");
 
-                if (notifications && manager != null) {
+                if (notifications && Commons.Notif.manager != null) {
                     Download[] remaining = (Download[]) intent.getSerializableExtra(Commons.ARGS.DATA);
 
                     if (remaining == null) break;
                     for (Download d : remaining)
                         if (d.status.isSuccessful())
-                            manager.notify(getNotifID(d.id), new NotificationCompat.Builder(activity, Commons.Notif.DOWNLOAD_PROGRESS)
+                            Commons.Notif.manager.notify(getNotifID(d.id), new NotificationCompat.Builder(activity, Commons.Notif.DOWNLOAD_PROGRESS)
                                     .setContentIntent(PendingIntent.getActivity(activity, 0, new Intent(context, MainActivity.class), 0))
                                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                                     .setSmallIcon(R.drawable.ic_notif)
                                     .setContentTitle(d.title)
                                     .setColor(context.getResources().getColor(R.color.Accent))
                                     .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-                                    .setGroup(CHANNEL_ID)
+                                    .setGroup(Commons.Notif.CHANNEL_ID)
                                     .setContentText("Cancelled")
                                     .setProgress(0, 0, false)
                                     .setAutoCancel(true)
@@ -106,22 +100,10 @@ public class DownloadReceiver extends BroadcastReceiver {
                     .setContentTitle(data.title)
                     .setColor(context.getResources().getColor(R.color.Accent))
                     .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-                    .setGroup(CHANNEL_ID);
-
-            if (manager == null) {
-                manager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Downloads in Progress", NotificationManager.IMPORTANCE_DEFAULT);
-                    channel.setDescription("All downloads are displayed here");
-                    channel.enableLights(false);
-                    channel.enableVibration(false);
-                    manager.createNotificationChannel(channel);
-                }
-            }
+                    .setGroup(Commons.Notif.CHANNEL_ID);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                builder.setChannelId(CHANNEL_ID);
+                builder.setChannelId(Commons.Notif.CHANNEL_ID);
             }
             boolean success = false;
             switch (intent.getIntExtra(Commons.ARGS.RESULT, Commons.ARGS.FAILED)) {
@@ -177,81 +159,85 @@ public class DownloadReceiver extends BroadcastReceiver {
                                 builder.setContentText("Download request is invalid");
                             else if (data.exception instanceof DownloadService.ServiceException) {
                                 DownloadService.ServiceException ex = (DownloadService.ServiceException) data.exception;
-                                //region ServiceException switch
-                                switch (ex.getDownload()) {
-                                    case QUEUED:
-                                        builder.setContentText("Failed while queueing for download");
-                                        break;
-                                    case RUNNING:
-                                        if (data.total > 0L) {
-                                            double c = data.current;
-                                            double t = data.total;
-
-                                            short ci = 0;
-                                            short ti = 0;
-
-                                            while (c >= 1000d && ci < Commons.suffix.length) {
-                                                c /= 1000d;
-                                                ci++;
-                                            }
-
-                                            while (t >= 1000d && ti < Commons.suffix.length) {
-                                                t /= 1000d;
-                                                ti++;
-                                            }
-
-                                            builder.setContentText(String.format(Locale.ENGLISH, "Failed while downloading. %.2f%s of %.2f%s completed.", c, Commons.suffix[ci], t, Commons.suffix[ti]));
-                                        } else builder.setContentText("Failed while downloading");
-                                        break;
-                                    case PAUSED:
-                                        if (data.current > 0L) {
-                                            double pc = data.current;
-                                            double pt = data.total;
-
-                                            short pci = 0;
-                                            short pti = 0;
-
-                                            while (pc >= 1000d && pci < Commons.suffix.length) {
-                                                pc /= 1000d;
-                                                pci++;
-                                            }
-
-                                            while (pt >= 1000d && pti < Commons.suffix.length) {
-                                                pt /= 1000d;
-                                                pti++;
-                                            }
-
-                                            builder.setContentText(String.format(Locale.ENGLISH, "An exception occurred while download was paused. %.2f%s of %.2f%s completed.", pc, Commons.suffix[pci], pt, Commons.suffix[pti]));
-                                        } else
-                                            builder.setContentText("An exception occurred while download was paused");
-                                        break;
-                                    default:
-                                        switch (((DownloadService.ServiceException) data.exception).getConvert()) {
-                                            case QUEUED:
-                                                builder.setContentText("An exception occurred while queueing for conversion");
-                                                break;
-                                            case PAUSED:
-                                                builder.setContentText("An exception occurred while paused before conversion");
-                                                break;
-                                            case SKIPPED:
-                                                builder.setContentText("An unknown exception occurred (skipped)");
-                                                break;
-                                            case RUNNING:
-                                                double v = data.current;
-                                                short vi = 0;
-
-                                                while (v >= 1000d && vi < Commons.suffix.length) {
-                                                    v /= 1000d;
-                                                    vi++;
-                                                }
-
-                                                builder.setContentText("Failed to convert file");
-                                                break;
-                                            default:
-                                                builder.setContentText("An exception occurred and was unhandled");
-                                        }
-                                }
-                                //endregion
+//                                //region ServiceException switch
+//                                switch (ex.getDownload()) {
+//                                    case QUEUED:
+//                                        builder.setContentText("Failed while queueing for download");
+//                                        break;
+//                                    case RUNNING:
+//                                        if (data.total > 0L) {
+//                                            double c = data.current;
+//                                            double t = data.total;
+//
+//                                            short ci = 0;
+//                                            short ti = 0;
+//
+//                                            while (c >= 1000d && ci < Commons.suffix.size) {
+//                                                c /= 1000d;
+//                                                ci++;
+//                                            }
+//
+//                                            while (t >= 1000d && ti < Commons.suffix.size) {
+//                                                t /= 1000d;
+//                                                ti++;
+//                                            }
+//
+//                                            builder.setContentText(String.format(Locale.ENGLISH, "Failed while downloading. %.2f%s of %.2f%s completed.", c, Commons.suffix[ci], t, Commons.suffix[ti]));
+//                                        } else builder.setContentText("Failed while downloading");
+//                                        break;
+//                                    case PAUSED:
+//                                        if (data.current > 0L) {
+//                                            double pc = data.current;
+//                                            double pt = data.total;
+//
+//                                            short pci = 0;
+//                                            short pti = 0;
+//
+//                                            while (pc >= 1000d && pci < Commons.suffix.size) {
+//                                                pc /= 1000d;
+//                                                pci++;
+//                                            }
+//
+//                                            while (pt >= 1000d && pti < Commons.suffix.size) {
+//                                                pt /= 1000d;
+//                                                pti++;
+//                                            }
+//
+//                                            builder.setContentText(String.format(Locale.ENGLISH, "An exception occurred while download was paused. %.2f%s of %.2f%s completed.", pc, Commons.suffix[pci], pt, Commons.suffix[pti]));
+//                                        } else
+//                                            builder.setContentText("An exception occurred while download was paused");
+//                                        break;
+//                                    default:
+//                                        switch (((DownloadService.ServiceException) data.exception).getConvert()) {
+//                                            case QUEUED:
+//                                                builder.setContentText("An exception occurred while queueing for conversion");
+//                                                break;
+//                                            case PAUSED:
+//                                                builder.setContentText("An exception occurred while paused before conversion");
+//                                                break;
+//                                            case SKIPPED:
+//                                                builder.setContentText("An unknown exception occurred (skipped)");
+//                                                break;
+//                                            case RUNNING:
+//                                                double v = data.current;
+//                                                short vi = 0;
+//
+//                                                while (v >= 1000d && vi < Commons.suffix.size) {
+//                                                    v /= 1000d;
+//                                                    vi++;
+//                                                }
+//
+//                                                builder.setContentText("Failed to convert file");
+//                                                break;
+//                                            default:
+//                                                builder.setContentText("An exception occurred and was unhandled");
+//                                        }
+//                                }
+//                                //endregion
+                                builder.setContentText(ex.getMessage());
+                                builder.setProgress(0, 0, false);
+                                builder.setAutoCancel(true);
+                                builder.setOngoing(false);
                             }
                         }
                     }
@@ -281,35 +267,20 @@ public class DownloadReceiver extends BroadcastReceiver {
                                 builder.setContentText("Waiting for download");
                                 builder.setAutoCancel(false);
                                 builder.setOngoing(true);
+                                builder.setProgress(0, 0, false);
                                 break;
                             case RUNNING:
-                                double c = intent.getLongExtra(Commons.ARGS.CURRENT, 0L);
-                                double t = intent.getLongExtra(Commons.ARGS.TOTAL, 0L);
-                                if (intent.getBooleanExtra(Commons.ARGS.PAUSED, false))
-                                    builder.setContentText("Paused");
-                                else {
-                                    if (t <= 0L)
-                                        builder.setContentText("Processing");
-                                    else {
-                                        int a = 0;
-                                        while (a < Commons.suffix.length && c >= 1000) {
-                                            c /= 1000;
-                                            a++;
-                                        }
-                                        int b = 0;
-                                        while (b < Commons.suffix.length && t >= 1000) {
-                                            t /= 1000;
-                                            b++;
-                                        }
-                                        builder.setContentText(String.format(Locale.ENGLISH, "Downloading %.2f%s of %.2f%s", c, Commons.suffix[a], t, Commons.suffix[b]));
-                                    }
-                                }
+                                long t = intent.getLongExtra(Commons.ARGS.TOTAL, 0L);
+                                if (intent.getBooleanExtra(Commons.ARGS.PAUSED, false)) builder.setContentText("Paused");
+                                else if (t <= 0L) builder.setContentText("Processing");
+                                else builder.setContentText(String.format(Locale.ENGLISH, "Downloading %s of %s", Commons.FormatBytes(intent.getLongExtra(Commons.ARGS.CURRENT, 0L)), Commons.FormatBytes(t)));
+
                                 builder.setAutoCancel(false);
                                 builder.setOngoing(true);
                                 break;
                             case PAUSED:
                                 builder.setContentText("Download Paused");
-                                builder.setProgress(data.current, data.total, data.indeterminate);
+                                builder.setProgress((int) data.current, (int) data.total, data.indeterminate);
                                 builder.setAutoCancel(false);
                                 builder.setOngoing(false);
                                 break;
@@ -324,13 +295,7 @@ public class DownloadReceiver extends BroadcastReceiver {
                                             builder.setOngoing(true);
                                             break;
                                         case RUNNING:
-                                            double size = intent.getLongExtra(Commons.ARGS.CURRENT, -1L);
-                                            int d = 0;
-                                            while (d < Commons.suffix.length && size >= 1000) {
-                                                size /= 1000;
-                                                d++;
-                                            }
-                                            builder.setContentText(String.format(Locale.ENGLISH, "%.2f %s processed so far", size, Commons.suffix[d]));
+                                            builder.setContentText(Commons.FormatBytes(intent.getLongExtra(Commons.ARGS.SIZE, 0L)) + " processed so far");
                                             builder.setAutoCancel(false);
                                             builder.setOngoing(true);
                                             break;
@@ -366,21 +331,22 @@ public class DownloadReceiver extends BroadcastReceiver {
                     Log.w(TAG, "Unknown misc parameter: " + intent.getIntExtra(Commons.ARGS.RESULT, Commons.ARGS.FAILED));
             }
 
-            manager.notify(0, new NotificationCompat.Builder(activity, Commons.Notif.DOWNLOAD_PROGRESS)
-                .setChannelId(CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notif)
-                .setGroup(CHANNEL_ID)
-                .setColor(activity.getResources().getColor(R.color.Accent))
-                .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-                .setGroupSummary(true)
-                .setContentText("All downloads have finished.")
-                .setContentTitle("Done")
-                .build());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                Commons.Notif.manager.notify(0, new NotificationCompat.Builder(activity, Commons.Notif.DOWNLOAD_PROGRESS)
+                    .setChannelId(Commons.Notif.CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_notif)
+                    .setGroup(Commons.Notif.CHANNEL_ID)
+                    .setColor(activity.getResources().getColor(R.color.Accent))
+                    .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+                    .setGroupSummary(true)
+                    .setContentText("All downloads have finished.")
+                    .setContentTitle("Done")
+                    .build());
 
             int id = getNotifID(data.id);
             if (success)
-                manager.cancel(id);
-            manager.notify(id, builder.build());
+                Commons.Notif.manager.cancel(id);
+            Commons.Notif.manager.notify(id, builder.build());
         }
     }
 

@@ -11,9 +11,10 @@
         android:layout_width="192dp"
         android:layout_height="192dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_notif"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_notif"
+        tools:ignore="VectorDrawableCompat" />
 
     <TextView
         android:id="@+id/Renebeats"

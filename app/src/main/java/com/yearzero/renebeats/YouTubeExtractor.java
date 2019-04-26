@@ -14,6 +14,8 @@ import android.os.Looper;
 import android.util.Log;
 import android.util.SparseArray;
 
+import androidx.annotation.NonNull;
+
 import com.evgenii.jsevaluator.JsEvaluator;
 import com.evgenii.jsevaluator.interfaces.JsCallback;
 
@@ -39,8 +41,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import androidx.annotation.NonNull;
 
 public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YouTubeExtractor.YtFile>> {
 
@@ -1068,7 +1068,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YouTub
         }
 
         /**
-         * The video length in seconds.
+         * The video size in seconds.
          */
         public long getVideoLength() {
             return videoLength;

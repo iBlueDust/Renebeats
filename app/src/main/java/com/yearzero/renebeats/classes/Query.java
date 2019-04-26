@@ -6,6 +6,8 @@ import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.SearchResultSnippet;
 import com.google.api.services.youtube.model.ThumbnailDetails;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +16,8 @@ import java.util.Date;
 import java.util.List;
 
 public class Query implements Serializable {
-    // Appcode (EA50) - Class code (Query: 0E10) - Gradle version (3) - Iteration
-    private static final long serialVersionUID = 0xEA50_0E10_0003_0001L;
+    // Appcode (EA50) - "Class" (ClA5) - Class ID (0E10_llE1)
+    private static final long serialVersionUID = 0xEA50_C1A5_0E10_11E1L;
 
     public String youtubeID, title, album, artist;
     public int year, track;
@@ -86,7 +88,7 @@ public class Query implements Serializable {
     }
     //endregion
 
-    public static List<Query> CastList(List<SearchResult> list) {
+    public static List<Query> CastListXML(List<SearchResult> list) {
         List<Query> result = new ArrayList<>();
 
         for (SearchResult r : list) {
@@ -97,8 +99,8 @@ public class Query implements Serializable {
 
             result.add(new Query(
                     r.getId().getVideoId(),
-                    s.getTitle(),
-                    s.getChannelTitle(),
+                    StringEscapeUtils.unescapeXml(s.getTitle()),
+                    StringEscapeUtils.unescapeXml(s.getChannelTitle()),
                     null,
                     cal.get(Calendar.YEAR),
                     0,

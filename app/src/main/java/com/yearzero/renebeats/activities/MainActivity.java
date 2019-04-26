@@ -18,6 +18,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -39,12 +45,9 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSmoothScroller;
-import androidx.recyclerview.widget.RecyclerView;
 import pub.devrel.easypermissions.EasyPermissions;
+
+//TODO: Implement Offline/Error Card
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection, DownloadService.ClientCallbacks, View.OnClickListener, View.OnKeyListener, YoutubeQueryTask.Callbacks {
     private static final String TAG = "MainActivity";
@@ -82,11 +85,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private static String query;
 
 //    private boolean querying;
-
-    //TODO: Implement Download Header Features
-    //TODO: History Activity and support
-    //TODO: Preference Activity
-    //TODO: Change icon mipmap
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,6 +181,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 //            }
 //        }).execute());
 
+        HistoryBtn.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, HistoryActivity.class));
+        });
+
         SettingsBtn.setOnClickListener(v -> startActivity(new Intent(this, PreferenceActivity.class)));
 
 //        int id = getIntent().getIntExtra(Commons.ARGS.NOTIF_CANCEL, -1);
@@ -250,20 +252,18 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         queries = results;
         int visi = View.GONE;
         if (results == null) {
-            visi = View.VISIBLE;
-
             OfflineImg.setImageResource(R.drawable.ic_cloud_off_secondarydark_96dp);
             OfflineMsg.setText("It seems that we can't connect to YouTube. Please check your connection and try again later.");
             OfflineAction.setText("Retry");
             OfflineAction.setOnClickListener(v -> Query());
+            queryAdapter.resetList();
         } else if (results.size() <= 0) {
-            visi = View.VISIBLE;
-
             OfflineImg.setImageResource(R.drawable.ic_search_lightgray_96dp);
             OfflineMsg.setText("Your search didn't come out with any results");
             OfflineAction.setText("Back");
             OfflineAction.setOnClickListener(v -> onBackPressed());
-        } else queryAdapter.resetList(Query.CastList(results));
+            queryAdapter.resetList();
+        } else queryAdapter.resetList(Query.CastListXML(results));
 
         OfflineImg.setVisibility(visi);
         OfflineMsg.setVisibility(visi);
@@ -352,8 +352,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     }
 
     @Override
-    public void onProgress(Download args, long progress, long max, boolean indeterminate) {
-        adapter.onProgress(args, progress, max, indeterminate);
+    public void onProgress(Download args, long progress, long max, long size, boolean indeterminate) {
+        adapter.onProgress(args, progress, max, size, indeterminate);
         UpdateInfo();
     }
 

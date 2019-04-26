@@ -2,22 +2,27 @@ package com.yearzero.renebeats.adapters;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.DownloadDialog;
 import com.yearzero.renebeats.DownloadService;
 import com.yearzero.renebeats.R;
+import com.yearzero.renebeats.adapters.viewholder.BasicViewHolder;
+import com.yearzero.renebeats.adapters.viewholder.FailedViewHolder;
+import com.yearzero.renebeats.adapters.viewholder.QueueViewHolder;
+import com.yearzero.renebeats.adapters.viewholder.RunningViewHolder;
+import com.yearzero.renebeats.adapters.viewholder.SuccessViewHolder;
+import com.yearzero.renebeats.adapters.viewholder.controller.DownloadController;
 import com.yearzero.renebeats.classes.Download;
 import com.yearzero.renebeats.classes.Status;
 
@@ -27,12 +32,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Locale;
 
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicViewHolder> implements DownloadService.ClientCallbacks {
+public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> implements DownloadService.ClientCallbacks {
     private static final String TAG = "DownloadAdapter";
     
     private Context context;
@@ -54,20 +54,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     @NonNull
     @Override
     public BasicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int vht = getViewHolderType(Status.Unpack(viewType));
-
-        switch (vht) {
-            case QueueViewHolder.LocalID:
-                return new QueueViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_download_queue, parent, false));
-            case RunningViewHolder.LocalID:
-                return new RunningViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_download_running, parent, false));
-            case SuccessViewHolder.LocalID:
-                return new SuccessViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_download_success, parent, false));
-            case FailedViewHolder.LocalID:
-                return new FailedViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_download_failed, parent, false));
-            default:
-                return new BasicViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_download_basic, parent, false));
-        }
+        return DownloadController.getViewHolderByType(context, parent, viewType);
     }
 
     @Override
@@ -93,23 +80,17 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
 
         if (!(dl == all[position].status.download || cv == all[position].status.convert || md == all[position].status.metadata)) Log.w(TAG, "ViewHolder type does not match Download type. Defaulting to follow ViewHolder type");
 
-        InitializeViewHolder(holder, all[position], type);
+        InitializeViewHolder(holder, all[position]);
     }
 
-    private void InitializeViewHolder(BasicViewHolder holder, Download args) {
-        InitializeViewHolder(holder, args, args.status.Pack());
-    }
-
-    private void InitializeViewHolder(BasicViewHolder holder, final Download args, int status) {
+    private void InitializeViewHolder(BasicViewHolder holder, final Download args) {
         holder.setTitle(args.title + (args.title == null || args.title.isEmpty() || args.artist == null || args.artist.isEmpty() ? "" : " - ") + args.artist);
 //        holder.setIsRecyclable(true);
 
-        Status pack = Status.Unpack(status);
-
-        if (pack.isInvalid()) {
+        if (args.status.isInvalid()) {
             FailedViewHolder n = (FailedViewHolder) holder;
             n.setStatus("Invalid download parameters. Please try again.");
-        } else if (pack.isFailed()) {
+        } else if (args.status.isFailed()) {
             //region FailedViewHolder
             FailedViewHolder n = (FailedViewHolder) holder;
             n.setStatus("Failed");
@@ -118,155 +99,143 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                 n.setStatus("Download request is invalid");
             else if (args.exception instanceof DownloadService.ServiceException) {
                 DownloadService.ServiceException e = (DownloadService.ServiceException) args.exception;
-                //region ServiceException switch
-                switch (e.getDownload()) {
-                    case QUEUED:
-                        n.setStatus("Failed while queueing for download");
-                        break;
-                    case RUNNING:
-                        if (args.total > 0L) {
-                            double c = args.current;
-                            double t = args.total;
+                n.setStatus(e.getMessage());
 
-                            short ci = 0;
-                            short ti = 0;
+                //                //region ServiceException switch
+                //                switch (e.getDownload()) {
+                //                    case QUEUED:
+                //                        n.setStatus("Failed while queueing for download");
+                //                        break;
+                //                    case RUNNING:
+                //                        if (args.total > 0L) {
+                //                            double c = args.current;
+                //                            double t = args.total;
+                //
+                //                            short ci = 0;
+                //                            short ti = 0;
+                //
+                //                            while (c >= 1000d && ci < Commons.suffix.size) {
+                //                                c /= 1000d;
+                //                                ci++;
+                //                            }
+                //
+                //                            while (t >= 1000d && ti < Commons.suffix.size) {
+                //                                t /= 1000d;
+                //                                ti++;
+                //                            }
+                //
+                //                            n.setStatus(String.format(Locale.ENGLISH, "Failed while downloading. %.2f%s of %.2f%s completed.", c, Commons.suffix[ci], t, Commons.suffix[ti]));
+                //                        } else n.setStatus("Failed while downloading");
+                //                        break;
+                //                    case PAUSED:
+                //                        if (args.current > 0L) {
+                //                            double pc = args.current;
+                //                            double pt = args.total;
+                //
+                //                            short pci = 0;
+                //                            short pti = 0;
+                //
+                //                            while (pc >= 1000d && pci < Commons.suffix.size) {
+                //                                pc /= 1000d;
+                //                                pci++;
+                //                            }
+                //
+                //                            while (pt >= 1000d && pti < Commons.suffix.size) {
+                //                                pt /= 1000d;
+                //                                pti++;
+                //                            }
+                //
+                //                            n.setStatus(String.format(Locale.ENGLISH, "An exception occurred while download was paused. %.2f%s of %.2f%s completed.", pc, Commons.suffix[pci], pt, Commons.suffix[pti]));
+                //                        } else
+                //                            n.setStatus("An exception occurred while download was paused");
+                //                        break;
+                //                    default:
+                //                        switch(((DownloadService.ServiceException) args.exception).getConvert()) {
+                //                            case QUEUED:
+                //                                n.setStatus("An exception occurred while queueing for conversion");
+                //                                break;
+                //                            case PAUSED:
+                //                                n.setStatus("An exception occurred while paused before conversion");
+                //                                break;
+                //                            case SKIPPED:
+                //                                n.setStatus("An unknown exception occurred (skipped)");
+                //                                break;
+                //                            case RUNNING:
+                //                                double v = args.current;
+                //                                short vi = 0;
+                //
+                //                                while (v >= 1000d && vi < Commons.suffix.size) {
+                //                                    v /= 1000d;
+                //                                    vi++;
+                //                                }
+                //
+                //                                n.setStatus("Failed to convert file");
+                //                                break;
+                //                            default:
+                //                                n.setStatus("An exception occurred and was unhandled");
+                //                        }
+                //                }
+                //                //endregion
+            }
+//            n.setInfoOnClickListener(v -> {
+            n.setAction(v -> {
+                final Dialog info = new Dialog(context);
+                info.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                info.setContentView(R.layout.dialog_info);
 
-                            while (c >= 1000d && ci < Commons.suffix.length) {
-                                c /= 1000d;
-                                ci++;
-                            }
+                if (args.exception == null) {
+                    ((TextView) info.findViewById(R.id.payload)).setText("Unknown exception");
+                    info.findViewById(R.id.save).setEnabled(false);
+                } else {
+                    Writer mainWriter = new StringWriter();
+                    args.exception.printStackTrace(new PrintWriter(mainWriter));
 
-                            while (t >= 1000d && ti < Commons.suffix.length) {
-                                t /= 1000d;
-                                ti++;
-                            }
+                    if (args.exception instanceof DownloadService.ServiceException && ((DownloadService.ServiceException) args.exception).getPayload() != null) {
+                        Writer extraWriter = new StringWriter();
+                        ((DownloadService.ServiceException) args.exception).getPayload().printStackTrace(new PrintWriter(extraWriter));
 
-                            n.setStatus(String.format(Locale.ENGLISH, "Failed while downloading. %.2f%s of %.2f%s completed.", c, Commons.suffix[ci], t, Commons.suffix[ti]));
-                        } else n.setStatus("Failed while downloading");
-                        break;
-                    case PAUSED:
-                        if (args.current > 0L) {
-                            double pc = args.current;
-                            double pt = args.total;
-
-                            short pci = 0;
-                            short pti = 0;
-
-                            while (pc >= 1000d && pci < Commons.suffix.length) {
-                                pc /= 1000d;
-                                pci++;
-                            }
-
-                            while (pt >= 1000d && pti < Commons.suffix.length) {
-                                pt /= 1000d;
-                                pti++;
-                            }
-
-                            n.setStatus(String.format(Locale.ENGLISH, "An exception occurred while download was paused. %.2f%s of %.2f%s completed.", pc, Commons.suffix[pci], pt, Commons.suffix[pti]));
-                        } else
-                            n.setStatus("An exception occurred while download was paused");
-                        break;
-                    default:
-                        switch(((DownloadService.ServiceException) args.exception).getConvert()) {
-                            case QUEUED:
-                                n.setStatus("An exception occurred while queueing for conversion");
-                                break;
-                            case PAUSED:
-                                n.setStatus("An exception occurred while paused before conversion");
-                                break;
-                            case SKIPPED:
-                                n.setStatus("An unknown exception occurred (skipped)");
-                                break;
-                            case RUNNING:
-                                double v = args.current;
-                                short vi = 0;
-
-                                while (v >= 1000d && vi < Commons.suffix.length) {
-                                    v /= 1000d;
-                                    vi++;
-                                }
-
-                                n.setStatus("Failed to convert file");
-                                break;
-                            default:
-                                n.setStatus("An exception occurred and was unhandled");
-                        }
-                }
-                //endregion
-
-                n.setInfoOnClickListener(v -> {
-                    final Dialog info = new Dialog(context);
-                    info.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    info.setContentView(R.layout.dialog_info);
-
-                    if (args.exception == null) {
-                        ((TextView) info.findViewById(R.id.payload)).setText("Unknown exception");
-                        info.findViewById(R.id.save).setEnabled(false);
-                    } else {
-                        Writer mainWriter = new StringWriter();
-                        args.exception.printStackTrace(new PrintWriter(mainWriter));
-
-                        if (args.exception instanceof DownloadService.ServiceException && ((DownloadService.ServiceException) args.exception).getPayload() != null) {
-                            Writer extraWriter = new StringWriter();
-                            ((DownloadService.ServiceException) args.exception).getPayload().printStackTrace(new PrintWriter(extraWriter));
-
-                            info.findViewById(R.id.horizontalScrollView2).setVisibility(View.VISIBLE);
-                            ((TextView) info.findViewById(R.id.extra)).setText(mainWriter.toString());
-                        }
-
-                        ((TextView) info.findViewById(R.id.payload)).setText(mainWriter.toString());
+                        info.findViewById(R.id.horizontalScrollView2).setVisibility(View.VISIBLE);
+                        ((TextView) info.findViewById(R.id.extra)).setText(mainWriter.toString());
                     }
 
-                    info.findViewById(R.id.save).setOnClickListener(v1 -> {
-                        if (args.exception != null && Commons.LogException(args, args.exception))
-                            Toast.makeText(context, "Failed to save log", Toast.LENGTH_LONG).show();
-                    });
+                    ((TextView) info.findViewById(R.id.payload)).setText(mainWriter.toString());
+                }
 
-                    info.findViewById(R.id.close).setOnClickListener(v12 -> info.dismiss());
+                info.findViewById(R.id.save).setOnClickListener(v1 -> {
+                    if (args.exception != null && Commons.LogException(args, args.exception))
+                        Toast.makeText(context, "Failed to save log", Toast.LENGTH_LONG).show();
                 });
-            }
+
+                info.findViewById(R.id.close).setOnClickListener(v12 -> info.dismiss());
+            });
             //endregion
-        } else if (pack.isCancelled())
+        } else if (args.status.isCancelled())
             ((QueueViewHolder) holder).setStatus("Cancelled");
-        else if (pack.download != null) {
+        else if (args.status.download != null) {
 
             try {
                 //region Status Main
-                switch (pack.download) {
+                switch (args.status.download) {
                     case QUEUED:
                         QueueViewHolder g = (QueueViewHolder) holder;
                         g.setStatus("Waiting for download");
                         break;
                     case RUNNING:
                         RunningViewHolder i = (RunningViewHolder) holder;
-
-                        double dc = args.current;
-                        double dt = args.total;
-                        short dci = 0;
-                        short dti = 0;
-                        
-                        while (dc >= 1000d && dci < Commons.suffix.length) {
-                            dc /= 1000d;
-                            dci++;
-                        }
-
-                        while (dt >= 1000d && dti < Commons.suffix.length) {
-                            dt /= 1000d;
-                            dti++;
-                        }
-
-                        i.setStatus(String.format(Locale.ENGLISH, "%.2f %s of %.2f %s downloaded", dc, Commons.suffix[dci], dt, Commons.suffix[dti]));
-                        i.setProgress(args.current, args.total, args.indeterminate);
+                        i.setStatus(String.format(Locale.ENGLISH, "%s of %s downloaded", Commons.FormatBytes(args.current), Commons.FormatBytes(args.total)));
+                        i.setProgress((int) args.current, (int) args.total, args.indeterminate);
+                        break;
+                    case NETWORK_PENDING:
                         break;
                     case PAUSED:
                         RunningViewHolder m = (RunningViewHolder) holder;
                         m.setStatus("Download Paused");
                         m.setPaused(true);
-                        m.setProgress(args.current, args.total, args.indeterminate);
+                        m.setProgress((int) args.current, (int) args.total, args.indeterminate);
                         break;
                     case COMPLETE:
-                        if (pack.convert == null) break;
-                        switch (pack.convert) {
+                        if (args.status.convert == null) break;
+                        switch (args.status.convert) {
                             case QUEUED:
                                 QueueViewHolder h = (QueueViewHolder) holder;
                                 h.setStatus("Download Completed, waiting for conversion");
@@ -274,26 +243,19 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                             case RUNNING:
                                 RunningViewHolder j = (RunningViewHolder) holder;
                                 
-                                double cc = args.current;
-                                short cci = 0;
-
-                                while (cc >= 1000d && cci < Commons.suffix.length) {
-                                    cc /= 1000d;
-                                    cci++;
-                                }
-                                
-                                j.setStatus(String.format(Locale.ENGLISH, "%.2f %s converted", cc, Commons.suffix[cci]));
-                                j.setProgress(0, 0, true);
+                                j.setStatus(String.format(Locale.ENGLISH, "%s converted", Commons.FormatBytes(args.size)));
+                                j.setProgress((int) args.current, (int) args.total, false);
                                 break;
                             case PAUSED:
                                 RunningViewHolder l = (RunningViewHolder) holder;
                                 l.setStatus("Paused");
+
                                 l.setPaused(true);
                                 l.setProgress(0, 0, true);
                                 break;
                             case SKIPPED:
                             case COMPLETE:
-                                if (pack.metadata == null) {
+                                if (args.status.metadata == null) {
                                     RunningViewHolder n = (RunningViewHolder) holder;
                                     n.setStatus("Applying metadata");
                                     n.setProgress(0, 0, true);
@@ -302,7 +264,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                                     o.setStatus("SUCCESS");
 
                                     if (!(args.assigned == null || args.completed == null)) {
-                                        String text = "Succeeded after ";
+                                        String text = "Took ";
 
                                         long elapsed = args.completed.getTime() - args.assigned.getTime();
                                         short hour = (short) (elapsed / 3600_000);
@@ -319,10 +281,8 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
                                             if (second < 10) text += "0";
                                         }
                                         text += second + "s";
-
                                         o.setDate(text);
                                     }
-
 //                                    Calendar ass = Calendar.getInstance();
 //                                    ass.setTime(args.getCompleteDate());
 //
@@ -338,7 +298,10 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
 //                                        o.setDate("Assigned on " + new SimpleDateFormat("EEE, d MMMM yyyy", Locale.ENGLISH).format(args.getCompleteDate()));
                                 }
                         }
-
+                    case CANCELLED:
+                        break;
+                    case FAILED:
+                        break;
                 }
                 //endregion
             } catch (ClassCastException e) {
@@ -363,7 +326,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     }
 
     @Override
-    public void onProgress(Download args, long progress, long max, boolean indeterminate) {
+    public void onProgress(Download args, long progress, long max, long size, boolean indeterminate) {
         Download[] array = getServiceDownloads();
 
         int index = -1;
@@ -375,9 +338,9 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
             }
         }
 
-        if (index < 0)
+        /*if (index < 0)
             notifyDataSetChanged();
-        else UpdateAtPosition(index, args);
+        else*/ UpdateAtPosition(index, args);
         if (dialog != null) dialog.UpdatePartial(args);
     }
 
@@ -412,20 +375,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
             notifyDataSetChanged();
             return -1;
         }
-        return array[position].status.Pack();
-    }
-
-    private int getViewHolderType(Status pack) {
-        if (pack.isFailed() || pack.isInvalid())
-            return FailedViewHolder.LocalID;
-        else if (pack.download == Status.Download.COMPLETE && (pack.convert == Status.Convert.COMPLETE || pack.convert == Status.Convert.SKIPPED))
-            return pack.metadata == null ? RunningViewHolder.LocalID : SuccessViewHolder.LocalID;
-        else if (pack.isCancelled() || pack.isQueued())
-            return QueueViewHolder.LocalID;
-        else if (pack.download == Status.Download.RUNNING || pack.download == Status.Download.PAUSED ||
-                pack.convert == Status.Convert.RUNNING || pack.convert == Status.Convert.PAUSED)
-            return RunningViewHolder.LocalID;
-        else return BasicViewHolder.LocalID;
+        return DownloadController.getViewHolderType(array[position].status);
     }
 
     private Download[] getServiceDownloads() {
@@ -438,130 +388,5 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.BasicV
     private void UpdateAtPosition(int position, Download download) {
         RecyclerView.ViewHolder holder = recycler.findViewHolderForAdapterPosition(position);
         if (holder instanceof BasicViewHolder) InitializeViewHolder((BasicViewHolder) holder, download);
-    }
-
-    static class BasicViewHolder extends RecyclerView.ViewHolder {
-        static final int LocalID = 0;
-
-        protected View Main;
-        protected TextView Title;
-        protected ImageView Action;
-
-        BasicViewHolder(View itemView) {
-            super(itemView);
-            Main = itemView;
-            Title = itemView.findViewById(R.id.title);
-            Action = itemView.findViewById(R.id.action);
-        }
-
-        void setTitle(String title) {
-            Title.setText(title);
-        }
-
-        void setOnClickListener(View.OnClickListener listener) {
-            Main.setOnClickListener(listener);
-        }
-
-        void setOnLongClickListener(View.OnLongClickListener listener) {
-            Main.setOnLongClickListener(listener);
-        }
-
-        void setAction(View.OnClickListener listener) {
-            Action.setOnClickListener(listener);
-        }
-
-    }
-
-    static class QueueViewHolder extends BasicViewHolder {
-        static final int LocalID = 1;
-
-        protected TextView Status;
-
-        QueueViewHolder(View itemView) {
-            super(itemView);
-
-            Status = itemView.findViewById(R.id.status);
-        }
-
-        void setStatus(String status) {
-            Status.setText(status);
-        }
-    }
-
-    static class RunningViewHolder extends QueueViewHolder {
-        static final int LocalID = 2;
-
-        protected ConstraintLayout Constraint;
-        protected ProgressBar Progress;
-
-        RunningViewHolder(View itemView) {
-            super(itemView);
-
-            Constraint = itemView.findViewById(R.id.constraint);
-            Progress = itemView.findViewById(R.id.progress);
-            UpdateAnimation();
-        }
-
-        void setProgress(int current, int total, boolean indeterminate) {
-            if (indeterminate) Progress.setIndeterminate(true);
-            else {
-                Progress.setIndeterminate(false);
-                Progress.setMax(total);
-                Progress.setProgress(current);
-            }
-        }
-
-        void setPaused(boolean paused) {
-            if (paused) {
-                Constraint.setBackgroundResource(R.drawable.background_layout_paused);
-                Status.setText("PAUSED");
-            } else {
-                Constraint.setBackgroundResource(R.drawable.background_layout_running);
-                UpdateAnimation();
-            }
-        }
-
-        protected void UpdateAnimation() {
-            Drawable draw = Constraint.getBackground();
-            if (draw instanceof AnimationDrawable) {
-                AnimationDrawable anim = (AnimationDrawable) draw;
-                anim.setEnterFadeDuration(500);
-                anim.setExitFadeDuration(1000);
-                anim.start();
-            }
-
-        }
-    }
-
-    static class SuccessViewHolder extends QueueViewHolder {
-        static final int LocalID = 3;
-
-        protected TextView Date;
-
-        SuccessViewHolder(View itemView) {
-            super(itemView);
-
-            Date = itemView.findViewById(R.id.date);
-        }
-
-        void setDate(String date) {
-            Date.setText(date);
-        }
-    }
-
-    static class FailedViewHolder extends QueueViewHolder {
-        static final int LocalID = 4;
-
-        protected ImageView Info;
-
-        FailedViewHolder(View itemView) {
-            super(itemView);
-
-            Info = itemView.findViewById(R.id.negative);
-        }
-
-        void setInfoOnClickListener(View.OnClickListener listener) {
-            Info.setOnClickListener(listener);
-        }
     }
 }
