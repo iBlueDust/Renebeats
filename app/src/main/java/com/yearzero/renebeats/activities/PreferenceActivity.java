@@ -1,10 +1,10 @@
 package com.yearzero.renebeats.activities;
 
-import com.yearzero.renebeats.R;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.yearzero.renebeats.R;
 
 public class PreferenceActivity extends de.mrapp.android.preference.activity.PreferenceActivity {
 

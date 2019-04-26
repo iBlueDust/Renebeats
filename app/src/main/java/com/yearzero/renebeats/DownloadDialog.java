@@ -9,6 +9,11 @@ import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+
 import com.yearzero.renebeats.classes.Download;
 import com.yearzero.renebeats.classes.Status;
 
@@ -16,11 +21,9 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
 import de.hdodenhof.circleimageview.CircleImageView;
+
+//TODO: Display new fields such as Download.size and Download.length
 
 public class DownloadDialog extends DialogFragment {
 
@@ -142,10 +145,13 @@ public class DownloadDialog extends DialogFragment {
             URL.setText('-');
         else {
             URL.setText("Tap to Reveal");
-            URL.setOnClickListener(view -> new AlertDialog.Builder(getContext())
-                    .setTitle("URL")
-                    .setMessage(download.url)
-                    .show());
+            URL.setOnClickListener(view -> {
+                    if (getContext() != null)
+                        new AlertDialog.Builder(getContext())
+                            .setTitle("URL")
+                            .setMessage(download.url)
+                            .show();
+            });
         }
         UpdatePartial();
     }
@@ -160,12 +166,14 @@ public class DownloadDialog extends DialogFragment {
             if (download.exception instanceof IllegalArgumentException)
                 Exception.setText("IllegalArgumentException");
             else if (download.exception instanceof DownloadService.ServiceException) {
-                if ((((DownloadService.ServiceException) download.exception).getDownload()) == null)
-                    DLText.setText("");
-                else UpdateStatus(download.status);
+//                if ((((DownloadService.ServiceException) download.exception).getDownload()) == null)
+//                    DLText.setText("");
+//                else UpdateStatus(download.status);
+                Exception.setText(((DownloadService.ServiceException) download.exception).getPayload().getMessage());
             } else if (download.exception != null)
                 Exception.setText(download.exception.getMessage());
-            else UpdateStatus(download.status);
+
+            UpdateStatus(download.status);
         }
 
         if (download == null || download.down == null) PathDownload.setText("-");

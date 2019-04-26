@@ -4,13 +4,15 @@ package com.yearzero.renebeats.fragments.preferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+
+import com.tonyodev.fetch2.NetworkType;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.TimeoutDialog;
 
-import androidx.annotation.Nullable;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
 import de.mrapp.android.preference.activity.PreferenceFragment;
 
 public class PrefDataFragment extends PreferenceFragment {
@@ -45,6 +47,9 @@ public class PrefDataFragment extends PreferenceFragment {
             ListPreference list = (ListPreference) preference;
             Commons.Pref.mobiledata = "1".equals(newValue);
             Commons.Pref.Save();
+            Commons.fetch.setGlobalNetworkType(Commons.Pref.mobiledata ? NetworkType.ALL : NetworkType.WIFI_ONLY);
+            //TODO: This ^^^^ will freeze the download. And downloads are really slow for big files
+
             preference.setSummary(list.getEntries()[Commons.Pref.mobiledata ? 1 : 0]);
             return true;
         });
@@ -56,17 +61,9 @@ public class PrefDataFragment extends PreferenceFragment {
 
         setPreference(ClearCache, null, p -> {
             if (getContext() == null) return false;
-            double size = Commons.Directories.GetCacheSize();
-
-            int i = 0;
-            while (size >= 1000 && i < Commons.suffix.length) {
-                size /= 1000f;
-                i++;
-            }
-
             new TimeoutDialog(getContext())
                     .setTitle("Clear Cache")
-                    .setMessage(String.format("Cache can only be cleared if there are no downloads running. Doing so while a download is running will most likely result in failure.\nCache is %s %s", size, Commons.suffix[i]))
+                    .setMessage(String.format("Cache can only be cleared if there are no downloads running. Doing so while a download is running will most likely result in failure.\nCache is %s", Commons.FormatBytes(Commons.Directories.GetCacheSize())))
                     .setPositive("Delete", () -> {
                         Toast.makeText(getContext(), Commons.Directories.ClearCache() ? "Cache has been cleared" : "Cache was not cleared", Toast.LENGTH_LONG).show();
                         return true;
@@ -81,17 +78,9 @@ public class PrefDataFragment extends PreferenceFragment {
 
         setPreference(DeleteHistory, null, p -> {
             if (getContext() == null) return false;
-            double size = Commons.Directories.GetHistorySize();
-
-            int i = 0;
-            while (size >= 1000 && i < Commons.suffix.length) {
-                size /= 1000f;
-                i++;
-            }
-
             new TimeoutDialog(getContext())
                     .setTitle("Delete Download History")
-                    .setMessage(String.format("Download History will be permanently deleted. There is no way to recover the data.\nHistory is %s %s", size, Commons.suffix[i]))
+                    .setMessage(String.format("Download History will be permanently deleted. There is no way to recover the data.\nHistory is %s", Commons.FormatBytes(Commons.Directories.GetHistorySize())))
                     .setPositive("Delete", () -> {
                         Toast.makeText(getContext(), Commons.Directories.DeleteHistory() ? "History has been cleared" : "History was not cleared", Toast.LENGTH_LONG).show();
                         return true;

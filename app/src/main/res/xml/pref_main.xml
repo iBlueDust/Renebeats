@@ -29,6 +29,11 @@
             android:title="About"
             android:icon="@drawable/ic_info_outline_black_24dp" />
 
+        <de.mrapp.android.preference.activity.NavigationPreference
+            android:fragment="com.yearzero.renebeats.fragments.DependencyFragment"
+            android:title="Libraries"
+            android:icon="@drawable/ic_link_black_24dp" />
+
     </androidx.preference.PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

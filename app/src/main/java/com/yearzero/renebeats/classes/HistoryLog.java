@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class HistoryLog implements Serializable {
-    // Appcode (EA50) - Class code (HistoryLog: 415C) - Gradle version (3) - Iteration
-    private static final long serialVersionUID = 0xEA50_415C_0003_0000L;
+    // Appcode (EA50) - "Class" (ClA5) - Class ID (415C_1066)
+    private static final long serialVersionUID = 0xEA50_C1A5_415C_1066L;
 
     public boolean convert, normalize, overwrite;
     public short bitrate;
@@ -15,7 +15,7 @@ public class HistoryLog implements Serializable {
     public String album, artist, availformat, conv, down, format, mtdt, title, url, youtubeID;
     public String[] genres;
     public Date assigned, completed;
-    public Status status;
+    public int status; //Packed
     public Exception exception;
 
     public HistoryLog() { }
@@ -53,7 +53,7 @@ public class HistoryLog implements Serializable {
         log.assigned = data.assigned;
         log.completed = data.completed;
 
-        log.status = data.status;
+        log.status = data.status.Pack();
 
         log.exception = data.exception;
 

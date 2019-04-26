@@ -2,12 +2,18 @@ package com.yearzero.renebeats;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.util.SparseArray;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
@@ -21,7 +27,6 @@ import com.tonyodev.fetch2.FetchConfiguration;
 import com.yearzero.renebeats.classes.Download;
 import com.yearzero.renebeats.classes.HistoryLog;
 import com.yearzero.renebeats.classes.Query;
-import com.yearzero.renebeats.classes.Status;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -45,26 +50,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
 
 public class Commons extends Application {
 
     static final String SHARED_PREF_KEY = "com.yearzero.renebeats";
     public static final String YT_API_KEY = "AIzaSyCwdpSqwQDMXfZdLKldtuZr9pe7y08pgok";
-    public static final String[] suffix = {"B", "KB", "MB", "GB"};
     private static final String TAG = "Commons";
     static final String INTL_DATE_FORMAT = "yyyy-mm-ddThh:mm:sszzz";
 
     public static final int PERM_REQUEST = 0x24D1;
 
     // SERIALIZABLE UID CLASS CODES
-    // Query      - 0E10
-    // Download   - D01D
-    // Status     - 55A5
-    // HistoryLog - 415C
-
+    // Query      - 0E10_llE1
+    // Download   - D010_AD00
+    // Status     - 515A_1500
+    // HistoryLog - 415C_1066
 
 //    public static DownloadReceiver downloadReceiver;
     public static Fetch fetch;
@@ -185,6 +186,7 @@ public class Commons extends Application {
         private static final String location_timeout = "master timeout";
         private static final String location_overwrite = "overwrite mode";
         private static final String location_restore = "restore all settings";
+        private static final String location_artistfirst = "file format artistfirst";
 
         private static final String location_overwrite_version = "overwrite mode version";
 
@@ -198,6 +200,7 @@ public class Commons extends Application {
         public static boolean normalize = true;
         public static boolean mobiledata;
         public static boolean restore;
+        public static boolean artistfirst;
         public static String format = "mp3";
         public static File location = new File(Environment.getExternalStorageDirectory() + "/Music");
 
@@ -218,24 +221,27 @@ public class Commons extends Application {
             Editor.putInt(location_overwrite, overwrite.getValue());
             Editor.putInt(location_overwrite_version, OverwriteMode.versionID);
             Editor.putBoolean(location_restore, restore);
+            Editor.putBoolean(location_artistfirst, artistfirst);
             Editor.apply();
         }
 
         public static void Load() {
             restore = SharedPref.getBoolean(location_restore, false);
 
-            if (restore) Save();
-            else {
-                bitrate = (short) SharedPref.getInt(location_bitrate, bitrate);
-                format = SharedPref.getString(location_format, format);
-                sdcard = Directories.isExternalStorageAvailable() && SharedPref.getBoolean(location_sdcard, sdcard);
-                normalize = SharedPref.getBoolean(location_normalize, normalize);
-                mobiledata = SharedPref.getBoolean(location_mobiledata, mobiledata);
-                location = new File(SharedPref.getString(location_location, location.getAbsolutePath()));
-                concurrency = (short) SharedPref.getInt(location_concurrency, concurrency);
-                query_amount = (short) SharedPref.getInt(location_query_amount, query_amount);
-                //            timeout = SharedPref.getInt(location_timeout, timeout);
+            if (restore) {
+                Save();
+                return;
             }
+            bitrate = (short) SharedPref.getInt(location_bitrate, bitrate);
+            format = SharedPref.getString(location_format, format);
+            sdcard = Directories.isExternalStorageAvailable() && SharedPref.getBoolean(location_sdcard, sdcard);
+            normalize = SharedPref.getBoolean(location_normalize, normalize);
+            mobiledata = SharedPref.getBoolean(location_mobiledata, mobiledata);
+            location = new File(SharedPref.getString(location_location, location.getAbsolutePath()));
+            concurrency = (short) SharedPref.getInt(location_concurrency, concurrency);
+            query_amount = (short) SharedPref.getInt(location_query_amount, query_amount);
+            artistfirst = SharedPref.getBoolean(location_artistfirst, artistfirst);
+            //            timeout = SharedPref.getInt(location_timeout, timeout);
 
             if (SharedPref.getInt(location_overwrite_version, -1) == OverwriteMode.versionID)
                 overwrite = OverwriteMode.values()[SharedPref.getInt(location_overwrite, overwrite.getValue())];
@@ -265,6 +271,7 @@ public class Commons extends Application {
         public static final String INDEX = "index";
         public static final String LOAD = "load";
         public static final String PAUSED = "paused";
+        public static final String SIZE = "size";
 //        public static final String NOTIF_CANCEL = "notifications.cancel";
 
         public static final int DESTROY = 0xDDDFF;
@@ -315,7 +322,8 @@ public class Commons extends Application {
             androidDefaultUEH = Thread.getDefaultUncaughtExceptionHandler();
             Thread.setDefaultUncaughtExceptionHandler(handler);
         }
-
+        Notif.manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Notif.Initialize();
     }
 
 //    @Override
@@ -357,6 +365,14 @@ public class Commons extends Application {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String FormatBytes(long length) {
+        final String[] suffix = {"B", "KB", "MB", "GB"};
+        float len = (float) length;
+        int i = -1;
+        while (i++ < suffix.length && len >= 1000F) len /= 1000F;
+        return String.format(Locale.ENGLISH, "%.2f %s", len, suffix[i]);
     }
 
     private Thread.UncaughtExceptionHandler androidDefaultUEH;
@@ -423,9 +439,25 @@ public class Commons extends Application {
     }
 
     static class Notif {
-        static final String DOWNLOAD_PROGRESS = "com.yearzero.renebeats/download/progress";
-        static final String DOWNLOAD_COMPLETE = "com.yearzero.renebeats/download/complete";
+        static final String DOWNLOAD_PROGRESS = "com.yearzero.renebeats/download";
+        static final String CHANNEL_ID = "DownloadChannel";
         static final int DOWNLOAD_BASE_ID = 0x7B00_0000;
+
+        static NotificationManager manager;
+
+        static void Initialize() {
+            if (manager != null) {
+                Commons.Notif.manager.cancelAll();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Downloads in Progress", NotificationManager.IMPORTANCE_DEFAULT);
+                    channel.setDescription("All downloads are displayed here");
+                    channel.enableLights(false);
+                    channel.enableVibration(false);
+                    manager.createNotificationChannel(channel);
+
+                }
+            }
+        }
     }
 
     public static class History {
@@ -437,9 +469,6 @@ public class Commons extends Application {
             kryo.register(HistoryLog[].class, 101);
             kryo.register(Date.class, 200);
             kryo.register(String[].class, 301);
-            kryo.register(Status.class, 400);
-            kryo.register(Status.Convert.class, 500);
-            kryo.register(Status.Download.class, 600);
         }
 
         public interface Callback<T, U> {

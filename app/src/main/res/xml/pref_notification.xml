@@ -11,7 +11,7 @@
         android:summary="Show notifications of queued downloads" />
 
     <androidx.preference.CheckBoxPreference
-        android:key="NotificationRunning"
+        android:key="@string/pref_notification_running"
         android:title="Running"
         android:summary="Show notifications of running downloads" />
 

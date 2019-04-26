@@ -6,14 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.yearzero.renebeats.R;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-public class AboutFragment extends Fragment {
+import com.yearzero.renebeats.R;
 
-    //TODO: Show all libraries
+public class AboutFragment extends Fragment {
 
     public AboutFragment() {
     }

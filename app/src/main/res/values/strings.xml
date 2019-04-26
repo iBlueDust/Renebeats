@@ -7,15 +7,20 @@
     <string name="pref_data_outputdirectory">OutputDirectory</string>
     <string name="pref_data_deletehistory">DeleteHistory</string>
     <string name="pref_data_restoresettings">RestoreSettings</string>
+
     <string name="pref_defaults_timeout">QueryTimeout</string>
     <string name="pref_defaults_queryamount">QueryAmount</string>
     <string name="pref_defaults_concurrent">ConcurrentDownloads</string>
     <string name="pref_defaults_format">DefaultFormat</string>
-    <string name="pref_defaults_bitrate">DefaultFormat</string>
+    <string name="pref_defaults_processspeed">DefaultProcessSpeed</string>
+    <string name="pref_defaults_bitrate">DefaultBitrate</string>
     <string name="pref_defaults_overwrite">DefaultOverwrite</string>
     <string name="pref_defaults_normalize">DefaultNormalize</string>
+    <string name="pref_defaults_filename">DefaultFileName</string>
+
     <string name="pref_notification_master">NotificationMaster</string>
     <string name="pref_notification_queue">NotificationQueue</string>
+    <string name="pref_notification_running">NotificationRunning</string>
     <string name="pref_notification_completed">NotificationCompleted</string>
     <string name="pref_guesser_modes">GuesserModes</string>
 
@@ -51,11 +56,33 @@
     <string-array name="guesser">
         <item>Off</item>
         <item>Use video title and uploader</item>
-        <item>Guess title and artist from title</item>
+        <item>Guess title and artist from title (Title first)</item>
+        <item>Guess title and artist from title (Artist first)</item>
     </string-array>
 
     <string-array name="file_name">
         <item>[Title] - [Artist]</item>
         <item>[Artist] - [Title]</item>
     </string-array>
+
+    <string-array name="dependencies">
+        <item>AndroidAudioConverter 0.0.8 by Adriel "adrielcafe" Café on GitHub (was modified to add normalize and preset functionality)</item>
+        <item>AndroidPreferenceActivity 7.0.1 by Michael "michael-rapp" Rapp on GitHub</item>
+        <item>Android Sliding Up Panel 3.4.0 by Umano on GitHub</item>
+        <item>CircleImageView 3.0.0 by Henning "hdodenhof" Dodenhof on GitHub</item>
+        <item>Commons Text 1.6 by Apache Software Foundation</item>
+        <item>Commons IO 1.3.2 by Apache Software Foundation</item>
+        <item>EasyPermissions 0.3.0 by Google Samples on GitHub</item>
+        <item>Fetch2 2.3.4 by Tonyo "tonyofrancis" Francis on GitHub</item>
+        <item>Gson 2.8.5 by Google</item>
+        <item>Kryo 5.0.0-RC1 by Esoteric Software on GitHub</item>
+        <!--<item>MaterialSearchView 1.4.0 by Miguel Catalan Bañuls on GitHub</item>-->
+        <item>MyID3 for Android</item>
+        <item>Nachos 1.1.1 by Hootsuite on GitHub</item>
+        <item>Picasso 2.71828 by Square on GitHub</item>
+        <item>picasso-transformations 2.2.1 by Daichi "wasabeef" Furiya by GitHub</item>
+        <item>Shimmer 0.4.0 by Facebook on GitHub</item>
+        <!--<item>Transitions Everywhere by Andrey "andkulikulov" Kulikulov on GitHub</item>-->
+    </string-array>
+
 </resources>

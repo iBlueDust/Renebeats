@@ -28,6 +28,11 @@
         <!--android:entries="@array/formats"-->
 
         <androidx.preference.ListPreference
+            android:key="@string/pref_defaults_processspeed"
+            android:title="Processing Speed Preset"
+            android:summary="Processing can be sped up at the cost of quality per file size"/>
+
+        <androidx.preference.ListPreference
             android:key="@string/pref_defaults_bitrate"
             android:title="Bitrate" />
             <!--android:entries="@array/bitrates" />-->
@@ -42,7 +47,7 @@
             android:title="Normalize" />
 
         <androidx.preference.ListPreference
-            android:key="DefaultFileName"
+            android:key="@string/pref_defaults_filename"
             android:title="File Name Format" />
             <!--android:entries="@array/file_name" />-->
 

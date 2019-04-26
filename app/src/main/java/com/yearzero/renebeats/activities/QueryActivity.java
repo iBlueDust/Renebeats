@@ -9,6 +9,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.api.services.youtube.model.SearchResult;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.R;
@@ -19,11 +24,6 @@ import com.yearzero.renebeats.classes.Query;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 @Deprecated
 public class QueryActivity extends AppCompatActivity implements YoutubeQueryTask.Callbacks {
@@ -118,7 +118,7 @@ public class QueryActivity extends AppCompatActivity implements YoutubeQueryTask
             OfflineMsg.setText("Your search didn't come out with any results");
             OfflineAction.setText("Back");
             OfflineAction.setOnClickListener(v -> onBackPressed());
-        } else adapter.resetList(Query.CastList(results));
+        } else adapter.resetList(Query.CastListXML(results));
 
         OfflineImg.setVisibility(visi);
         OfflineMsg.setVisibility(visi);
