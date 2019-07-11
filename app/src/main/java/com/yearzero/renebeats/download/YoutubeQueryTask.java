@@ -25,11 +25,17 @@ public class YoutubeQueryTask extends AsyncTask<String, Void, List<SearchResult>
 
     private Callbacks listener;
     private String pkgName;
+    private String sha1;
     private int timeout;
 
     YoutubeQueryTask(Callbacks listener, @NonNull String pkgName) {
         this.listener = listener;
         this.pkgName = pkgName;
+    }
+
+    YoutubeQueryTask setSignature(String sha1) {
+        this.sha1 = sha1;
+        return this;
     }
 
     YoutubeQueryTask setTimeout(int timeout) {
@@ -57,7 +63,10 @@ public class YoutubeQueryTask extends AsyncTask<String, Void, List<SearchResult>
     @Override
     protected List<SearchResult> doInBackground(String... query) {
         try {
-            YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), request -> {})
+            YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), request -> {
+                request.getHeaders().set("X-Android-Package", pkgName);
+                if (sha1 != null) request.getHeaders().set("X-Android-Cert", sha1);
+            })
                     .setApplicationName(pkgName)
                     .build();
 
