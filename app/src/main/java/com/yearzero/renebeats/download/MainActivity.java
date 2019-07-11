@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -33,6 +34,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.api.services.youtube.model.SearchResult;
+import com.google.common.io.BaseEncoding;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.InternalArgs;
@@ -40,6 +42,8 @@ import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.preferences.PreferenceActivity;
 import com.yearzero.renebeats.preferences.Preferences;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 queryAdapter.resetList(Collections.nCopies(Preferences.getQuery_amount(), null));
                 new YoutubeQueryTask(MainActivity.this, getPackageName())
                         .setTimeout(Preferences.getTimeout())
+                        .setSignature(getSignature(getPackageManager(), getPackageName()))
                         .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
             } else {
                 OfflineAction.setText("Retry");
@@ -435,4 +440,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 //        super.onResume();
 //        if (querying) Shimmer.startShimmer();
 //    }
+
+    public static String getSignature(@NonNull PackageManager pm, @NonNull String packageName) {
+        try {
+            PackageInfo packageInfo = pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
+            if (packageInfo == null
+                    || packageInfo.signatures == null
+                    || packageInfo.signatures.length == 0
+                    || packageInfo.signatures[0] == null) {
+                return null;
+            }
+
+            byte[] signature = packageInfo.signatures[0].toByteArray();
+            MessageDigest md = MessageDigest.getInstance("SHA1");
+            byte[] digest = md.digest(signature);
+            return BaseEncoding.base16().lowerCase().encode(digest);
+        } catch (NoSuchAlgorithmException | PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -23,6 +23,7 @@ android {
     //    6 | alpha0.6
   }
   buildTypes {
+
     release {
       minifyEnabled true
       shrinkResources true
