@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <androidx.preference.ListPreference
-        android:key="@string/pref_data_downloadusing"
-        android:title="Download using" />
-        <!--android:entries="@array/data" />-->
-
     <androidx.preference.Preference
         android:key="@string/pref_data_outputdirectory"
         android:title="Output Location" />
@@ -21,6 +16,11 @@
             android:key="@string/pref_data_clearpaused"
             android:title="Clear Paused"
             android:summary="All paused downloads will be cancelled" />
+
+        <androidx.preference.Preference
+            android:key="@string/pref_data_clearlogs"
+            android:title="Clear Logs"
+            android:summary="Clear all error logs" />
 
         <androidx.preference.Preference
             android:key="@string/pref_data_deletehistory"

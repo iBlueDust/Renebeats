@@ -2,7 +2,7 @@
 
 Done notification is disappearing because of another process
 Predictive title field fill
-Do not start download until sparsearray is get.
+Do not start log until sparsearray is get.
 Cover DownloadActivity when retrieving
 Download Fragment
 Settings Activity
