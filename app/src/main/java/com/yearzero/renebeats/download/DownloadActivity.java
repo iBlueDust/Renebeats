@@ -43,7 +43,6 @@ import com.yearzero.renebeats.preferences.Preferences;
 import com.yearzero.renebeats.preferences.enums.GuesserMode;
 import com.yearzero.renebeats.preferences.enums.OverwriteMode;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.File;
@@ -575,7 +574,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 return new String[]{split[1], split[0]};
             else //if (split[1].matches("(?i)(?:.*\\s+|\\s*)(?:ft\\.?|feat\\.?|featuring)\\s++.+"))
                 return split;
-        } else return new String[]{title, StringUtils.replace(uploader,"VEVO", "")};
+        } else return new String[]{title, uploader == null ? "" : uploader.replace("VEVO", "")};
     }
 
     private void LoadThumbnail() {

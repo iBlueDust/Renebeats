@@ -8,9 +8,10 @@ android {
     applicationId "com.yearzero.renebeats"
     minSdkVersion 16
     multiDexEnabled true
+    resConfigs "en"
     targetSdkVersion 28
-    versionCode 6
-    versionName "alpha0.6"
+    versionCode 601
+    versionName "alpha0.6.1"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     // CODE | VERSION NAME
@@ -21,14 +22,16 @@ android {
     //    4 | alpha0.4
     //    5 | alpha0.5
     //    6 | alpha0.6
+    //  601 | alpha0.6.1
   }
   buildTypes {
-
     release {
       minifyEnabled true
       shrinkResources true
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
+
     buildTypes.all {
       buildConfigField 'String', 'YT_API_KEY', YouTubeAPIKey
 
@@ -70,7 +73,7 @@ dependencies {
   implementation 'com.github.michael-rapp:android-preference-activity:7.0.1'
   implementation 'androidx.tonyodev.fetch2:xfetch2:3.1.1'
   implementation 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
-  implementation 'com.hootsuite.android:nachos:1.1.1'
+//  implementation 'com.hootsuite.android:nachos:1.1.1'
   implementation 'com.google.code.gson:gson:2.8.5'
   implementation 'com.sothree.slidinguppanel:library:3.4.0'
   implementation 'com.esotericsoftware:kryo:5.0.0-RC2'
@@ -78,7 +81,7 @@ dependencies {
   implementation 'commons-io:commons-io:2.6'
   implementation 'com.facebook.shimmer:shimmer:0.4.0'
   implementation 'com.github.codekidX:storage-chooser:2.0.4.4'
-  implementation 'com.github.pwittchen:infinitescroll:0.0.2'
+//  implementation 'com.github.pwittchen:infinitescroll:0.0.2'
   implementation 'com.github.tylerfilla:PanView:0.1.0'
 //    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
 //    implementation 'com.andkulikov:transitionseverywhere:1.8.1'

@@ -454,6 +454,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             byte[] signature = packageInfo.signatures[0].toByteArray();
             MessageDigest md = MessageDigest.getInstance("SHA1");
             byte[] digest = md.digest(signature);
+
             return BaseEncoding.base16().lowerCase().encode(digest);
         } catch (NoSuchAlgorithmException | PackageManager.NameNotFoundException e) {
             e.printStackTrace();

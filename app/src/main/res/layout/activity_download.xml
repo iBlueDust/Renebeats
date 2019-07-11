@@ -374,18 +374,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" >
 
-            <!--<com.hootsuite.nachos.NachoTextView-->
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/genres"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Genres"
             android:maxLines="3"
-            android:singleLine="false"
-            app:chipBackground="@color/Accent"
-            app:chipTextColor="#FEFEFE"
-            app:chipTextSize="16dp"
-            app:chipVerticalSpacing="3dp" />
+            android:singleLine="false" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <CheckBox
