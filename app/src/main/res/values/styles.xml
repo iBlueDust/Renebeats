@@ -25,6 +25,7 @@
 
     <style name="Text" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">@font/segoeui</item>
+        <item name="android:textColor">@color/textDark</item>
     </style>
 
     <style name="Text.SemiLight" parent="Text">
@@ -46,26 +47,35 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="Text.Header" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">@color/gray</item>
-        <item name="android:fontFamily">@font/montserrat_semibold</item>
+    <style name="Text.Header" parent="Text">
+        <item name="android:fontFamily">@font/segoeui_semibold</item>
+        <!--<item name="android:fontFamily">@font/montserrat_semibold</item>-->
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Text.Header.Big" parent="Text.Header">
+        <item name="android:fontFamily">@font/segoeui_semibold</item>
+        <!--<item name="android:fontFamily">@font/montserrat_semibold</item>-->
         <item name="android:textSize">32sp</item>
     </style>
 
-    <style name="Text.HeaderSmall" parent="Text.Header">
-        <item name="android:textColor">@color/gray</item>
-        <item name="android:fontFamily">@font/montserrat_semibold</item>
+    <style name="Text.Header.Small" parent="Text.Header">
+        <item name="android:fontFamily">@font/segoeui_semibold</item>
+        <!--<item name="android:fontFamily">@font/montserrat_semibold</item>-->
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="Text.HeaderHuge" parent="Text.Header">
-        <item name="android:textColor">@color/gray</item>
-        <item name="android:fontFamily">@font/montserrat_semibold</item>
+    <style name="Text.Header.Huge" parent="Text.Header">
+        <!--<item name="android:fontFamily">@font/montserrat_semibold</item>-->
+        <item name="android:fontFamily">@font/segoeui_semibold</item>
         <item name="android:textSize">60sp</item>
     </style>
 
-    <style name="Text.SemiBold.Italic" parent="Text">
-        <item name="android:textColor">@color/textDark</item>
+    <style name="Text.SemiBold" parent="Text">
+        <item name="android:fontFamily">@font/segoeui_semibold</item>
+    </style>
+
+    <style name="Text.SemiBold.Italic" parent="Text.SemiBold">
         <item name="android:fontFamily">@font/segoeui_semibolditalic</item>
     </style>
     

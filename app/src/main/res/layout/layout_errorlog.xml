@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription=">"
+            app:layout_constraintBottom_toBottomOf="@id/view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/ic_arrow_right_black_24dp"
+            tools:ignore="VectorDrawableCompat" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:textAppearance="@style/Text.SemiBold"
+            app:layout_constraintBottom_toBottomOf="@id/arrow"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/arrow"
+            app:layout_constraintTop_toTopOf="@+id/arrow" />
+
+        <!--<androidx.constraintlayout.widget.ConstraintLayout-->
+            <!--android:id="@+id/collapsible"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:visibility="gone"-->
+            <!--app:layout_constraintBottom_toBottomOf="parent"-->
+            <!--app:layout_constraintLeft_toLeftOf="parent"-->
+            <!--app:layout_constraintRight_toRightOf="parent"-->
+            <!--app:layout_constraintTop_toBottomOf="@id/arrow">-->
+
+            <!--<androidx.constraintlayout.widget.ConstraintLayout-->
+                <!--android:id="@+id/scroll"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--app:layout_constrainedHeight="true"-->
+                <!--app:layout_constraintHeight_max="300dp"-->
+                <!--app:layout_constraintBottom_toTopOf="@id/share"-->
+                <!--app:layout_constraintLeft_toLeftOf="parent"-->
+                <!--app:layout_constraintRight_toRightOf="parent"-->
+                <!--app:layout_constraintTop_toTopOf="parent">-->
+
+                <!--<com.gmail.tylerfilla.widget.panview.PanView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:background="#EEE">-->
+
+                    <!--<TextView-->
+                        <!--android:id="@+id/payload"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:clipToPadding="true"-->
+                        <!--android:fontFamily="serif-monospace" />-->
+                        <!--&lt;!&ndash;android:text="D/LibGlobalFetchLib: PriorityIterator backoffTime reset to 500 milliseconds\n    PriorityIterator started\nW/System: A resource failed to call close. \n    A resource failed to call close. \nW/rzero.renebeat: Accessing hidden method Landroid/view/View;->computeFitSystemWindows(Landroid/graphics/Rect;Landroid/graphics/Rect;)Z (light greylist, reflection)\nW/rzero.renebeat: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (light greylist, reflection)\nW/rzero.renebeat: Accessing hidden method Landroid/graphics/Canvas;->save(I)I (light greylist, linking)\nD/LibGlobalFetchLib: PriorityIterator backoffTime increased to 1 minute(s)\nD/LibGlobalFetchLib: PriorityIterator backoffTime increased to 2 minute(s)\nW/rzero.renebeat: Accessing hidden method Landroid/graphics/FontFamily;-><init>()V (light greylist, reflection)\n    Accessing hidden method Landroid/graphics/FontFamily;->addFontFromAssetManager(Landroid/content/res/AssetManager;Ljava/lang/String;IZIII[Landroid/graphics/fonts/FontVariationAxis;)Z (light greylist, reflection)\n    Accessing hidden method Landroid/graphics/FontFamily;->addFontFromBuffer(Ljava/nio/ByteBuffer;I[Landroid/graphics/fonts/FontVariationAxis;II)Z (light greylist, reflection)\n    Accessing hidden method Landroid/graphics/FontFamily;->freeze()Z (light greylist, reflection)\n    Accessing hidden method Landroid/graphics/FontFamily;->abortCreation()V (light greylist, reflection)\nW/rzero.renebeat: Accessing hidden method Landroid/graphics/Typeface;->createFromFamiliesWithDefault([Landroid/graphics/FontFamily;Ljava/lang/String;II)Landroid/graphics/Typeface; (light greylist, reflection)\nI/Adreno: QUALCOMM build                   : cf57c9c, I1cb5c4d1cc\n    Build Date                       : 09/23/18\n    OpenGL ES Shader Compiler Version: EV031.25.03.01\n    Local Branch                     : \n    Remote Branch                    : \n    Remote Branch                    : \n    Reconstruct Branch               : \n    Build Config                     : S L 6.0.7 AArch32\nI/Adreno: PFP: 0x005ff112, ME: 0x005ff066\nI/ConfigStore: android::hardware::configstore::V1_0::ISurfaceFlingerConfigs::hasWideColorDisplay retrieved: 0\nI/ConfigStore: android::hardware::configstore::V1_0::ISurfaceFlingerConfigs::hasHDRDisplay retrieved: 0\nI/OpenGLRenderer: Initialized EGL, version 1.4\nD/OpenGLRenderer: Swap behavior 2\nE/RecyclerView: No adapter attached; skipping layout\nI/Commons: AndroidAudioConverter successfully loaded\nI/AssistStructure: Flattened final assist data: 3936 bytes, containing 1 windows, 14 views\nI/Timeline: Timeline: Activity_launch_request time:47077271 intent:Intent { cmp=com.yearzero.renebeats/.activities.PreferenceActivity }\nW/ActivityThread: handleWindowVisibility: no activity for token android.os.BinderProxy@7119391\nE/rzero.renebeat: No package ID ff found for ID 0xffffffff.\nI/chatty: uid=10210(com.yearzero.renebeats) identical 4 lines\nE/rzero.renebeat: No package ID ff found for ID 0xffffffff.\nE/rzero.renebeat: No package ID ff found for ID 0xffffffff.\nE/RecyclerView: No adapter attached; skipping layout\nE/rzero.renebeat: No package ID ff found for ID 0xffffffff.\n    No package ID ff found for ID 0xffffffff.\nW/rzero.renebeat: Accessing hidden field Landroid/view/animation/Animation;->mListener:Landroid/view/animation/Animation$AnimationListener; (light greylist, reflection)\nI/Timeline: Timeline: Activity_launch_request time:47079448 intent:Intent { cmp=com.yearzero.renebeats/.activities.ErrorLogActivity }\nW/ActivityThread: handleWindowVisibility: no activity for token android.os.BinderProxy@5141b4d\nW/rzero.renebeat: Accessing hidden method Landroid/view/View;->getTransitionAlpha()F (light greylist, reflection)\nW/rzero.renebeat: Accessing hidden method Landroid/view/View;->setLeftTopRightBottom(IIII)V (light greylist, reflection)\nW/rzero.renebeat: Accessing hidden method Landroid/view/ViewGroup;->suppressLayout(Z)V (light greylist, reflection)\nW/rzero.renebeat: Accessing hidden method Landroid/view/View;->setTransitionAlpha(F)V (light greylist, reflection)\nI/rzero.renebeat: ProcessProfilingInfo new_methods=10 is saved saved_to_disk=1 resolve_classes_delay=8000\nW/rzero.renebeat: Accessing hidden field Landroid/view/View;->mViewFlags:I (light greylist, reflection)\nI/rzero.renebeat: Background concurrent copying GC freed 15941(1144KB) AllocSpace objects, 4(76KB) LOS objects, 49% free, 4MB/8MB, paused 433us total 110.171ms\nW/Choreographer: OPTS_INPUT: First frame was drawed before optimized, so skip!\nD/LibGlobalFetchLib: PriorityIterator backoffTime increased to 4 minute(s)\nApplication terminated." />&ndash;&gt;-->
+                <!--</com.gmail.tylerfilla.widget.panview.PanView>-->
+            <!--</androidx.constraintlayout.widget.ConstraintLayout>-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/copy"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:background="@android:color/transparent"-->
+                <!--android:contentDescription="Copy"-->
+                <!--android:padding="8dp"-->
+                <!--android:src="@drawable/ic_copy_accent_24dp"-->
+                <!--app:layout_constraintEnd_toStartOf="@id/share"-->
+                <!--app:layout_constraintTop_toTopOf="@id/share" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/share"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginBottom="8dp"-->
+                <!--android:background="@android:color/transparent"-->
+                <!--android:contentDescription="Share"-->
+                <!--android:padding="8dp"-->
+                <!--android:src="@drawable/ic_share_accent_24dp"-->
+                <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                <!--app:layout_constraintEnd_toEndOf="@id/scroll" />-->
+        <!--</androidx.constraintlayout.widget.ConstraintLayout>-->
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="#EEE"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

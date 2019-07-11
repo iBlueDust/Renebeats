@@ -19,7 +19,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
-            android:textAppearance="@style/Text.HeaderSmall"
+            android:textAppearance="@style/Text.Header.Small"
             app:layout_constraintEnd_toStartOf="@+id/dismiss"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -169,6 +169,31 @@
                     android:textAlignment="textEnd"
                     android:textAppearance="@style/Text.SemiLight" />
             </TableRow>
+
+            <!--<TableRow-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content">-->
+
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginEnd="8dp"-->
+                    <!--android:layout_marginRight="8dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:text="Duration"-->
+                    <!--android:textAppearance="@style/Text.BoldAccent" />-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/duration"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="end"-->
+                    <!--android:layout_weight="2"-->
+                    <!--android:ellipsize="end"-->
+                    <!--android:maxLines="2"-->
+                    <!--android:textAlignment="textEnd"-->
+                    <!--android:textAppearance="@style/Text.SemiLight" />-->
+            <!--</TableRow>-->
         </TableLayout>
 
         <View
@@ -501,7 +526,6 @@
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
             android:background="@color/ClearGray"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/secret_main"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -518,7 +542,6 @@
             android:layout_marginRight="32dp"
             android:text="Super Secret"
             android:textAppearance="@style/Text.Section"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/secret_view" />
@@ -533,7 +556,6 @@
             android:layout_marginRight="32dp"
             android:shrinkColumns="1"
             android:stretchColumns="1"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/secret_lbl">
@@ -607,8 +629,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_weight="2"
-                    android:maxLines="2"
                     android:ellipsize="end"
+                    android:maxLines="2"
                     android:textAlignment="textEnd"
                     android:textAppearance="@style/Text.SemiLight" />
             </TableRow>
@@ -641,7 +663,7 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="8dp" >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -654,6 +676,33 @@
 
                 <TextView
                     android:id="@+id/exception"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_weight="2"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textAlignment="textEnd"
+                    android:textAppearance="@style/Text.SemiLight" />
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/progress_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:text="Progress"
+                    android:textAppearance="@style/Text.BoldAccent" />
+
+                <TextView
+                    android:id="@+id/progress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
@@ -676,7 +725,6 @@
             android:layout_marginRight="32dp"
             android:text="Paths"
             android:textAppearance="@style/Text.Section"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/secret_view" />
@@ -691,14 +739,13 @@
             android:layout_marginRight="16dp"
             android:shrinkColumns="1"
             android:stretchColumns="1"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/secret_paths">
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -796,7 +843,7 @@
         </TableLayout>
 
         <Button
-            android:id="@+id/close"
+            android:id="@+id/save"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -6,14 +6,18 @@
 package com.yearzero.renebeats;
 
 import android.content.Context;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegLoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
+import com.yearzero.renebeats.preferences.enums.ProcessSpeed;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,8 +33,10 @@ import java.util.TimeZone;
 import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
 import cafe.adriel.androidaudioconverter.model.AudioFormat;
 
+//TODO: Add mp4 support (and video support actually)
+
 public class AndroidAudioConverter {
-    public static final String TAG = "ModdedAudioConverter";
+    public static final String TAG = "AndroidAudioConverter";
 
     public interface IConvertCallback {
         void onSuccess(File var1);
@@ -94,24 +100,22 @@ public class AndroidAudioConverter {
         return this;
     }
 
+//    public AndroidAudioConverter setProgressEnable(boolean progress) {
+//        this.progress = progress;
+//        return this;
+//    }
+
     public AndroidAudioConverter setFormat(AudioFormat format) {
         this.format = format;
         return this;
     }
 
     public AndroidAudioConverter setBitrate(short bitRate) {
-        boolean contain = false;
-        for (short b : Commons.Pref.BITRATES) if (b == bitRate) {
-            contain = true;
-            break;
-        }
-
-        if (contain) this.bitRate = bitRate;
+        if (bitRate > 0) this.bitRate = bitRate;
         else {
             Log.e(TAG, "Indicated sample rate is not supported, audio is converting with original sample rate");
             this.bitRate = 0;
         }
-
         return this;
     }
 
@@ -156,9 +160,8 @@ public class AndroidAudioConverter {
         return this;
     }
 
-    //TODO: Make length check independent of normalize=true (run normalize check command nevertheless?)
-
-    public void convert() {
+    @Nullable
+    public File convert() {
         if (!isLoaded()) {
             this.callback.onFailure(new Exception("FFmpeg not loaded"));
         } else if (this.audioFile != null && this.audioFile.exists()) {
@@ -166,17 +169,31 @@ public class AndroidAudioConverter {
                 this.callback.onFailure(new IOException("Can't read the file. Missing permission?"));
             else {
                 if (instance == null) instance = FFmpeg.getInstance(context);
+
+                //region get audio file length
+                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                mmr.setDataSource(context, Uri.fromFile(audioFile));
+                String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                try {
+                    total = Integer.parseInt(durationStr);
+                } catch (NumberFormatException e) {
+                    Log.e(TAG, "NumberFormatException when retrieving length of audio file. Process will still continue but progress tracking will not work.");
+                }
+                //endregion
+                final File convertedFile = getConvertedFile(this.audioFile, this.format);
+
                 if (normalize) {
+                    callback.onProgress(0L, 0, 0);
                     try {
                         instance.execute(new String[]{"-i", audioFile.getAbsolutePath(), "-af", "volumedetect", "-vn", "-sn", "-dn", "-f", "null", "/dev/null"}, new FFmpegExecuteResponseHandler() {
                             @Override
                             public void onSuccess(String message) {
-                                postexcecute();
+                                postExcecute(convertedFile);
                             }
 
                             @Override
                             public void onProgress(String message) {
-                                if (message.startsWith("size=N/A")) {
+                                /*if (progress && message.startsWith("size=N/A")) {
                                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS", Locale.ENGLISH);
                                     sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
                                     Date date;
@@ -186,7 +203,7 @@ public class AndroidAudioConverter {
                                     } catch (ParseException e) {
                                         Log.w(TAG, "Normalize size search ParseException 'time='");
                                     }
-                                } else if (message.startsWith("[Parsed")) {
+                                } else */if (message.startsWith("[Parsed")) {
                                     try {
                                         maxdB = Float.parseFloat(message.replaceFirst("\\[Parsed_volumedetect_0 @ [0-9a-fx]+] max_volume: (-?\\d+\\.\\d+) dB", "$1"));
                                     } catch (NumberFormatException ignored) {}
@@ -210,13 +227,14 @@ public class AndroidAudioConverter {
                     } catch (FFmpegCommandAlreadyRunningException e) {
                         e.printStackTrace();
                     }
-                } else postexcecute();
+                } else postExcecute(convertedFile);
+                return convertedFile;
             }
         } else if (callback != null) callback.onFailure(new FileNotFoundException());
+        return null;
     }
 
-    private void postexcecute() {
-        final File convertedFile = getConvertedFile(this.audioFile, this.format);
+    private void postExcecute(File convertedFile) {
         ArrayList<String> commandBuilder = new ArrayList<>(Arrays.asList("-y", "-i", this.audioFile.getPath()));
 
         if (speed != null)

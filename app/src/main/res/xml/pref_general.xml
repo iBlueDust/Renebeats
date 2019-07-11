@@ -2,54 +2,69 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.preference.ListPreference
-        android:key="@string/pref_defaults_timeout"
-        android:title="Query Timeout" />
+        android:key="@string/pref_data_downloadusing"
+        android:title="Download using" />
+    <!--android:entries="@array/data" />-->
 
     <androidx.preference.ListPreference
-        android:key="@string/pref_defaults_queryamount"
-        android:title="Query Amount" />
+        android:key="@string/pref_defaults_processspeed"
+        android:title="Processing Speed Preset"
+        android:summary="Processing can be sped up at the cost of quality per file size"
+        android:entries="@array/process_speed"
+        android:entryValues="@array/process_speed_entries" />
 
-    <androidx.preference.ListPreference
-        android:key="@string/pref_defaults_concurrent"
-        android:title="Concurrent Downloads" />
+    <!--<androidx.preference.ListPreference-->
+        <!--android:key="@string/pref_defaults_concurrent"-->
+        <!--android:title="Concurrent Downloads" />-->
+
+    <androidx.preference.CheckBoxPreference
+        android:key="@string/pref_defaults_alwayslog"
+        android:title="Always Log Failed Downloads"
+        android:checked="false"
+        android:summary="Error reports will be immediately saved. Long press to view all logs" />
 
     <androidx.preference.ListPreference
         android:key="@string/pref_guesser_modes"
         android:icon="@drawable/ic_prediction_black_24dp"
-        android:title="Guess Modes" />
-    <!--android:entries="@array/guesser" />-->
+        android:title="Autofill Options"
+        android:entries="@array/guesser"
+        android:entryValues="@array/guesser_entries"/>
+
+    <androidx.preference.ListPreference
+        android:key="@string/pref_defaults_queryamount"
+        android:title="Query Amount"
+        android:entries="@array/query_amount"
+        android:entryValues="@array/query_amount" />
 
     <androidx.preference.PreferenceCategory
         android:title="Defaults" >
 
         <androidx.preference.ListPreference
             android:key="@string/pref_defaults_format"
-            android:title="Format" />
-        <!--android:entries="@array/formats"-->
-
-        <androidx.preference.ListPreference
-            android:key="@string/pref_defaults_processspeed"
-            android:title="Processing Speed Preset"
-            android:summary="Processing can be sped up at the cost of quality per file size"/>
+            android:title="Format"
+            android:entries="@array/formats"
+            android:entryValues="@array/formats" />
 
         <androidx.preference.ListPreference
             android:key="@string/pref_defaults_bitrate"
             android:title="Bitrate" />
-            <!--android:entries="@array/bitrates" />-->
 
         <androidx.preference.ListPreference
             android:key="@string/pref_defaults_overwrite"
-            android:title="Overwrite" />
-            <!--android:entries="@array/overwrite" />-->
+            android:title="Overwrite"
+            android:entries="@array/overwrite"
+            android:entryValues="@array/overwrite_entries" />
 
         <androidx.preference.CheckBoxPreference
             android:key="@string/pref_defaults_normalize"
-            android:title="Normalize" />
+            android:title="Normalize"
+            android:summary="This helps fix overly quiet audio" />
 
         <androidx.preference.ListPreference
             android:key="@string/pref_defaults_filename"
-            android:title="File Name Format" />
-            <!--android:entries="@array/file_name" />-->
+            android:title="File Name Format"
+            android:entries="@array/file_name"
+            android:entryValues="@array/file_name_entries" />
 
     </androidx.preference.PreferenceCategory>
 

@@ -16,16 +16,18 @@
         android:roundIcon="@mipmap/ic_new_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        android:usesCleartextTraffic="true"
+        android:fullBackupContent="@xml/backup_descriptor"
+        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute" >
 
         <service
-            android:name=".DownloadService"
+            android:name=".download.DownloadService"
             android:stopWithTask="false" />
 
-        <receiver android:name=".DownloadReceiver" />
+        <receiver android:name=".notification.DownloadReceiver" />
 
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".download.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,26 +36,43 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.DownloadActivity"
+            android:name=".download.DownloadActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
-        </activity>
-        <activity
-            android:name=".activities.PreferenceActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
-        </activity>
+                android:value=".download.MainActivity" />
 
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="www.youtube.com"
+                    android:mimeType="text/*" />
+            </intent-filter>
+        </activity>
         <activity
-            android:name=".activities.HistoryActivity"
+            android:name=".preferences.PreferenceActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="Preferences" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".download.MainActivity" />
+        </activity>
+        <activity
+            android:name=".download.HistoryActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
+                android:value=".download.MainActivity" />
+        </activity>
+        <activity android:name=".errorlog.ErrorLogActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".preferences.PreferenceActivity" />
         </activity>
     </application>
+
 </manifest>
