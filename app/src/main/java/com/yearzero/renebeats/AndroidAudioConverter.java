@@ -152,7 +152,9 @@ public class AndroidAudioConverter {
     }
 
     public boolean killProcess() {
-        return (instance == null || instance.isFFmpegCommandRunning()) || instance.killRunningProcesses();
+        boolean b = instance == null || (instance.isFFmpegCommandRunning() && instance.killRunningProcesses());
+        instance = null;
+        return b;
     }
 
     public AndroidAudioConverter setCallback(IConvertCallback callback) {
@@ -276,7 +278,7 @@ public class AndroidAudioConverter {
         String[] cmd = commandBuilder.toArray(new String[0]);
 
         try {
-            instance.execute(cmd, new FFmpegExecuteResponseHandler() {
+            if (instance != null) instance.execute(cmd, new FFmpegExecuteResponseHandler() {
                 public void onStart() {
                 }
 

@@ -29,16 +29,17 @@ public class Query implements Serializable {
     private static long serialVersionUID = 0xEA50_C1A5_0E10_11E1L;
 
     @Getter @Setter(AccessLevel.PACKAGE) private String youtubeID;
-    @Getter @Setter(AccessLevel.PACKAGE) private String title;
-    @Getter @Setter(AccessLevel.PACKAGE) private String album;
-    @Getter @Setter(AccessLevel.PACKAGE) private String artist;
+    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String title = "";
+    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String album = "";
+    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String artist = "";
     @Getter @Setter(AccessLevel.PACKAGE) private int year = 0;
     @Getter @Setter(AccessLevel.PACKAGE) private int track = 0;
-    @Getter @Setter(AccessLevel.PACKAGE) private String genres;
+    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String genres = "";
 
     //region Thumbnail Getters
     @Getter @Setter(AccessLevel.PACKAGE) private String thumbMax;
     @Getter @Setter(AccessLevel.PACKAGE) private String thumbHigh;
+
     @Getter @Setter(AccessLevel.PACKAGE) private String thumbMedium;
     @Getter @Setter(AccessLevel.PACKAGE) private String thumbDefault;
     @Getter @Setter(AccessLevel.PACKAGE) private String thumbStandard;
@@ -49,7 +50,7 @@ public class Query implements Serializable {
         this.youtubeID = id;
     }
 
-    Query(@Nullable String id, @Nullable String title, @Nullable String artist, @Nullable String album, int year, int track, @Nullable String genres) {
+    Query(@Nullable String id, @NonNull String title, @NonNull String artist, @NonNull String album, int year, int track, @NonNull String genres) {
         this.youtubeID = id;
         this.title = title;
         this.artist = artist;
@@ -59,7 +60,7 @@ public class Query implements Serializable {
         this.genres = genres;
     }
 
-    private Query(@Nullable String id, @Nullable String title, @Nullable String artist, @Nullable String album, int year, int track, @Nullable String genres, @NonNull ThumbnailDetails thumbnail) {
+    private Query(@Nullable String id, @NonNull String title, @NonNull String artist, @NonNull String album, int year, int track, @NonNull String genres, @NonNull ThumbnailDetails thumbnail) {
         this(id, title, artist, album, year, track, genres);
         if (thumbnail.getMaxres() != null) thumbMax = thumbnail.getMaxres().getUrl();
         if (thumbnail.getHigh() != null) thumbHigh = thumbnail.getHigh().getUrl();
@@ -68,7 +69,7 @@ public class Query implements Serializable {
         if (thumbnail.getStandard() != null) thumbStandard = thumbnail.getStandard().getUrl();
     }
 
-    Query(@Nullable String id, @Nullable String title, @Nullable String artist, @Nullable String album, int year, int track, @Nullable String genres, @Nullable String thumbMax, @Nullable String thumbHigh, @Nullable String thumbMedium, @Nullable String thumbDefault, @Nullable String thumbStandard) {
+    Query(@Nullable String id, @NonNull String title, @NonNull String artist, @NonNull String album, int year, int track, @NonNull String genres, @Nullable String thumbMax, @Nullable String thumbHigh, @Nullable String thumbMedium, @Nullable String thumbDefault, @Nullable String thumbStandard) {
         this(id, title, artist, album, year, track, genres);
         this.thumbMax = thumbMax;
         this.thumbHigh = thumbHigh;
@@ -80,13 +81,13 @@ public class Query implements Serializable {
     @Nullable
     String getFilename() {
         String result;
-        if (artist == null) {
-            if (title == null)
+        if (artist.isEmpty()) {
+            if (title.isEmpty())
                 return null;
             else
                 result = title.trim();
         } else {
-            if (title == null)
+            if (title.isEmpty())
                 result = artist.trim();
             else if (Preferences.getArtist_first())
                 result = artist.trim() + " - " + title.trim();
@@ -167,15 +168,15 @@ public class Query implements Serializable {
     public int hashCode() {
         int result = 37;
 
-        result = 37 * result + (album == null ? 0 : album.hashCode());
-        result = 37 * result + (artist == null ? 0 : artist.hashCode());
-        result = 37 * result + (genres == null ? 0 : genres.hashCode());
+        result = 37 * result + album.hashCode();
+        result = 37 * result + artist.hashCode();
+        result = 37 * result + genres.hashCode();
         result = 37 * result + (thumbDefault == null ? 0 : thumbDefault.hashCode());
         result = 37 * result + (thumbHigh == null ? 0 : thumbHigh.hashCode());
         result = 37 * result + (thumbMax == null ? 0 : thumbMax.hashCode());
         result = 37 * result + (thumbMedium == null ? 0 : thumbMedium.hashCode());
         result = 37 * result + (thumbStandard == null ? 0 : thumbStandard.hashCode());
-        result = 37 * result + (title == null ? 0 : title.hashCode());
+        result = 37 * result + title.hashCode();
         result = 37 * result + track;
         result = 37 * result + year;
         result = 37 * result + (youtubeID == null ? 0 : youtubeID.hashCode());
@@ -214,7 +215,7 @@ public class Query implements Serializable {
             result.add(new Query(
                     r.getId().getVideoId(),
                     StringEscapeUtils.unescapeXml(s.getTitle()),
-                    StringEscapeUtils.unescapeXml(s.getChannelTitle()), null,
+                    StringEscapeUtils.unescapeXml(s.getChannelTitle()), "",
                     cal.get(Calendar.YEAR),
                     0,
                     "",

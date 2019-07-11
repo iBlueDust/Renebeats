@@ -57,7 +57,7 @@ public class DownloadService extends Service {
     private static final int GROUP_ID = 0xC560_6A11;
     //    public static final String DONT_LOAD = "dont_load";
 
-    private FetchListener fetchListener = new FetchListener() {
+    private final FetchListener fetchListener = new FetchListener() {
         @Override
         public void onAdded(@NotNull com.tonyodev.fetch2.Download download) {
             UpdateProgress(download, "onAdded", null);
@@ -163,11 +163,11 @@ public class DownloadService extends Service {
     private final LocalBinder binder = new LocalBinder();
 
     private boolean loaded;//, cpause, pause;
-    private AndroidAudioConverter converter;
+    private @Nullable AndroidAudioConverter converter;
     private final ArrayList<ClientCallbacks> callbacks = new ArrayList<>();
     private final LinkedList<Download> convertQueue = new LinkedList<>();
 //    private final ArrayList<Download> convertPause = new ArrayList<>();
-    private Download convertProgress;
+    private @Nullable Download convertProgress;
     private final ArrayList<Download> completed = new ArrayList<>();
     private final SparseArray<Download> downloadMap = new SparseArray<>();
 
@@ -384,7 +384,7 @@ public class DownloadService extends Service {
             return new IllegalArgumentException("Argument object is null");
         else if (args.getSparseArray() == null)
             return new IllegalArgumentException("No SparseArray found");
-        else if (args.getTitle() == null || args.getTitle().isEmpty())
+        else if (args.getTitle().isEmpty())
             return new IllegalArgumentException("No Title found");
         return null;
     }
@@ -533,11 +533,11 @@ public class DownloadService extends Service {
             }
         } else {
             MusicMetadata meta = new MusicMetadata("name");
-            if (!(current.getTitle() == null || current.getTitle().isEmpty()))
+            if (!current.getTitle().isEmpty())
                 meta.setSongTitle(current.getTitle());
-            if (!(current.getArtist() == null || current.getArtist().isEmpty()))
+            if (!current.getArtist().isEmpty())
                 meta.setArtist(current.getArtist());
-            if (!(current.getAlbum() == null || current.getAlbum().isEmpty())) meta.setAlbum(current.getAlbum());
+            if (!current.getAlbum().isEmpty()) meta.setAlbum(current.getAlbum());
             if (current.getTrack() > 0) meta.setTrackNumber(current.getTrack());
             if (current.getYear() > 0) meta.setYear(String.valueOf(current.getYear()));
 
@@ -550,9 +550,7 @@ public class DownloadService extends Service {
 //                str.append(current.genres[current.genres.length - 1]);
 //                meta.setGenre(str.toString());
 //            }
-            if (current.getGenres() != null) meta.setGenre(current.getGenres());
-
-            if (current.getTitle() == null) throw new IllegalArgumentException("Title field is somehow empty at Metadata. Was Validate() bypassed?");
+            if (!current.getGenres().isEmpty()) meta.setGenre(current.getGenres());
 
             try {
                 new MyID3().write(
@@ -730,8 +728,8 @@ public class DownloadService extends Service {
 //    }
 
     public void cancel(int id) {
-        if (convertProgress.getId() == id) {
-            converter.killProcess();
+        if (convertProgress != null && convertProgress.getId() == id) {
+            if (converter != null) converter.killProcess();
             convertProgress.setCompleteDate(new Date());
             convertProgress.setCurrent(0);
             convertProgress.setTotal(0);
@@ -741,12 +739,7 @@ public class DownloadService extends Service {
             onFinish(convertProgress, false, new ServiceException("Cancelled"));
             convertProgress = null;
             Convert();
-        } else {
-            int index = downloadMap.indexOfKey(id);
-            if (index >= 0){
-                Commons.fetch.cancel(id);
-            }
-        }
+        } else if (downloadMap.indexOfKey(id) >= 0) Commons.fetch.cancel(id);
     }
 
     private void UpdateMaps(com.tonyodev.fetch2.Download download, Download args) {
