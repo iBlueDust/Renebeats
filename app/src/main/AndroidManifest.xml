@@ -19,13 +19,13 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <service
-            android:name=".DownloadService"
+            android:name=".download.DownloadService"
             android:stopWithTask="false" />
 
-        <receiver android:name=".DownloadReceiver" />
+        <receiver android:name=".notification.DownloadReceiver" />
 
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".download.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,26 +34,26 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.DownloadActivity"
+            android:name=".download.DownloadActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
+                android:value=".download.MainActivity" />
         </activity>
         <activity
-            android:name=".activities.PreferenceActivity"
+            android:name=".preferences.PreferenceActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
+                android:value=".download.MainActivity" />
         </activity>
 
         <activity
-            android:name=".activities.HistoryActivity"
+            android:name=".download.HistoryActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
+                android:value=".download.MainActivity" />
         </activity>
     </application>
 </manifest>

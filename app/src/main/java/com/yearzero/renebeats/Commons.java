@@ -24,9 +24,9 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.GsonBuilder;
 import com.tonyodev.fetch2.Fetch;
 import com.tonyodev.fetch2.FetchConfiguration;
-import com.yearzero.renebeats.classes.Download;
-import com.yearzero.renebeats.classes.HistoryLog;
-import com.yearzero.renebeats.classes.Query;
+import com.yearzero.renebeats.download.Download;
+import com.yearzero.renebeats.download.HistoryLog;
+import com.yearzero.renebeats.download.Query;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
