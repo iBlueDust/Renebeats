@@ -12,8 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.yearzero.renebeats.R;
-
 public class DependencyFragment extends Fragment {
 
     private View view;

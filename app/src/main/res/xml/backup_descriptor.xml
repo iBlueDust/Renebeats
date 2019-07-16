@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude the shared preferences file that contains the GCM registrationId -->
+    <include domain="sharedpref" path="com.yearzero.renebeats.xml" />
+    <!--<exclude domain="external" path="Year Zero/Renebeats/logs/" />-->
+</full-backup-content>

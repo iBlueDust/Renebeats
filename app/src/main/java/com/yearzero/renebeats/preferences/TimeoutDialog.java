@@ -8,17 +8,17 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Locale;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.yearzero.renebeats.R;
 
+import java.util.Locale;
+
 public class TimeoutDialog extends Dialog {
 
-    public TextView Title, Message;
-    public Button Positive, Negative;
+    private TextView Title, Message;
+    private Button Positive, Negative;
 
     private String title, message, positive, negative;
     private OnClickListener positivel, negativel;

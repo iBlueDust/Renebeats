@@ -20,7 +20,7 @@
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
             android:text="Libraries Used"
-            android:textAppearance="@style/Text.Header"
+            android:textAppearance="@style/Text.Header.Big"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
