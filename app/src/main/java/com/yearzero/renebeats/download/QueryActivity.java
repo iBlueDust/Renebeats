@@ -15,8 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.api.services.youtube.model.SearchResult;
-import com.yearzero.renebeats.Commons;
+import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.R;
+import com.yearzero.renebeats.preferences.Preferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,13 +28,13 @@ public class QueryActivity extends AppCompatActivity implements YoutubeQueryTask
 
     private static final String TAG = "QueryActivity";
 
-//    private SwipeRefreshLayout Swipe;
+    //    private SwipeRefreshLayout Swipe;
     private ImageButton Home, Refresh;
     private RecyclerView List;
     private ImageView OfflineImg;
     private TextView OfflineMsg, Title;
     private Button OfflineAction;
-//    private ProgressBar Loading;
+    //    private ProgressBar Loading;
 
     private QueryAdapter adapter;
 
@@ -46,22 +47,22 @@ public class QueryActivity extends AppCompatActivity implements YoutubeQueryTask
         setContentView(R.layout.activity_query);
 
         Bundle bundle = getIntent().getExtras();
-        if (bundle == null || bundle.getString(Commons.ARGS.DATA) == null) {
+        if (bundle == null || bundle.getString(InternalArgs.DATA) == null) {
             onBackPressed();
             return;
         }
 
-        query = bundle.getString(Commons.ARGS.DATA);
+        query = bundle.getString(InternalArgs.DATA);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) actionBar.setDisplayShowTitleEnabled(false);
 
-//        Swipe = findViewById(R.id.swipe);
+        //        Swipe = findViewById(R.id.swipe);
         Title = findViewById(R.id.title);
         List = findViewById(R.id.query_list);
         Home = findViewById(R.id.dismiss);
         Refresh = findViewById(R.id.refresh);
-//        Loading = findViewById(R.id.loading);
+        //        Loading = findViewById(R.id.loading);
 
         OfflineImg = findViewById(R.id.offline_img);
         OfflineMsg = findViewById(R.id.offline_msg);
@@ -76,7 +77,7 @@ public class QueryActivity extends AppCompatActivity implements YoutubeQueryTask
 
         Home.setOnClickListener(v -> onBackPressed());
         Refresh.setOnClickListener(v -> Query());
-//
+        //
         if (query != null && queries != null) {
             Title.setText(query);
             Refresh.setOnClickListener(view -> Query());
@@ -91,11 +92,11 @@ public class QueryActivity extends AppCompatActivity implements YoutubeQueryTask
     private void Query(String query) {
         this.query = query;
         queries = null;
-        adapter.resetList(Collections.nCopies(Commons.Pref.query_amount, null));
+        adapter.resetList(Collections.nCopies(Preferences.getQuery_amount(), null));
 
         new YoutubeQueryTask(this, getPackageName())
-            .setTimeout(Commons.Pref.timeout)
-            .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
+                .setTimeout(Preferences.getTimeout())
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
     }
 
     @Override
@@ -115,7 +116,7 @@ public class QueryActivity extends AppCompatActivity implements YoutubeQueryTask
             OfflineMsg.setText("Your search didn't come out with any results");
             OfflineAction.setText("Back");
             OfflineAction.setOnClickListener(v -> onBackPressed());
-        } else adapter.resetList(Query.CastListXML(results));
+        } else adapter.resetList(Query.castListXML(results));
 
         OfflineImg.setVisibility(visi);
         OfflineMsg.setVisibility(visi);

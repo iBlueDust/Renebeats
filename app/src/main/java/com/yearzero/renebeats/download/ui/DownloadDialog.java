@@ -1,6 +1,9 @@
 package com.yearzero.renebeats.download.ui;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +18,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.yearzero.renebeats.Commons;
+import com.yearzero.renebeats.Directories;
 import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.download.Download;
-import com.yearzero.renebeats.download.Status;
 import com.yearzero.renebeats.download.DownloadService;
+import com.yearzero.renebeats.download.Status;
+import com.yearzero.renebeats.preferences.Preferences;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -26,15 +31,14 @@ import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-//TODO: Display new fields such as Download.size and Download.length
-
 public class DownloadDialog extends DialogFragment {
+    private static final String TAG = "DownloadDialog";
 
     private TextView Title, Artist, Album, Genres, Year, Track;
     private TextView Format, Bitrate, Normalize, Start, End, Overwrite;
     private TextView DLText, Conversion, Metadata;
     private TextView Assigned, Completed;
-    private TextView YouTubeID, ID, URL, AvailFormat, Exception;
+    private TextView YouTubeID, ID, URL, AvailFormat, Exception, Progress;
     private TextView PathDownload, PathConversion, PathMetadata;
     private CircleImageView StatusDownload, StatusConversion, StatusMetadata;
 
@@ -49,6 +53,7 @@ public class DownloadDialog extends DialogFragment {
     private Download download;
 
     @Override
+    @NonNull
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View dialog = inflater.inflate(R.layout.dialog_download, parent, false);
@@ -76,6 +81,7 @@ public class DownloadDialog extends DialogFragment {
         URL = dialog.findViewById(R.id.url);
         AvailFormat = dialog.findViewById(R.id.availformat);
         Exception = dialog.findViewById(R.id.exception);
+        Progress = dialog.findViewById(R.id.progress);
         PathDownload = dialog.findViewById(R.id.path_download);
         PathConversion = dialog.findViewById(R.id.path_conversion);
         PathMetadata = dialog.findViewById(R.id.path_metadata);
@@ -89,21 +95,20 @@ public class DownloadDialog extends DialogFragment {
         SecretPaths = dialog.findViewById(R.id.secret_paths);
         SecretSecond = dialog.findViewById(R.id.secret_second);
 
-        Close = dialog.findViewById(R.id.close);
+        Close = dialog.findViewById(R.id.save);
         Dismiss = dialog.findViewById(R.id.dismiss);
         Close.setOnClickListener(v -> dismiss());
         Dismiss.setOnClickListener(v -> dismiss());
 
-        int visi = secret ? View.VISIBLE : View.GONE;
+        int visibility = secret ? View.VISIBLE : View.GONE;
 
-        SecretLabel.setVisibility(visi);
-        SecretView.setVisibility(visi);
-        SecretMain.setVisibility(visi);
-        SecretPaths.setVisibility(visi);
-        SecretSecond.setVisibility(visi);
+        SecretLabel.setVisibility(visibility);
+        SecretView.setVisibility(visibility);
+        SecretMain.setVisibility(visibility);
+        SecretPaths.setVisibility(visibility);
+        SecretSecond.setVisibility(visibility);
 
         Update();
-
         return dialog;
     }
 
@@ -112,39 +117,46 @@ public class DownloadDialog extends DialogFragment {
         return this;
     }
 
-    public DownloadDialog setDownload(Download download) {
+    public DownloadDialog setDownload(@NonNull Download download) {
         this.download = download;
         return this;
     }
 
+    public Download getDownload() {
+        return download;
+    }
+
     private void Update() {
-        Title.setText(download == null || download.title == null ? "-" : download.title);
-        Artist.setText(download == null || download.artist == null ? "-" : download.artist);
-        Album.setText(download == null || download.album == null ? "-" : download.album);
-        Genres.setText(download == null || download.genres == null ? "-" : ArrayToString(download.genres));
-        Year.setText(download == null ? "-" : String.valueOf(download.year));
-        Track.setText(download == null ? "-" : String.valueOf(download.track));
-        Format.setText(download == null || download.format == null ? "-" : download.format.toUpperCase());
-        Bitrate.setText(download == null ? "-" : String.valueOf(download.bitrate) + " kbps");
-        Normalize.setText(download == null ? "-" : (download.normalize ? "ON" : "OFF"));
-        Start.setText(download == null || download.start == null ? "-" : IntegerToMinSec(download.start));
-        End.setText(download == null || download.end == null ? "-" : IntegerToMinSec(download.end));
-        Overwrite.setText(download == null ? "-" : download.overwrite ? "True" : "False");
+        if (isDownloadNull()) return;
+
+        Title.setText(download.getTitle() == null ? "-" : download.getTitle());
+        Artist.setText(download.getArtist() == null ? "-" : download.getArtist());
+        Album.setText(download.getAlbum() == null ? "-" : download.getAlbum());
+        Genres.setText(download.getGenres() == null ? "-" : download.getGenres());
+        Year.setText(String.valueOf(download.getYear()));
+        Track.setText(String.valueOf(download.getTrack()));
+        download.getFormat();
+        Format.setText(download.getFormat().toUpperCase());
+        Bitrate.setText(String.format("%s kbps", download.getBitrate()));
+        Normalize.setText(download.isNormalize() ? "ON" : "OFF");
+        Start.setText(download.getStart() == null ? "-" : IntToHMS(download.getStart()));
+        End.setText(download.getEnd() == null ? "-" : IntToHMS(download.getEnd()));
+        Overwrite.setText(download.getOverwrite() ? "True" : "False");
 
         DLText.setText("-");
         Conversion.setText("-");
         Metadata.setText("-");
 
-        Assigned.setText(download == null || download.assigned == null ? "-" : new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss", Locale.ENGLISH).format(download.assigned));
-        Completed.setText(download == null || download.completed == null ? "-" : new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss", Locale.ENGLISH).format(download.completed));
+        Assigned.setText(download == null || download.getAssigned() == null || getContext() == null ? "-" : Preferences.formatDateLong(getContext(), download.getAssigned()));
+        Completed.setText(download == null || download.getCompleteDate() == null ? "-" : new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss", Locale.ENGLISH).format(download.getCompleteDate()));
 
-        YouTubeID.setText(download == null ? "-" : download.youtubeID);
-        ID.setText(download == null ? "-" : Long.toHexString(download.id));
+        YouTubeID.setText(download == null ? "-" : download.getYoutubeID());
+        ID.setText(download == null ? "-" : Long.toHexString(download.getId()));
         //        URL.setText(download == null || download.url == null ? "-" : download.url);
-        AvailFormat.setText(download == null || download.availformat == null ? "-" : download.availformat.toUpperCase());
-        Exception.setText(download == null || download.exception == null ? "-" : download.exception.getMessage());
+        AvailFormat.setText(download == null || download.getAvailableFormat() == null ? "-" : download.getAvailableFormat().toUpperCase());
+        Exception.setText(download == null || download.getException() == null ? "-" : download.getException().getMessage());
 
-        if (download == null || download.url == null || download.url.isEmpty())
+        if (download.getUrl() == null || download.getUrl().isEmpty())
             URL.setText('-');
         else {
             URL.setText("Tap to Reveal");
@@ -152,67 +164,77 @@ public class DownloadDialog extends DialogFragment {
                     if (getContext() != null)
                         new AlertDialog.Builder(getContext())
                             .setTitle("URL")
-                            .setMessage(download.url)
+                            .setMessage(download.getUrl())
+                            .setPositiveButton("Go", (dialog, which) -> {
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse(download.getUrl()));
+                                startActivity(intent);
+                            })
                             .show();
             });
         }
         UpdatePartial();
     }
 
-    public void UpdatePartial(Download download) {
+    public void UpdatePartial(@NonNull Download download) {
         this.download = download;
         UpdatePartial();
     }
 
-    private void UpdatePartial() {
-        if (download != null) {
-            if (download.exception instanceof IllegalArgumentException)
-                Exception.setText("IllegalArgumentException");
-            else if (download.exception instanceof DownloadService.ServiceException) {
+    void UpdatePartial() {
+        if (isDownloadNull()) return;
+
+        if (download.getException() instanceof IllegalArgumentException)
+            Exception.setText("IllegalArgumentException");
+        else if (download.getException() instanceof DownloadService.ServiceException) {
 //                if ((((DownloadService.ServiceException) download.exception).getDownload()) == null)
 //                    DLText.setText("");
 //                else UpdateStatus(download.status);
-                Exception.setText(((DownloadService.ServiceException) download.exception).getPayload().getMessage());
-            } else if (download.exception != null)
-                Exception.setText(download.exception.getMessage());
+            Exception payload = ((DownloadService.ServiceException) download.getException()).getPayload();
+            Exception.setText(payload == null ? download.getException().getMessage() : payload.getMessage());
+        } else if (download.getException() != null)
+            Exception.setText(download.getException().getMessage());
 
-            UpdateStatus(download.status);
-        }
+        if (download.getSize() <= 0)
+            Progress.setText(String.format(Commons.getLocale(), "%d/%d", download.getCurrent(), download.getTotal()));
+        else Progress.setText(String.format(Commons.getLocale(), "%d/%d (%s)", download.getCurrent(), download.getTotal(), Commons.FormatBytes(download.getSize())));
 
-        if (download == null || download.down == null) PathDownload.setText("-");
+        UpdateStatus(download.getStatus());
+
+        if (download.getDown() == null) PathDownload.setText("-");
         else {
-            PathDownload.setText(download.down);
-            if (new File(Commons.Directories.BIN, download.down).exists())
-                StatusDownload.setImageResource(download.status.metadata != null && download.status.metadata ? R.color.red : R.color.yellow);
-            else if (download.status.download == Status.Download.COMPLETE)
+            PathDownload.setText(download.getDown());
+            if (Directories.isCacheExists(download.getDown()))
+                StatusDownload.setImageResource(download.getStatus().getMetadata() != null && download.getStatus().getMetadata() ? R.color.red : R.color.yellow);
+            else if (download.getStatus().getDownload() == Status.Download.COMPLETE)
                 StatusDownload.setImageResource(R.color.green);
             else StatusDownload.setImageResource(R.color.SecondaryDark);
         }
 
-        if (download == null || download.conv == null) PathConversion.setText("-");
+        if (download.getConv() == null) PathConversion.setText("-");
         else {
-            PathConversion.setText(download.conv);
-            if (new File(Commons.Directories.BIN, download.conv).exists())
-                StatusConversion.setImageResource(download.status.metadata != null && download.status.metadata ? R.color.red : R.color.yellow);
-            else if (download.status.convert == Status.Convert.COMPLETE || download.status.convert == Status.Convert.SKIPPED)
+            PathConversion.setText(download.getConv());
+            if (Directories.isCacheExists(download.getConv()))
+                StatusConversion.setImageResource(download.getStatus().getMetadata() != null && download.getStatus().getMetadata() ? R.color.red : R.color.yellow);
+            else if (download.getStatus().getConvert() == Status.Convert.COMPLETE || download.getStatus().getConvert() == Status.Convert.SKIPPED)
                 StatusConversion.setImageResource(R.color.green);
             else StatusConversion.setImageResource(R.color.SecondaryDark);
         }
 
-        if (download == null || download.mtdt == null) PathMetadata.setText("-");
+        if (download.getMtdt() == null) PathMetadata.setText("-");
         else {
-            PathMetadata.setText(download.mtdt);
-            if (download.status.metadata != null && download.status.metadata)
-                StatusMetadata.setImageResource(new File(Commons.Directories.MUSIC, download.mtdt).exists() ? R.color.green : R.color.red);
+            PathMetadata.setText(download.getMtdt());
+            if (download.getStatus().getMetadata() != null && download.getStatus().getMetadata())
+                StatusMetadata.setImageResource(new File(Directories.getMUSIC(), download.getMtdt()).exists() ? R.color.green : R.color.red);
             else StatusMetadata.setImageResource(R.color.SecondaryDark);
         }
     }
 
     private void UpdateStatus(@Nullable Status status) {
-        if (status == null || status.download == null)
+        if (status == null || status.getDownload() == null)
             DLText.setText("-");
         else {
-            switch (status.download) {
+            switch (status.getDownload()) {
                 case QUEUED:
                     DLText.setText("QUEUED");
                     break;
@@ -233,16 +255,16 @@ public class DownloadDialog extends DialogFragment {
             }
         }
 
-        if (status == null || status.convert == null)
+        if (status == null || status.getConvert() == null)
             Conversion.setText("-");
         else {
-            switch (status.convert) {
+            switch (status.getConvert()) {
                 case SKIPPED:
                     Conversion.setText("SKIPPED");
                     break;
-                case PAUSED:
-                    Conversion.setText("PAUSED");
-                    break;
+//                case PAUSED:
+//                    Conversion.setText("PAUSED");
+//                    break;
                 case QUEUED:
                     Conversion.setText("QUEUED");
                     break;
@@ -263,19 +285,26 @@ public class DownloadDialog extends DialogFragment {
             }
         }
 
-        if (status == null || status.metadata == null) Metadata.setText("-");
-        else if (status.metadata) Metadata.setText("Completed");
+        if (status == null || status.getMetadata() == null) Metadata.setText("-");
+        else if (status.getMetadata()) Metadata.setText("Completed");
         else Metadata.setText("FAILED");
     }
 
-    private String ArrayToString(String[] strings) {
-        if (strings.length <= 0) return "";
-        StringBuilder builder = new StringBuilder(strings[0]);
-        for (String string : strings) builder.append(',').append(string);
-        return builder.toString();
+    private boolean isDownloadNull() {
+        if (download == null) {
+            Log.w(TAG, "download == null");
+            return true;
+        } else return false;
     }
 
-    private String IntegerToMinSec(int i) {
+//    private String ArrayToString(String[] strings) {
+//        if (strings.length <= 0) return "";
+//        StringBuilder builder = new StringBuilder(strings[0]);
+//        for (String string : strings) builder.append(',').append(string);
+//        return builder.toString();
+//    }
+
+    private String IntToHMS(int i) {
         StringBuilder str = new StringBuilder();
 
         short h = (short) Math.floor(i / 3600f);

@@ -3,9 +3,11 @@
 /local.properties
 /.idea/libraries
 /.idea/modules.xml
+/.idea/modules-old.xml
 /.idea/workspace.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 /app/src/main/vector
+main*.rar

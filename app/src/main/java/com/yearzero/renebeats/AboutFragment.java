@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.yearzero.renebeats.R;
-
 public class AboutFragment extends Fragment {
 
     public AboutFragment() {

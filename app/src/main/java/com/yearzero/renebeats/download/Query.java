@@ -1,41 +1,56 @@
 package com.yearzero.renebeats.download;
 
-import android.net.Uri;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.SearchResultSnippet;
 import com.google.api.services.youtube.model.ThumbnailDetails;
+import com.yearzero.renebeats.preferences.Preferences;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.ParametersAreNullableByDefault;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
+@ParametersAreNullableByDefault
 public class Query implements Serializable {
-    // Appcode (EA50) - "Class" (ClA5) - Class ID (0E10_llE1)
-    private static final long serialVersionUID = 0xEA50_C1A5_0E10_11E1L;
+    // App code (EA50) - "Class" (ClA5) - Class ID (0E10_llE1)
+    private static long serialVersionUID = 0xEA50_C1A5_0E10_11E1L;
 
-    public String youtubeID, title, album, artist;
-    public int year, track;
-    public String[] genres;
+    @Getter @Setter(AccessLevel.PACKAGE) private String youtubeID;
+    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String title = "";
+    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String album = "";
+    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String artist = "";
+    @Getter @Setter(AccessLevel.PACKAGE) private int year = 0;
+    @Getter @Setter(AccessLevel.PACKAGE) private int track = 0;
+    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String genres = "";
 
-    public String thumbMax, thumbHigh, thumbMedium, thumbDefault, thumbStandard;
-    public Uri thumbmap;
+    //region Thumbnail Getters
+    @Getter @Setter(AccessLevel.PACKAGE) private String thumbMax;
+    @Getter @Setter(AccessLevel.PACKAGE) private String thumbHigh;
 
-    public Query() { }
+    @Getter @Setter(AccessLevel.PACKAGE) private String thumbMedium;
+    @Getter @Setter(AccessLevel.PACKAGE) private String thumbDefault;
+    @Getter @Setter(AccessLevel.PACKAGE) private String thumbStandard;
 
-    public Query(String id) {
+    Query() {}
+
+    Query(@Nullable String id) {
         this.youtubeID = id;
-        year = Calendar.getInstance().get(Calendar.YEAR);
-        track = 1;
-        album = "";
     }
 
-    public Query(String id, String title, String artist, String album, int year, int track, String[] genres) {
+    Query(@Nullable String id, @NonNull String title, @NonNull String artist, @NonNull String album, int year, int track, @NonNull String genres) {
         this.youtubeID = id;
         this.title = title;
         this.artist = artist;
@@ -45,9 +60,8 @@ public class Query implements Serializable {
         this.genres = genres;
     }
 
-    public Query(String id, String title, String artist, String album, int year, int track, String[] genres, ThumbnailDetails thumbnail) {
+    private Query(@Nullable String id, @NonNull String title, @NonNull String artist, @NonNull String album, int year, int track, @NonNull String genres, @NonNull ThumbnailDetails thumbnail) {
         this(id, title, artist, album, year, track, genres);
-
         if (thumbnail.getMaxres() != null) thumbMax = thumbnail.getMaxres().getUrl();
         if (thumbnail.getHigh() != null) thumbHigh = thumbnail.getHigh().getUrl();
         if (thumbnail.getMedium() != null) thumbMedium = thumbnail.getMedium().getUrl();
@@ -55,63 +69,37 @@ public class Query implements Serializable {
         if (thumbnail.getStandard() != null) thumbStandard = thumbnail.getStandard().getUrl();
     }
 
-    public Query(String id, String title, String artist, String album, int year, int track, String[] genres, String thumbMax, String thumbHigh, String thumbMedium, String thumbDefault, String thumbStandard, Uri thumbmap) {
+    Query(@Nullable String id, @NonNull String title, @NonNull String artist, @NonNull String album, int year, int track, @NonNull String genres, @Nullable String thumbMax, @Nullable String thumbHigh, @Nullable String thumbMedium, @Nullable String thumbDefault, @Nullable String thumbStandard) {
         this(id, title, artist, album, year, track, genres);
-
         this.thumbMax = thumbMax;
         this.thumbHigh = thumbHigh;
         this.thumbMedium = thumbMedium;
         this.thumbDefault = thumbDefault;
         this.thumbStandard = thumbStandard;
-        this.thumbmap = thumbmap;
     }
 
-    //region Thumbnail Getters
-    public String getThumbMax() {
-        return thumbMax;
-    }
-
-    public String getThumbHigh() {
-        return thumbHigh;
-    }
-
-    public String getThumbMedium() {
-        return thumbMedium;
-    }
-
-    public String getThumbDefault() {
-        return thumbDefault;
-    }
-
-    public String getThumbStandard() {
-        return thumbStandard;
-    }
-    //endregion
-
-    public static List<Query> CastListXML(List<SearchResult> list) {
-        List<Query> result = new ArrayList<>();
-
-        for (SearchResult r : list) {
-            SearchResultSnippet s = r.getSnippet();
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date(s.getPublishedAt().getValue()));
-
-            result.add(new Query(
-                    r.getId().getVideoId(),
-                    StringEscapeUtils.unescapeXml(s.getTitle()),
-                    StringEscapeUtils.unescapeXml(s.getChannelTitle()),
-                    null,
-                    cal.get(Calendar.YEAR),
-                    0,
-                    new String[0],
-                    s.getThumbnails()
-            ));
+    @Nullable
+    String getFilename() {
+        String result;
+        if (artist.isEmpty()) {
+            if (title.isEmpty())
+                return null;
+            else
+                result = title.trim();
+        } else {
+            if (title.isEmpty())
+                result = artist.trim();
+            else if (Preferences.getArtist_first())
+                result = artist.trim() + " - " + title.trim();
+            else
+                result = title.trim() + " - " + artist.trim();
         }
-        return result;
+        return result.replaceAll("(?:\\||\\\\|\\?|\\*|<|\"|:|>|\\+|\\[|]|/')", "_");
     }
 
-    public String getThumbnail(ThumbnailQuality quality) {
+    //In Java use overflow/no break switch case
+    @Nullable
+    String getThumbnail(@NonNull ThumbnailQuality quality) {
         switch (quality) {
             case MaxRes:
                 if (thumbMax != null) return thumbMax;
@@ -126,29 +114,69 @@ public class Query implements Serializable {
         }
     }
 
-    public void setThumbnail(ThumbnailDetails thumbnail) {
-        if (thumbnail.getMaxres() != null) thumbMax = thumbnail.getMaxres().getUrl();
-        if (thumbnail.getHigh() != null) thumbHigh = thumbnail.getHigh().getUrl();
-        if (thumbnail.getMedium() != null) thumbHigh = thumbnail.getMedium().getUrl();
-        if (thumbnail.getDefault() != null) thumbHigh = thumbnail.getDefault().getUrl();
-        if (thumbnail.getStandard() != null) thumbHigh = thumbnail.getStandard().getUrl();
+    //  public void setThumbnail(ThumbnailDetails thumbnail) {
+    //    if (thumbnail.getMaxres() != null) thumbMax = thumbnail.getMaxres().getUrl();
+    //    if (thumbnail.getHigh() != null) thumbHigh = thumbnail.getHigh().getUrl();
+    //    if (thumbnail.getMedium() != null) thumbHigh = thumbnail.getMedium().getUrl();
+    //    if (thumbnail.getDefault() != null) thumbHigh = thumbnail.getDefault().getUrl();
+    //    if (thumbnail.getStandard() != null) thumbHigh = thumbnail.getStandard().getUrl();
+    //  }
+
+    //    public String getFileNoExt() {
+    //        boolean t = title == null || title.isEmpty();
+    //        boolean a = artist == null || artist.isEmpty();
+    //        if (!(t || a)) return title + '-' + artist;
+    //        else if (t && a) return "-";
+    //        else if (t) return title;
+    //        else return artist;
+    //    }
+
+    public enum ThumbnailQuality {
+        MaxRes("maxres"),
+        High("high"),
+        Medium("medium"),
+        Default("default"),
+        Standard("standard");
+        @NonNull private String value;
+
+        ThumbnailQuality(@NonNull String value) {
+            this.value = value;
+        }
+
+        public String toValue() {
+            return value;
+        }
+
+        @NonNull
+        public static ThumbnailQuality fromValue(@NonNull String value) {
+            switch (value.toLowerCase()) {
+                case "maxres":
+                    return MaxRes;
+                case "high":
+                    return High;
+                case "medium":
+                    return Medium;
+                case "standard":
+                    return Standard;
+                default:
+                    return Default;
+            }
+        }
     }
 
-    public enum ThumbnailQuality {MaxRes, High, Medium, Default, Standard;}
-
+    @Override
     public int hashCode() {
         int result = 37;
 
-        result = 37 * result + (album == null ? 0 : album.hashCode());
-        result = 37 * result + (artist == null ? 0 : artist.hashCode());
-        result = 37 * result + (genres == null ? 0 : Arrays.hashCode(genres));
+        result = 37 * result + album.hashCode();
+        result = 37 * result + artist.hashCode();
+        result = 37 * result + genres.hashCode();
         result = 37 * result + (thumbDefault == null ? 0 : thumbDefault.hashCode());
         result = 37 * result + (thumbHigh == null ? 0 : thumbHigh.hashCode());
-        result = 37 * result + (thumbmap == null ? 0 : thumbmap.hashCode());
         result = 37 * result + (thumbMax == null ? 0 : thumbMax.hashCode());
         result = 37 * result + (thumbMedium == null ? 0 : thumbMedium.hashCode());
         result = 37 * result + (thumbStandard == null ? 0 : thumbStandard.hashCode());
-        result = 37 * result + (title == null ? 0 : title.hashCode());
+        result = 37 * result + title.hashCode();
         result = 37 * result + track;
         result = 37 * result + year;
         result = 37 * result + (youtubeID == null ? 0 : youtubeID.hashCode());
@@ -156,7 +184,159 @@ public class Query implements Serializable {
         return result;
     }
 
-    public String makeFile() {
-        return ((artist == null ? "" : artist.trim() + " - ") + title.trim()).replaceAll("(?:\\||\\\\|\\?|\\*|<|\"|:|>|\\+|\\[|]|/')", "_");
+    @Override
+    public boolean equals(@Nullable Object other) {
+        if (this == other) return true;
+        if (!(other instanceof Query)) return false;
+        Query cast = (Query) other;
+
+        if (!(StringUtils.equals(youtubeID, cast.youtubeID) &&
+                StringUtils.equals(title, cast.title) &&
+                StringUtils.equals(album, cast.album) &&
+                StringUtils.equals(artist, cast.artist) &&
+                year == cast.year && track == cast.track &&
+                StringUtils.equals(genres, cast.genres) &&
+                StringUtils.equals(thumbMax, cast.thumbMax) &&
+                StringUtils.equals(thumbHigh, cast.thumbHigh) &&
+                StringUtils.equals(thumbMedium, cast.thumbMedium) &&
+                StringUtils.equals(thumbDefault, cast.thumbDefault))) return false;
+        return StringUtils.equals(thumbStandard, cast.thumbStandard);
     }
+
+    static List<Query> castListXML(@NonNull List<SearchResult> list) {
+        ArrayList<Query> result = new ArrayList<>();
+
+        for (SearchResult r : list) {
+            SearchResultSnippet s = r.getSnippet();
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date(s.getPublishedAt().getValue()));
+
+            result.add(new Query(
+                    r.getId().getVideoId(),
+                    StringEscapeUtils.unescapeXml(s.getTitle()),
+                    StringEscapeUtils.unescapeXml(s.getChannelTitle()), "",
+                    cal.get(Calendar.YEAR),
+                    0,
+                    "",
+                    s.getThumbnails()
+            ));
+        }
+        return result;
+    }
+
+//    //region Getters and Setters
+//    @Nullable
+//    public String getYoutubeID() {
+//        return youtubeID;
+//    }
+//
+////    public Query setYoutubeID(@Nullable String youtubeID) {
+////        this.youtubeID = youtubeID;
+////        return this;
+////    }
+//
+//    @Nullable
+//    public String getTitle() {
+//        return title;
+//    }
+//
+//    public Query setTitle(@Nullable String title) {
+//        this.title = title;
+//        return this;
+//    }
+//
+//    @Nullable
+//    String getAlbum() {
+//        return album;
+//    }
+//
+//    Query setAlbum(@Nullable String album) {
+//        this.album = album;
+//        return this;
+//    }
+//
+//    @Nullable
+//    public String getArtist() {
+//        return artist;
+//    }
+//
+//    public Query setArtist(@Nullable String artist) {
+//        this.artist = artist;
+//        return this;
+//    }
+//
+//    public int getYear() {
+//        return year;
+//    }
+//
+//    public Query setYear(int year) {
+//        this.year = year;
+//        return this;
+//    }
+//
+//    public int getTrack() {
+//        return track;
+//    }
+//
+//    Query setTrack(int track) {
+//        this.track = track;
+//        return this;
+//    }
+//
+//    @Nullable
+//    public String getGenres() {
+//        return genres;
+//    }
+//
+//    Query setGenres(@Nullable String genres) {
+//        this.genres = genres;
+//        return this;
+//    }
+//
+//    @Nullable
+//    public String getThumbMax() {
+//        return thumbMax;
+//    }
+//
+//    void setThumbMax(@Nullable String thumbMax) {
+//        this.thumbMax = thumbMax;
+//    }
+//
+//    @Nullable
+//    public String getThumbHigh() {
+//        return thumbHigh;
+//    }
+//
+//    void setThumbHigh(@Nullable String thumbHigh) {
+//        this.thumbHigh = thumbHigh;
+//    }
+//
+//    @Nullable
+//    public String getThumbMedium() {
+//        return thumbMedium;
+//    }
+//
+//    void setThumbMedium(@Nullable String thumbMedium) {
+//        this.thumbMedium = thumbMedium;
+//    }
+//
+//    @Nullable
+//    public String getThumbDefault() {
+//        return thumbDefault;
+//    }
+//
+//    void setThumbDefault(@Nullable String thumbDefault) {
+//        this.thumbDefault = thumbDefault;
+//    }
+//
+//    @Nullable
+//    public String getThumbStandard() {
+//        return thumbStandard;
+//    }
+//
+//    void setThumbStandard(@Nullable String thumbStandard) {
+//        this.thumbStandard = thumbStandard;
+//    }
+//    //endregion
 }

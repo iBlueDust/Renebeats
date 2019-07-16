@@ -24,6 +24,10 @@
     <androidx.preference.PreferenceCategory
         android:title="Miscellaneous" >
 
+        <androidx.preference.Preference
+            android:key="@string/pref_data_showlogs"
+            android:title="Show All Error Logs" />
+
         <de.mrapp.android.preference.activity.NavigationPreference
             android:fragment="com.yearzero.renebeats.AboutFragment"
             android:title="About"

@@ -1,19 +1,13 @@
 package com.yearzero.renebeats.download.ui.viewholder
 
 import android.view.View
-import android.widget.TextView
 
-import com.yearzero.renebeats.R
+class QueueViewHolder(itemView: View) : AdvancedViewHolder(itemView) {
 
-open class QueueViewHolder(itemView: View) : BasicViewHolder(itemView) {
-
-    protected var Status: TextView = itemView.findViewById(R.id.status)
-
-    fun setStatus(status: String) {
-        Status.text = status
-    }
+    fun setCancelListener(listener: View.OnClickListener) = setAction0(listener)
+    fun setSortListener(listener: View.OnClickListener) = setAction1(listener)
 
     companion object {
-        const val LocalID = 1
+        const val LocalID = 0x0202
     }
 }

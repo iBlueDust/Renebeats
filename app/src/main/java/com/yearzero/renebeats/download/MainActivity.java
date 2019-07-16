@@ -1,10 +1,16 @@
 package com.yearzero.renebeats.download;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -28,11 +34,16 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.api.services.youtube.model.SearchResult;
+import com.google.common.io.BaseEncoding;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.yearzero.renebeats.Commons;
-import com.yearzero.renebeats.preferences.PreferenceActivity;
+import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.R;
+import com.yearzero.renebeats.preferences.PreferenceActivity;
+import com.yearzero.renebeats.preferences.Preferences;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,10 +53,10 @@ import java.util.regex.Pattern;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-//TODO: Implement Offline/Error Card
-
 public class MainActivity extends AppCompatActivity implements ServiceConnection, DownloadService.ClientCallbacks, View.OnClickListener, View.OnKeyListener, YoutubeQueryTask.Callbacks {
     private static final String TAG = "MainActivity";
+
+    //TOOD: Prompt user on next start after unhandled error to share or copy
 
     private SlidingUpPanelLayout SlideUp;
 
@@ -59,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private ImageView ScrollImg;
     private TextView InfoTitle;
-    private Button InfoAction;
+//    private Button InfoAction;
 
     private RecyclerView List;
     private DownloadAdapter adapter;
@@ -67,8 +78,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private ImageButton Refresh, Dismiss;
     private RecyclerView QueryList;
-//    private ProgressBar QueryLoading;
-//    private ShimmerFrameLayout Shimmer;
     private ImageView OfflineImg;
     private TextView OfflineMsg, Title;
     private Button OfflineAction;
@@ -78,12 +87,45 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private static List<SearchResult> queries;
     private static String query;
+    private BroadcastReceiver WifiListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-//    private boolean querying;
+            if (!(mWifi.isConnected() || Preferences.getMobiledata())) {
+                ErrorCard.setVisibility(View.VISIBLE);
+                ErrorImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
+                ErrorTitle.setText("No Wifi");
+                ErrorMsg.setText("Connect to a wifi network to resume downloads.");
+                ErrorAction.setText("Resume Anyway");
+                ErrorAction.setOnClickListener(v -> Commons.modifyDownloadState(true));
+            } else ErrorCard.setVisibility(View.GONE);
+
+            if (mWifi.isConnected()) {
+                queryAdapter.resetList(Collections.nCopies(Preferences.getQuery_amount(), null));
+                new YoutubeQueryTask(MainActivity.this, getPackageName())
+                        .setTimeout(Preferences.getTimeout())
+                        .setSignature(getSignature(getPackageManager(), getPackageName()))
+                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
+            } else {
+                OfflineAction.setText("Retry");
+                OfflineImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
+                OfflineMsg.setText("No Internet");
+                OfflineAction.setVisibility(View.VISIBLE);
+                OfflineImg.setVisibility(View.VISIBLE);
+                OfflineMsg.setVisibility(View.VISIBLE);
+                OfflineAction.setOnClickListener(v -> Query());
+            }
+        }
+    };
+    private boolean WifiListenerRegistered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        if (getIntent() != null && getIntent().getBooleanExtra(InternalArgs.EXIT, false)) finish();
+
         setContentView(R.layout.activity_main);
 
         SlideUp = findViewById(R.id.slide_up);
@@ -101,15 +143,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         ScrollImg = findViewById(R.id.scroll_img);
         InfoTitle = findViewById(R.id.info_title);
-        InfoAction = findViewById(R.id.info_action);
+//        InfoAction = findViewById(R.id.info_action);
 
         List = findViewById(R.id.list);
 
         Refresh = findViewById(R.id.refresh);
         Dismiss = findViewById(R.id.dismiss);
         QueryList = findViewById(R.id.query_list);
-//        QueryLoading = findViewById(R.id.loading);
-//        Shimmer = findViewById(R.id.shimmer);
         Title = findViewById(R.id.title);
 
         OfflineImg = findViewById(R.id.offline_img);
@@ -135,10 +175,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             e.printStackTrace();
         }
 
-//        SlideUp.setScrollableViewHelper(new NestedScrollableViewHelper(NestedList));
-//        SlideUp.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-//        SlideUp.setScrollableView(NestedList);
-
         Dismiss.setOnClickListener(view -> {
             SlideUp.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
             queries = null;
@@ -152,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Search.setOnKeyListener(this);
         QueryBtn.setOnClickListener(this);
 
-        int index = getIntent().getIntExtra(Commons.ARGS.INDEX, -1);
+        int index = getIntent().getIntExtra(InternalArgs.INDEX, -1);
         if (index > 0 && List != null && manager.findFirstCompletelyVisibleItemPosition() <= index && manager.findLastCompletelyVisibleItemPosition() >= index) {
             RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(this) {
                 @Override
@@ -164,33 +200,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             manager.startSmoothScroll(smoothScroller);
         }
 
-//        HistoryBtn.setOnClickListener(v -> new Commons.History.RetrieveRangeTask().setCallback(new Commons.History.Callback<Integer, List<HistoryLog[]>>() {
-//            @Override
-//            public void onComplete(java.util.List<HistoryLog[]> data) {
-//                Log.d(TAG, data.size() < 1 ? "RETRIEVE INVALID LENGTH" : "RETRIEVE > " + new GsonBuilder().setPrettyPrinting().create().toJson(data.get(0)));
-//            }
-//
-//            @Override
-//            public void onError(Integer location, Exception e) {
-//                Log.e(TAG, String.format(Locale.ENGLISH, "RETRIEVE ERROR at %d-%d.%s", location >> 4, location & 0xF, Commons.History.EXTENSION));
-//            }
-//        }).execute());
-
-        HistoryBtn.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, HistoryActivity.class));
-        });
-
+        HistoryBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, HistoryActivity.class)));
         SettingsBtn.setOnClickListener(v -> startActivity(new Intent(this, PreferenceActivity.class)));
 
-//        int id = getIntent().getIntExtra(Commons.ARGS.NOTIF_CANCEL, -1);
-//        if (id > 0) {
-//            Intent intent = new Intent(TAG);
-//            intent.putExtra(Commons.ARGS.NOTIF_CANCEL, id);
-//            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-//        }
-
+        Search.requestFocus();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        Search.findFocus();
 
         if (queries != null && query != null) {
             Title.setText(query);
@@ -208,11 +222,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private void Query(String query) {
         MainActivity.query = query;
         queries = null;
-        queryAdapter.resetList(Collections.nCopies(Commons.Pref.query_amount, null));
 
-        new YoutubeQueryTask(this, getPackageName())
-                .setTimeout(Commons.Pref.timeout)
-                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
+        WifiListener.onReceive(this, null);
 
         Title.setText(query);
         Refresh.setOnClickListener(view -> Query());
@@ -221,32 +232,32 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private void UpdateInfo() {
         if (service != null) {
-            int running = service.getRunning().size();
+            int running = service.getRunning().length;
             if (running > 0) {
                 InfoTitle.setText(String.format(Locale.ENGLISH, "%d download%s running", running, running == 1 ? " is" : "s are"));
                 return;
             }
 
-            int completed = service.getCompleted().size();
+            int completed = service.getCompleted().length;
             if (completed > 0) {
                 InfoTitle.setText(String.format(Locale.ENGLISH, "%d download%s completed", completed, completed == 1 ? " has" : "s have"));
                 return;
             }
 
-            int queued = service.getQueue().size();
+            int queued = service.getQueue().length;
             if (queued > 0) {
                 InfoTitle.setText(String.format(Locale.ENGLISH, "%d download%s queued", queued, queued == 1 ? " is" : "s are"));
                 return;
             }
         }
-
         InfoTitle.setText("No downloads are running currently");
     }
 
     public void onComplete(java.util.List<SearchResult> results) {
         queries = results;
-        int visi = View.GONE;
+        int visibility = View.GONE;
         if (results == null) {
+            visibility = View.VISIBLE;
             OfflineImg.setImageResource(R.drawable.ic_cloud_off_secondarydark_96dp);
             OfflineMsg.setText("It seems that we can't connect to YouTube. Please check your connection and try again later.");
             OfflineAction.setText("Retry");
@@ -258,11 +269,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             OfflineAction.setText("Back");
             OfflineAction.setOnClickListener(v -> onBackPressed());
             queryAdapter.resetList();
-        } else queryAdapter.resetList(Query.CastListXML(results));
+        } else queryAdapter.resetList(Query.castListXML(results));
 
-        OfflineImg.setVisibility(visi);
-        OfflineMsg.setVisibility(visi);
-        OfflineAction.setVisibility(visi);
+        OfflineImg.setVisibility(visibility);
+        OfflineMsg.setVisibility(visibility);
+        OfflineAction.setVisibility(visibility);
     }
 
     public void onTimeout() {
@@ -297,6 +308,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     protected void onPause() {
         unbindService(this);
+        if (WifiListenerRegistered) {
+            WifiListenerRegistered = false;
+            unregisterReceiver(WifiListener);
+        }
         super.onPause();
     }
 
@@ -304,6 +319,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     protected void onResume() {
         super.onResume();
         bindService(new Intent(this, DownloadService.class), this, 0);
+
+        if (!WifiListenerRegistered) {
+            WifiListenerRegistered = true;
+            registerReceiver(WifiListener, new IntentFilter("android.net.wifi.STATE_CHANGE"));
+        }
     }
 
     @Override
@@ -314,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         List.setLayoutManager(manager);
         List.setAdapter(adapter);
         ScrollImg.setVisibility(View.VISIBLE);
-//        int index = getIntent().getIntExtra(Commons.ARGS.INDEX, -1);
+//        int index = getIntent().getIntExtra(InternalArgs.INDEX, -1);
 //        if (index > 0 && manager.findFirstCompletelyVisibleItemPosition() <= index && manager.findLastCompletelyVisibleItemPosition() >= index) {
 //            RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(this) {
 //                @Override
@@ -328,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
 
 //        if (getIntent() != null) {
-//            int scrollIndex = getIntent().getIntExtra(Commons.ARGS.INDEX, -1);
+//            int scrollIndex = getIntent().getIntExtra(InternalArgs.INDEX, -1);
 //            if (scrollIndex >= 0 && scrollIndex < adapter.getItemCount()) {
 //                float y = List.getY() + List.getChildAt(scrollIndex).getY();
 //                ((NestedScrollView) findViewById(R.id.main)).smoothScrollTo(0, (int) y);
@@ -361,7 +381,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void onWarn(Download args, String type) {
         adapter.onWarn(args, type);
-        Log.w(TAG, (args.title == null ? "SERVICE " : '\'' + args.title + '\'') + ": " + type);
+        Log.w(TAG, (args.getTitle() == null ? "SERVICE " : '\'' + args.getTitle() + '\'') + ": " + type);
         Snackbar.make(findViewById(R.id.main), type, Snackbar.LENGTH_LONG).show();
     }
 
@@ -386,12 +406,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Matcher matcher = Pattern.compile("^https?://.*(?:youtu.be/|v/|u/\\w/|embed/|watch\\?v=)([^#&?]*).*$", Pattern.CASE_INSENSITIVE).matcher(url);
         if (matcher.matches()){
             Intent intent = new Intent(this, DownloadActivity.class);
-            intent.putExtra(Commons.ARGS.DATA, new Query(matcher.group(1)));
+            intent.putExtra(InternalArgs.DATA, new Query(matcher.group(1)));
             startActivity(intent);
         } else {
-//            Intent intent = new Intent(this, QueryActivity.class);
-//            intent.putExtra(Commons.ARGS.DATA, query);
-//            startActivity(intent);
             Query(query);
             SlideUp.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         }
@@ -423,4 +440,25 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 //        super.onResume();
 //        if (querying) Shimmer.startShimmer();
 //    }
+
+    public static String getSignature(@NonNull PackageManager pm, @NonNull String packageName) {
+        try {
+            PackageInfo packageInfo = pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
+            if (packageInfo == null
+                    || packageInfo.signatures == null
+                    || packageInfo.signatures.length == 0
+                    || packageInfo.signatures[0] == null) {
+                return null;
+            }
+
+            byte[] signature = packageInfo.signatures[0].toByteArray();
+            MessageDigest md = MessageDigest.getInstance("SHA1");
+            byte[] digest = md.digest(signature);
+
+            return BaseEncoding.base16().lowerCase().encode(digest);
+        } catch (NoSuchAlgorithmException | PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

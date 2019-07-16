@@ -16,7 +16,9 @@
         android:roundIcon="@mipmap/ic_new_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        android:usesCleartextTraffic="true"
+        android:fullBackupContent="@xml/backup_descriptor"
+        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute" >
 
         <service
             android:name=".download.DownloadService"
@@ -39,15 +41,25 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".download.MainActivity" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="www.youtube.com"
+                    android:mimeType="text/*" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".preferences.PreferenceActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="Preferences" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".download.MainActivity" />
         </activity>
-
         <activity
             android:name=".download.HistoryActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -55,5 +67,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".download.MainActivity" />
         </activity>
+        <activity android:name=".errorlog.ErrorLogActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".preferences.PreferenceActivity" />
+        </activity>
     </application>
+
 </manifest>

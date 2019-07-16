@@ -6,14 +6,14 @@ import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.yearzero.renebeats.R
 
-class RunningViewHolder(itemView: View) : QueueViewHolder(itemView) {
+class RunningViewHolder(Main: View) : IntermediateViewHolder(Main) {
 
-    protected var Constraint: ConstraintLayout = itemView.findViewById(R.id.constraint)
-    protected var Progress: ProgressBar = itemView.findViewById(R.id.progress)
+    private var Constraint: ConstraintLayout = Main.findViewById(R.id.constraint)
+    private var Progress: ProgressBar = Main.findViewById(R.id.progress)
 
-    init {
-        UpdateAnimation()
-    }
+    init { updateAnimation() }
+
+    fun setCancelListener(listener: View.OnClickListener) = setAction0(listener)
 
     fun setProgress(current: Int, total: Int, indeterminate: Boolean) {
         if (indeterminate)
@@ -25,27 +25,26 @@ class RunningViewHolder(itemView: View) : QueueViewHolder(itemView) {
         }
     }
 
-    fun setPaused(paused: Boolean) {
-        if (paused) {
-            Constraint.setBackgroundResource(R.drawable.background_layout_paused)
-            Status.text = "PAUSED"
-        } else {
-            Constraint.setBackgroundResource(R.drawable.background_layout_running)
-            UpdateAnimation()
-        }
-    }
+//    fun setPaused(value: Boolean) = if (value) {
+//        Constraint.setBackgroundResource(R.drawable.background_layout_paused)
+//        Status.text = "PAUSED"
+//        Action0.setImageResource(R.drawable.ic_play_black_24dp)
+//    } else {
+//        Constraint.setBackgroundResource(R.drawable.background_layout_running)
+//        Action0.setImageResource(R.drawable.ic_pause_black_24dp)
+//        updateAnimation()
+//    }
 
-    protected fun UpdateAnimation() {
+    private fun updateAnimation() {
         val draw = Constraint.background
         if (draw is AnimationDrawable) {
             draw.setEnterFadeDuration(500)
             draw.setExitFadeDuration(1000)
             draw.start()
         }
-
     }
 
     companion object {
-        val LocalID = 2
+        const val LocalID = 0x0101
     }
 }

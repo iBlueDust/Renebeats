@@ -10,17 +10,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.squareup.picasso.Picasso;
-import com.yearzero.renebeats.Commons;
+import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.R;
-import com.yearzero.renebeats.download.DownloadActivity;
-import com.yearzero.renebeats.download.Query;
+import com.yearzero.renebeats.preferences.Preferences;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -38,12 +38,10 @@ public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case 0:
-                return new ShimmerViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > 400f ? R.layout.layout_query_shimmer_large : R.layout.layout_query_shimmer, parent, false));
-            default:
-                return new ViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > 400f ? R.layout.layout_query_large : R.layout.layout_query, parent, false));
+        if (viewType == 0) {
+            return new ShimmerViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > 400f ? R.layout.layout_query_shimmer_large : R.layout.layout_query_shimmer, parent, false));
         }
+        return new ViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > 400f ? R.layout.layout_query_large : R.layout.layout_query, parent, false));
     }
 
     @Override
@@ -57,32 +55,32 @@ public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         if (h instanceof ViewHolder) {
             ViewHolder holder = (ViewHolder) h;
-            if (query.thumbmap != null) holder.setThumbnail(query.thumbmap);
-            else if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null) {
-                holder.setThumbnail(query.getThumbnail(metrics.widthPixels / metrics.density > 400f ? Commons.Pref.queryImageLarge : Commons.Pref.queryImage));
+            if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null) {
+                holder.setThumbnail(query.getThumbnail(metrics.widthPixels / metrics.density <
+                        400f ? Preferences.getQueryImageLarge() : Preferences.getQueryImage()));
             }
 
-            holder.setTitle(query.title);
-            holder.setAuthor(query.artist);
+            holder.setTitle(query.getTitle());
+            holder.setAuthor(query.getArtist());
 
             holder.setOnClickListener(v -> {
                 int index = holder.getAdapterPosition();
                 if (index < 0 || index >= queries.size()) return;
 
                 Intent intent = new Intent(context, DownloadActivity.class);
-                intent.putExtra(Commons.ARGS.DATA, queries.get(index));
+                intent.putExtra(InternalArgs.DATA, queries.get(index));
                 context.startActivity(intent);
             });
         }
     }
 
-    public void resetList(Collection<Query> list){
+    void resetList(Collection<Query> list){
         queries.clear();
         queries.addAll(list);
         notifyDataSetChanged();
     }
 
-    public void resetList() {
+    void resetList() {
         queries.clear();
         notifyDataSetChanged();
     }
@@ -117,18 +115,18 @@ public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         protected void setThumbnail(String url){
             if (url != null)
                 Picasso.get()
-                    .load(url)
-                    .placeholder(R.drawable.shimmer_rounded)
-                    .transform(new RoundedCornersTransformation((int) context.getResources().getDimension(R.dimen.thumbnail_radius), 0))
-                    .centerCrop()
-                    .fit()
-                    .into(Thumbnail);
+                        .load(url)
+                        .placeholder(R.drawable.shimmer_rounded)
+                        .transform(new RoundedCornersTransformation((int) context.getResources().getDimension(R.dimen.thumbnail_radius), 0))
+                        .centerCrop()
+                        .fit()
+                        .into(Thumbnail);
         }
 
         protected void setThumbnail(Uri image){
             if (image != null) Thumbnail.setImageURI(image);
-//            ShimmerThumbnail.stopShimmer();
-//            ShimmerThumbnail.setVisibility(View.GONE);
+            //            ShimmerThumbnail.stopShimmer();
+            //            ShimmerThumbnail.setVisibility(View.GONE);
         }
 
         protected void setTitle(String title){
