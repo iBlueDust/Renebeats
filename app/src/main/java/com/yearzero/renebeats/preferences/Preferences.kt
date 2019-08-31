@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.text.format.DateFormat
+import com.yearzero.renebeats.BuildConfig
 import com.yearzero.renebeats.Directories
 import com.yearzero.renebeats.download.Query
 import com.yearzero.renebeats.preferences.enums.GuesserMode
@@ -63,7 +64,7 @@ object Preferences {
     @JvmStatic var notifications_completed = true
 
     @JvmStatic fun initialize(context: Context) {
-        SharedPref = context.getSharedPreferences("com.yearzero.renebeats", MODE_PRIVATE)
+        SharedPref = context.getSharedPreferences(BuildConfig.APPLICATION_ID, MODE_PRIVATE)
         load()
     }
 
@@ -147,6 +148,6 @@ object Preferences {
     }
 
     @JvmStatic fun formatTime(context: Context, date: Date): String {
-        return android.text.format.DateFormat.getTimeFormat(context).format(date)
+        return DateFormat.getTimeFormat(context).format(date)
     }
 }

@@ -286,6 +286,7 @@ public class AndroidAudioConverter {
                     if (!message.startsWith("size=")) return;
                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS", Locale.ENGLISH);
                     sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
                     Date date;
                     try {
                         date = sdf.parse(message.replaceFirst(".*?time=([0-9:.]+).*", "$1") + '0');

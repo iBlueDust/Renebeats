@@ -23,26 +23,28 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+@Setter(AccessLevel.PACKAGE)
+@Getter
 @ParametersAreNullableByDefault
 public class Query implements Serializable {
     // App code (EA50) - "Class" (ClA5) - Class ID (0E10_llE1)
     private static long serialVersionUID = 0xEA50_C1A5_0E10_11E1L;
 
-    @Getter @Setter(AccessLevel.PACKAGE) private String youtubeID;
-    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String title = "";
-    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String album = "";
-    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String artist = "";
-    @Getter @Setter(AccessLevel.PACKAGE) private int year = 0;
-    @Getter @Setter(AccessLevel.PACKAGE) private int track = 0;
-    @Getter @Setter(AccessLevel.PACKAGE) @NonNull private String genres = "";
+    private String youtubeID;
+    @NonNull private String title = "";
+    @NonNull private String album = "";
+    @NonNull private String artist = "";
+    private int year = 0;
+    private int track = 0;
+    @NonNull private String genres = "";
 
     //region Thumbnail Getters
-    @Getter @Setter(AccessLevel.PACKAGE) private String thumbMax;
-    @Getter @Setter(AccessLevel.PACKAGE) private String thumbHigh;
+    private String thumbMax;
+    private String thumbHigh;
 
-    @Getter @Setter(AccessLevel.PACKAGE) private String thumbMedium;
-    @Getter @Setter(AccessLevel.PACKAGE) private String thumbDefault;
-    @Getter @Setter(AccessLevel.PACKAGE) private String thumbStandard;
+    private String thumbMedium;
+    private String thumbDefault;
+    private String thumbStandard;
 
     Query() {}
 
@@ -121,15 +123,6 @@ public class Query implements Serializable {
     //    if (thumbnail.getDefault() != null) thumbHigh = thumbnail.getDefault().getUrl();
     //    if (thumbnail.getStandard() != null) thumbHigh = thumbnail.getStandard().getUrl();
     //  }
-
-    //    public String getFileNoExt() {
-    //        boolean t = title == null || title.isEmpty();
-    //        boolean a = artist == null || artist.isEmpty();
-    //        if (!(t || a)) return title + '-' + artist;
-    //        else if (t && a) return "-";
-    //        else if (t) return title;
-    //        else return artist;
-    //    }
 
     public enum ThumbnailQuality {
         MaxRes("maxres"),

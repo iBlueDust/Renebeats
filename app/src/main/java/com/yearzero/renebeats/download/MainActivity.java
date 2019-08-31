@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,6 +40,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.R;
+import com.yearzero.renebeats.download.ui.viewholder.BasicViewHolder;
 import com.yearzero.renebeats.preferences.PreferenceActivity;
 import com.yearzero.renebeats.preferences.Preferences;
 
@@ -96,9 +98,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             if (!(mWifi.isConnected() || Preferences.getMobiledata())) {
                 ErrorCard.setVisibility(View.VISIBLE);
                 ErrorImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
-                ErrorTitle.setText("No Wifi");
-                ErrorMsg.setText("Connect to a wifi network to resume downloads.");
-                ErrorAction.setText("Resume Anyway");
+                ErrorTitle.setText(getString(R.string.no_wifi));
+                ErrorMsg.setText(R.string.error_wifi_msg);
+                ErrorAction.setText(R.string.error_wifi_action);
                 ErrorAction.setOnClickListener(v -> Commons.modifyDownloadState(true));
             } else ErrorCard.setVisibility(View.GONE);
 
@@ -109,9 +111,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         .setSignature(getSignature(getPackageManager(), getPackageName()))
                         .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
             } else {
-                OfflineAction.setText("Retry");
+                OfflineAction.setText(R.string.retry);
                 OfflineImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
-                OfflineMsg.setText("No Internet");
+                OfflineMsg.setText(R.string.no_internet);
                 OfflineAction.setVisibility(View.VISIBLE);
                 OfflineImg.setVisibility(View.VISIBLE);
                 OfflineMsg.setVisibility(View.VISIBLE);
@@ -167,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             String[] perms = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_PERMISSIONS).requestedPermissions;
             if (!EasyPermissions.hasPermissions(this, perms))
                 EasyPermissions.requestPermissions(this,
-                        "This app requires the following permissions. Without them, some functionality will be lost",
+                        getString(R.string.permission_rationale),
                         Commons.PERM_REQUEST,
                         perms
                 );
@@ -234,23 +236,23 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         if (service != null) {
             int running = service.getRunning().length;
             if (running > 0) {
-                InfoTitle.setText(String.format(Locale.ENGLISH, "%d download%s running", running, running == 1 ? " is" : "s are"));
+                InfoTitle.setText(String.format(Locale.ENGLISH, getString(R.string.main_header_running), running, running == 1 ? getString(R.string.main_header_is) : getString(R.string.main_header_are)));
                 return;
             }
 
             int completed = service.getCompleted().length;
             if (completed > 0) {
-                InfoTitle.setText(String.format(Locale.ENGLISH, "%d download%s completed", completed, completed == 1 ? " has" : "s have"));
+                InfoTitle.setText(String.format(Locale.ENGLISH, getString(R.string.main_header_completed), completed, completed == 1 ? getString(R.string.main_header_has) : getString(R.string.main_header_have)));
                 return;
             }
 
             int queued = service.getQueue().length;
             if (queued > 0) {
-                InfoTitle.setText(String.format(Locale.ENGLISH, "%d download%s queued", queued, queued == 1 ? " is" : "s are"));
+                InfoTitle.setText(String.format(Locale.ENGLISH, getString(R.string.main_header_queued), queued, queued == 1 ? getString(R.string.main_header_is) : getString(R.string.main_header_are)));
                 return;
             }
         }
-        InfoTitle.setText("No downloads are running currently");
+        InfoTitle.setText(getString(R.string.main_header_empty));
     }
 
     public void onComplete(java.util.List<SearchResult> results) {
@@ -259,14 +261,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         if (results == null) {
             visibility = View.VISIBLE;
             OfflineImg.setImageResource(R.drawable.ic_cloud_off_secondarydark_96dp);
-            OfflineMsg.setText("It seems that we can't connect to YouTube. Please check your connection and try again later.");
-            OfflineAction.setText("Retry");
+            OfflineMsg.setText(R.string.main_error_connection_msg);
+            OfflineAction.setText(R.string.retry);
             OfflineAction.setOnClickListener(v -> Query());
             queryAdapter.resetList();
         } else if (results.size() <= 0) {
             OfflineImg.setImageResource(R.drawable.ic_search_lightgray_96dp);
-            OfflineMsg.setText("Your search didn't come out with any results");
-            OfflineAction.setText("Back");
+            OfflineMsg.setText(R.string.main_error_empty);
+            OfflineAction.setText(R.string.back);
             OfflineAction.setOnClickListener(v -> onBackPressed());
             queryAdapter.resetList();
         } else queryAdapter.resetList(Query.castListXML(results));
@@ -280,10 +282,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         queryAdapter.resetList();
         OfflineImg.setImageResource(R.drawable.ic_timer_lightgray_96dp);
         OfflineImg.setVisibility(View.VISIBLE);
-        OfflineMsg.setText("Request timed out");
+        OfflineMsg.setText(R.string.main_error_timeout);
         OfflineMsg.setVisibility(View.VISIBLE);
         OfflineAction.setVisibility(View.VISIBLE);
-        OfflineAction.setText("Retry");
+        OfflineAction.setText(R.string.retry);
         OfflineAction.setOnClickListener(v -> Query(query));
     }
 
@@ -381,7 +383,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void onWarn(Download args, String type) {
         adapter.onWarn(args, type);
-        Log.w(TAG, (args.getTitle() == null ? "SERVICE " : '\'' + args.getTitle() + '\'') + ": " + type);
+        Log.w(TAG, '\'' + args.getTitle() + '\'' + ": " + type);
         Snackbar.make(findViewById(R.id.main), type, Snackbar.LENGTH_LONG).show();
     }
 
@@ -459,6 +461,38 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         } catch (NoSuchAlgorithmException | PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    static class DownloadSwipeCallback extends ItemTouchHelper.SimpleCallback {
+        private Activity activity;
+        private RecyclerView.Adapter<BasicViewHolder> adapter;
+
+        DownloadSwipeCallback(Activity activity, RecyclerView.Adapter<BasicViewHolder> adapter) {
+            super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+            this.activity = activity;
+            this.adapter = adapter;
+        }
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            if (adapter instanceof DownloadAdapter){
+                DownloadAdapter downloadAdapter = (DownloadAdapter) adapter;
+                downloadAdapter.blacklistAt(viewHolder.getAdapterPosition());
+                String title = viewHolder instanceof BasicViewHolder && !((BasicViewHolder) viewHolder).getTitle().toString().trim().isEmpty() ? ((BasicViewHolder) viewHolder).getTitle().toString() : "a download";
+
+                Snackbar.make(activity.getWindow().getDecorView().getRootView(), "Hid " + title, Snackbar.LENGTH_LONG)
+                        .setAction("Undo", a -> {
+                            downloadAdapter.unBlacklistAt(viewHolder.getAdapterPosition());
+
+                            Snackbar.make(activity.getWindow().getDecorView().getRootView(), "Unhid " + title, Snackbar.LENGTH_LONG)
+                                    .show();
+                        }).show();
+            }
         }
     }
 }

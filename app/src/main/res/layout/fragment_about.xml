@@ -14,7 +14,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_notif"
-        android:contentDescription="App Icon"
+        android:contentDescription="@string/app_icon"
         tools:ignore="VectorDrawableCompat" />
 
     <TextView
@@ -24,7 +24,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        android:text="Renebeats"
+        android:text="@string/app_name"
         android:textAppearance="@style/Text.Header.Big"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -40,7 +40,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginBottom="32dp"
         android:gravity="end"
-        android:text='Renebeats was made by Peter Raozen (iBlueDust) under the company name "Year Zero".\n\nThe project is under no official license and was intended for a limited audience and for private use only. The creator has full rights to the modification, extermination, and publishing of this application.\n\nDevelopment started in 20 September 2018 and is still under alpha or initial development. Only one developer is continuing this project in his spare time.'
+        android:text="@string/about_msg"
         android:textAlignment="textEnd"
         android:textAppearance="@style/Text"
         app:layout_constraintBottom_toTopOf="@+id/imageView2"

@@ -7,7 +7,6 @@ public class InternalArgs {
     public static final int CANCELLED = 9;
 
     public static final String REMAINING = "remaining";
-    public static final String EXIT = "exit";
     public static final String REQUEST = "request";
     public static final String DATA = "data";
     public static final String RESULT = "result";
@@ -16,7 +15,6 @@ public class InternalArgs {
     public static final String INDETERMINATE = "indeterminate";
     public static final String EXCEPTION = "exception";
     public static final String INDEX = "index";
-    public static final String LOAD = "load";
     public static final String PAUSED = "paused";
     public static final String SIZE = "size";
     //        public static final String NOTIF_CANCEL = "notifications.cancel";

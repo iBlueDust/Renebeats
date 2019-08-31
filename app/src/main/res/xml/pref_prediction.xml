@@ -2,7 +2,7 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.preference.ListPreference
-        android:key="@string/pref_guesser_modes"
-        android:title="Prediction Modes" />
+        android:key="@string/pref_guesser"
+        android:title="@string/pref_guesser_title" />
 
 </androidx.preference.PreferenceScreen>

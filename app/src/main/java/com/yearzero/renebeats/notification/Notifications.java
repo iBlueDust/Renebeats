@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Build;
 
 import com.yearzero.renebeats.BuildConfig;
+import com.yearzero.renebeats.R;
 
 public class Notifications {
 
@@ -21,7 +22,7 @@ public class Notifications {
             manager.cancelAll();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Downloads in Progress", android.app.NotificationManager.IMPORTANCE_LOW);
-                channel.setDescription("All downloads are displayed here");
+                channel.setDescription(context.getString(R.string.notif_desc));
                 channel.enableLights(false);
                 channel.enableVibration(false);
                 manager.createNotificationChannel(channel);

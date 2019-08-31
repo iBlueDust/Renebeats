@@ -2,14 +2,14 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.preference.ListPreference
-        android:key="@string/pref_data_downloadusing"
-        android:title="Download using" />
+        android:key="@string/pref_data_using"
+        android:title="@string/pref_general_using_title" />
     <!--android:entries="@array/data" />-->
 
     <androidx.preference.ListPreference
-        android:key="@string/pref_defaults_processspeed"
-        android:title="Processing Speed Preset"
-        android:summary="Processing can be sped up at the cost of quality per file size"
+        android:key="@string/pref_general_speed"
+        android:title="@string/pref_general_speed_title"
+        android:summary="@string/pref_general_speed_summary"
         android:entries="@array/process_speed"
         android:entryValues="@array/process_speed_entries" />
 
@@ -18,51 +18,51 @@
         <!--android:title="Concurrent Downloads" />-->
 
     <androidx.preference.CheckBoxPreference
-        android:key="@string/pref_defaults_alwayslog"
-        android:title="Always Log Failed Downloads"
+        android:key="@string/pref_general_autolog"
+        android:title="@string/pref_general_autolog_title"
         android:checked="false"
-        android:summary="Error reports will be immediately saved. Long press to view all logs" />
+        android:summary="@string/pref_general_autolog_summary" />
 
     <androidx.preference.ListPreference
-        android:key="@string/pref_guesser_modes"
+        android:key="@string/pref_guesser"
         android:icon="@drawable/ic_prediction_black_24dp"
-        android:title="Autofill Options"
+        android:title="@string/pref_guesser_title"
         android:entries="@array/guesser"
         android:entryValues="@array/guesser_entries"/>
 
     <androidx.preference.ListPreference
-        android:key="@string/pref_defaults_queryamount"
-        android:title="Query Amount"
+        android:key="@string/pref_general_query"
+        android:title="@string/pref_general_query_title"
         android:entries="@array/query_amount"
         android:entryValues="@array/query_amount" />
 
     <androidx.preference.PreferenceCategory
-        android:title="Defaults" >
+        android:title="@string/pref_general_cat_defaults" >
 
         <androidx.preference.ListPreference
-            android:key="@string/pref_defaults_format"
-            android:title="Format"
+            android:key="@string/pref_general_format"
+            android:title="@string/pref_general_format_title"
             android:entries="@array/formats"
             android:entryValues="@array/formats" />
 
         <androidx.preference.ListPreference
-            android:key="@string/pref_defaults_bitrate"
-            android:title="Bitrate" />
+            android:key="@string/pref_general_bitrate"
+            android:title="@string/pref_general_bitrate_title" />
 
         <androidx.preference.ListPreference
-            android:key="@string/pref_defaults_overwrite"
-            android:title="Overwrite"
+            android:key="@string/pref_general_overwrite"
+            android:title="@string/pref_general_overwrite_title"
             android:entries="@array/overwrite"
             android:entryValues="@array/overwrite_entries" />
 
         <androidx.preference.CheckBoxPreference
-            android:key="@string/pref_defaults_normalize"
-            android:title="Normalize"
-            android:summary="This helps fix overly quiet audio" />
+            android:key="@string/pref_general_normalize"
+            android:title="@string/pref_general_normalize_title"
+            android:summary="@string/pref_general_normalize_summary" />
 
         <androidx.preference.ListPreference
-            android:key="@string/pref_defaults_filename"
-            android:title="File Name Format"
+            android:key="@string/pref_general_first"
+            android:title="@string/pref_general_first_title"
             android:entries="@array/file_name"
             android:entryValues="@array/file_name_entries" />
 

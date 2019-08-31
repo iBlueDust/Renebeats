@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.util.LongSparseArray;
 import android.util.SparseArray;
 
 import androidx.annotation.NonNull;
@@ -48,8 +47,6 @@ import java.util.Locale;
 import cafe.adriel.androidaudioconverter.model.AudioFormat;
 
 public class DownloadService extends Service {
-
-    //TODO: Dedicated queue file
 
     public static final String TAG = "DownloadService";
     public static final String MISSING_IN_MAP = "Request Queue: A Download in Fetch is not in HashMap (IGNORED)";
@@ -162,7 +159,7 @@ public class DownloadService extends Service {
 
     private final LocalBinder binder = new LocalBinder();
 
-    private boolean loaded;//, cpause, pause;
+//    private boolean loaded, cpause, pause;
     private @Nullable AndroidAudioConverter converter;
     private final ArrayList<ClientCallbacks> callbacks = new ArrayList<>();
     private final LinkedList<Download> convertQueue = new LinkedList<>();
@@ -217,16 +214,6 @@ public class DownloadService extends Service {
                 return START_STICKY;
             }
 
-            if ((intent.getBooleanExtra(InternalArgs.LOAD, true) && !loaded)) {
-                Download[] pkg = Directories.loadQueue();
-                if (pkg == null)
-                    Log.e(TAG, "Failed to load queue");
-                else {
-                    loaded = true;
-                    LoadPackage(pkg);
-                }
-            }
-
             try {
                 current = (Download) intent.getSerializableExtra(InternalArgs.DATA);
             } catch (ClassCastException e) {
@@ -247,9 +234,9 @@ public class DownloadService extends Service {
 
             Exception v = Validate(current);
             if (v != null) {
+                Log.e(TAG, "Invalid Argument: " + v.getMessage());
                 current.getStatus().setInvalid(true);
                 onFinish(current, false, v);
-                Log.e(TAG, "Invalid Argument: " + v.getMessage());
                 return START_STICKY;
             }
 
@@ -259,7 +246,13 @@ public class DownloadService extends Service {
                 current.getStatus().setDownload(Status.Download.QUEUED);
                 current.getStatus().setConvert(null);
                 current.getStatus().setMetadata(null);
-                new History.AppendNowTask().execute(current);
+
+                Exception e = History.record(HistoryLog.generate(current));
+                if (e != null) {
+                    Log.e(TAG, "Failed to record download history");
+                    e.printStackTrace();
+                }
+
                 onProgress(0, 0, true, current);
                 Download(current);
             }
@@ -267,117 +260,116 @@ public class DownloadService extends Service {
         return START_STICKY;
     }
 
-    private void LoadPackage(Download[] pkg) {
-        LongSparseArray<Download> paused = new LongSparseArray<>();
-
-        for (Download d : pkg) {
-            if (d.getStatus().getDownload() == null) continue;
-            switch (d.getStatus().getDownload()) {
-                case QUEUED:
-                    Download(d);
-                    break;
-                case RUNNING:
-                case PAUSED:
-                    paused.append(d.getId(), d);
-                    break;
-
-                case CANCELLED:
-                    this.completed.add(d);
-                    // TODO: Replace "this.completed.add(d);" with "Commons.History.add(d);"
-                    break;
-                default:
-                    if (d.getStatus().getConvert() == null) continue;
-                    switch (d.getStatus().getConvert()) {
-                        case RUNNING:
-//                        case PAUSED:
-//                            d.status.setConvert(Status.Convert.QUEUED);
-//                            if (d.conv != null) {
-//                                File file = new File(Directories.getBIN(), d.conv);
-//                                if (file.exists() && !file.delete())
-//                                    Log.w(TAG, "LoadPackage // Found Paused/Running in conversion Download and its conv file, yet failed to delete\nChanged status to QUEUED");
+//    private void LoadPackage(Download[] pkg) {
+//        LongSparseArray<Download> paused = new LongSparseArray<>();
+//
+//        for (Download d : pkg) {
+//            if (d.getStatus().getDownload() == null) continue;
+//            switch (d.getStatus().getDownload()) {
+//                case QUEUED:
+//                    Download(d);
+//                    break;
+//                case RUNNING:
+//                case PAUSED:
+//                    paused.append(d.getId(), d);
+//                    break;
+//
+//                case CANCELLED:
+//                    this.completed.add(d);
+//                    break;
+//                default:
+//                    if (d.getStatus().getConvert() == null) continue;
+//                    switch (d.getStatus().getConvert()) {
+//                        case RUNNING:
+////                        case PAUSED:
+////                            d.status.setConvert(Status.Convert.QUEUED);
+////                            if (d.conv != null) {
+////                                File file = new File(Directories.getBIN(), d.conv);
+////                                if (file.exists() && !file.delete())
+////                                    Log.w(TAG, "LoadPackage // Found Paused/Running in conversion Download and its conv file, yet failed to delete\nChanged status to QUEUED");
+////                            }
+//                        case QUEUED:
+//                            if (d.getDown() == null || !new File(d.getDown()).exists()) {
+//                                Exception v = Validate(d);
+//                                if (v == null) {
+//                                    convertQueue.add(d);
+//                                } else {
+////                                    d.exception = v;
+//                                    onFinish(d, false, v);
+//                                    Log.e(TAG, "Invalid Argument: " + v.getMessage());
+//                                }
+//                            } else convertQueue.add(d);
+//                            break;
+//                        default:
+//                            if (d.getStatus().getMetadata() == null) {
+//                                if (d.getConv() == null || !new File(d.getConv()).exists()) {
+//                                    Exception v = Validate(d);
+//                                    if (v == null) {
+//                                        if (d.getDown() == null || !new File(d.getDown()).exists())
+//                                            //                                            downloadQueue.add(d);
+//                                            Download(d);
+//                                        else convertQueue.add(d);
+//                                    } else {
+//                                        d.getStatus().setMetadata(false);
+////                                        d.exception = v;
+//                                        onFinish(d, false, v);
+//                                        Log.e(TAG, "Invalid Argument :" + v.getMessage());
+//                                    }
+//                                } else Metadata(d);
+//                            } else {
+//                                Exception v = Validate(d);
+//                                if (v == null) {
+//                                    //                                    downloadQueue.add(d);
+//                                    Download(d);
+//                                    continue;
+//                                }
+//                                d.getStatus().setMetadata(false);
+////                                d.exception = v;
+//                                onFinish(d, false, v);
+//                                Log.e(TAG, "Invalid Argument :" + v.getMessage());
 //                            }
-                        case QUEUED:
-                            if (d.getDown() == null || !new File(d.getDown()).exists()) {
-                                Exception v = Validate(d);
-                                if (v == null) {
-                                    convertQueue.add(d);
-                                } else {
-//                                    d.exception = v;
-                                    onFinish(d, false, v);
-                                    Log.e(TAG, "Invalid Argument: " + v.getMessage());
-                                }
-                            } else convertQueue.add(d);
-                            break;
-                        default:
-                            if (d.getStatus().getMetadata() == null) {
-                                if (d.getConv() == null || !new File(d.getConv()).exists()) {
-                                    Exception v = Validate(d);
-                                    if (v == null) {
-                                        if (d.getDown() == null || !new File(d.getDown()).exists())
-                                            //                                            downloadQueue.add(d);
-                                            Download(d);
-                                        else convertQueue.add(d);
-                                    } else {
-                                        d.getStatus().setMetadata(false);
-//                                        d.exception = v;
-                                        onFinish(d, false, v);
-                                        Log.e(TAG, "Invalid Argument :" + v.getMessage());
-                                    }
-                                } else Metadata(d);
-                            } else {
-                                Exception v = Validate(d);
-                                if (v == null) {
-                                    //                                    downloadQueue.add(d);
-                                    Download(d);
-                                    continue;
-                                }
-                                d.getStatus().setMetadata(false);
-//                                d.exception = v;
-                                onFinish(d, false, v);
-                                Log.e(TAG, "Invalid Argument :" + v.getMessage());
-                            }
-                    }
-            }
-        }
-
-        List<Integer> ids = new ArrayList<>();
-        for (int i = 0; i < paused.size(); i++) ids.add(paused.get(paused.keyAt(i)).getId());
-
-        for (long id : ids) {
-            Commons.fetch.getDownloadsByRequestIdentifier(id, result -> {
-                for (com.tonyodev.fetch2.Download d : result) {
-                    switch (d.getStatus()) {
-                        case ADDED:
-                        case QUEUED:
-                            paused.get(d.getId()).getStatus().setDownload(Status.Download.QUEUED);
-                            break;
-                        case DOWNLOADING:
-                            paused.get(d.getId()).getStatus().setDownload(Status.Download.RUNNING);
-                            break;
-                        case PAUSED:
-                            paused.get(d.getId()).getStatus().setDownload(Status.Download.PAUSED);
-                            break;
-                        case CANCELLED:
-                        case DELETED:
-                        case REMOVED:
-                            paused.get(d.getId()).getStatus().setDownload(Status.Download.CANCELLED);
-                            break;
-                        case FAILED:
-                            paused.get(d.getId()).getStatus().setDownload(Status.Download.FAILED);
-                            break;
-                        case COMPLETED:
-                            Download p = paused.get(d.getId());
-                            p.getStatus().setDownload(Status.Download.COMPLETE);
-                            if (p.isConvert()) convertQueue.add(p);
-                            else Metadata(p);
-                            break;
-                        default:
-                            Download(paused.get(d.getId()));
-                    }
-                }
-            });
-        }
-    }
+//                    }
+//            }
+//        }
+//
+//        List<Integer> ids = new ArrayList<>();
+//        for (int i = 0; i < paused.size(); i++) ids.add(paused.get(paused.keyAt(i)).getId());
+//
+//        for (long id : ids) {
+//            Commons.fetch.getDownloadsByRequestIdentifier(id, result -> {
+//                for (com.tonyodev.fetch2.Download d : result) {
+//                    switch (d.getStatus()) {
+//                        case ADDED:
+//                        case QUEUED:
+//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.QUEUED);
+//                            break;
+//                        case DOWNLOADING:
+//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.RUNNING);
+//                            break;
+//                        case PAUSED:
+//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.PAUSED);
+//                            break;
+//                        case CANCELLED:
+//                        case DELETED:
+//                        case REMOVED:
+//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.CANCELLED);
+//                            break;
+//                        case FAILED:
+//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.FAILED);
+//                            break;
+//                        case COMPLETED:
+//                            Download p = paused.get(d.getId());
+//                            p.getStatus().setDownload(Status.Download.COMPLETE);
+//                            if (p.isConvert()) convertQueue.add(p);
+//                            else Metadata(p);
+//                            break;
+//                        default:
+//                            Download(paused.get(d.getId()));
+//                    }
+//                }
+//            });
+//        }
+//    }
 
     private Exception Validate(Download args) {
         if (args == null)
@@ -390,21 +382,6 @@ public class DownloadService extends Service {
     }
 
     private void Download(@NonNull Download current) {
-        short i = 0;
-        if (!(Directories.getBIN().exists() || Directories.getBIN().mkdirs()))
-            Log.w(TAG, "Failed to create BIN folder");
-        else {
-            ArrayList<Short> indexes = new ArrayList<>();
-            for (String f : Directories.getBIN().list()) {
-                String number = f.replaceFirst("^(\\d+).*?$", "$1");
-
-                try {
-                    indexes.add(Short.parseShort(number));
-                } catch (NumberFormatException ignored) { }
-            }
-            while (indexes.contains(i)) i++;
-        }
-
         if (current.getAvailableFormat() == null || current.getAvailableFormat().isEmpty()) {
             current.extractFromSparse();
             if (current.getUrl() == null) {
@@ -412,9 +389,13 @@ public class DownloadService extends Service {
             }
         }
 
+        short i = 0;
+        if (!(Directories.getBIN().exists() || Directories.getBIN().mkdirs()))
+            Log.w(TAG, "Failed to create BIN folder");
+        else current.setDown(String.format(Locale.ENGLISH, "%s.%s", History.getFilename(current), current.getAvailableFormat()));
+
         current.getStatus().setConvert(null);
         current.getStatus().setMetadata(null);
-        current.setDown(String.format(Locale.ENGLISH, "%d.%s", i, current.getAvailableFormat()));
 
         if (!Commons.fetch.getListenerSet().contains(fetchListener))
             Commons.fetch.addListener(fetchListener);
@@ -586,13 +567,22 @@ public class DownloadService extends Service {
         //        for (File f : Directories.getBIN().listFiles()) {
         //            if (!f.delete()) failed = true;
         //        }
-        if (!(new File(Directories.getBIN(), args.getDown()).delete() &&
-                new File(Directories.getBIN(), args.getConv()).delete()))
+        if (args.getDown() == null)
+            Log.w(TAG, "Download received does not have a down");
+        else if (args.getConv() == null)
+            Log.w(TAG, "Download received does not have a conv");
+        else if (!(new File(Directories.getBIN(), args.getDown()).delete() && new File(Directories.getBIN(), args.getConv()).delete()))
             Log.w(TAG, "Failed to delete cache from BIN");
 
         if (args.getCompleteDate() == null) args.setCompleteDate(new Date());
         args.setException(successful ? null : e);
         if (!completed.contains(args)) completed.add(args);
+
+        Exception f = History.completeRecord(HistoryLog.generate(args));
+        if (f != null) {
+            Log.e(TAG, "Failed to record download history");
+            f.printStackTrace();
+        }
 
         for (int i = 0; i < callbacks.size(); i++) {
             ClientCallbacks c = callbacks.get(i);
@@ -646,8 +636,6 @@ public class DownloadService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
         Commons.fetch.removeListener(fetchListener);
-
-        // TODO: Implement saving, completed array must not be saved nor loaded, rather saved into another "history array" in Commons
 
         //        Commons.fetch.getDownloadsWithStatus(Status.COMPLETE, new Func<List<Download>>() {
         //            @Override

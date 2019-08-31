@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
+import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.preferences.Preferences;
@@ -29,7 +30,7 @@ public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private ArrayList<Query> queries;
     private DisplayMetrics metrics;
 
-    public QueryAdapter(Context context, ArrayList<Query> queries) {
+    QueryAdapter(Context context, ArrayList<Query> queries) {
         this.context = context;
         this.queries = queries;
         metrics = context.getResources().getDisplayMetrics();
@@ -39,9 +40,9 @@ public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == 0) {
-            return new ShimmerViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > 400f ? R.layout.layout_query_shimmer_large : R.layout.layout_query_shimmer, parent, false));
+            return new ShimmerViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > Commons.displayThreshold ? R.layout.layout_query_shimmer_large : R.layout.layout_query_shimmer, parent, false));
         }
-        return new ViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > 400f ? R.layout.layout_query_large : R.layout.layout_query, parent, false));
+        return new ViewHolder(LayoutInflater.from(context).inflate(metrics.widthPixels / metrics.density > Commons.displayThreshold ? R.layout.layout_query_large : R.layout.layout_query, parent, false));
     }
 
     @Override
@@ -57,7 +58,7 @@ public class QueryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ViewHolder holder = (ViewHolder) h;
             if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null) {
                 holder.setThumbnail(query.getThumbnail(metrics.widthPixels / metrics.density <
-                        400f ? Preferences.getQueryImageLarge() : Preferences.getQueryImage()));
+                        Commons.displayThreshold ? Preferences.getQueryImageLarge() : Preferences.getQueryImage()));
             }
 
             holder.setTitle(query.getTitle());

@@ -19,7 +19,7 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
-            android:text="Libraries Used"
+            android:text="@string/dependencies_title"
             android:textAppearance="@style/Text.Header.Big"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -31,126 +31,5 @@
             android:layout_height="wrap_content"
             android:padding="32dp"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-        <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="vertical"-->
-                <!--android:padding="32dp"-->
-                <!--app:layout_constraintTop_toBottomOf="@+id/textView" >-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text='AndroidAudioConverter 0.0.8 by Adriel "adrielcafe" Café on GitHub (was modified to add normalize and preset functionality)' />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text='AndroidPreferenceActivity 7.0.1 by Michael "michael-rapp" Rapp on GitHub' />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="Android Sliding Up Panel 3.4.0 by Umano on GitHub" />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text='CircleImageView 3.0.0 by Henning "hdodenhof" Dodenhof on GitHub' />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="Commons Text 1.6 by Apache Software Foundation" />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="Commons IO 2.6 by Apache Software Foundation" />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="EasyPermissions 0.3.0 by Google Samples on GitHub" />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text='Fetch2 2.3.4 by Tonyo "tonyofrancis" Francis on GitHub' />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="Gson 2.8.5 by Google" />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="MyID3 for Android" />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="Nachos 1.1.1 by Hootsuite on GitHub" />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="Picasso 2.71828 by Square on GitHub" />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text='picasso-transformations 2.2.1 by Daichi "wasabeef" Furiya by GitHub' />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="Shimmer 0.4.0 by Facebook on GitHub" />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text='Transitions Everywhere by Andrey "andkulikulov" Kulikulov on GitHub' />-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:fontFamily="monospace"-->
-                    <!--android:text="Kryo 5.0.0-RC1 by Esoteric Software on GitHub" />-->
-
-            <!--</LinearLayout>-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

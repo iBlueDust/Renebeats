@@ -2,7 +2,6 @@ package com.yearzero.renebeats.download;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Looper;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -13,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.InternalArgs;
+import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.download.ui.DownloadDialog;
 import com.yearzero.renebeats.download.ui.viewholder.BasicViewHolder;
 import com.yearzero.renebeats.download.ui.viewholder.FailedViewHolder;
@@ -62,39 +62,24 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
     @Override
     public void onBindViewHolder(@NonNull BasicViewHolder holder, int position) {
         List<Download> list = getServiceDownloads();
-        if (position < 0 || position >= list.size()) return;
-
-        int type = getItemViewType(position, list);
-        Status.Download dl = type >>> 20 >= Status.Download.values().length ? null : Status.Download.values()[type >>> 20];
-        Status.Convert cv = ((type >>> 10) & 0x3FF) >= Status.Convert.values().length ? null : Status.Convert.values()[(type >>> 10) & 0x3FF];
-        Boolean md = null;
-        int i = type & 0x3FF;
-        if (i == Boolean.TRUE.hashCode())
-            md = true;
-        else if (i == Boolean.FALSE.hashCode())
-            md = false;
-
-        if (!(dl == list.get(position).getStatus().getDownload() || cv == list.get(position).getStatus().getConvert() || md == list.get(position).getStatus().getMetadata()))
-            Log.w(TAG, "ViewHolder type does not match Download type. Defaulting to follow ViewHolder type");
-
         InitializeViewHolder(holder, list.get(position));
     }
 
     private void InitializeViewHolder(BasicViewHolder holder, final Download args) {
-        holder.setTitle(args.getFilename() == null ? "N/A" : args.getFilename());
+        holder.setTitle(args.getFilename() == null ? context.getString(R.string.sym_empty) : args.getFilename());
 //        holder.setIsRecyclable(true);
 
         //TODO: Invalid has never been tested
         if (args.getStatus().isInvalid()) {
             FailedViewHolder n = (FailedViewHolder) holder;
-            n.setStatus("Invalid download parameters. Please try again.");
+            n.setStatus(context.getString(R.string.adapter_download_invalid));
         } else if (args.getStatus().isFailed()) {
             //region FailedViewHolder
             FailedViewHolder n = (FailedViewHolder) holder;
-            n.setStatus("Failed");
+            n.setStatus(context.getString(R.string.failed));
 
             if (args.getException() instanceof IllegalArgumentException)
-                n.setStatus("Download request is invalid");
+                n.setStatus(context.getString(R.string.adapter_download_invalid));
             else if (args.getException() instanceof DownloadService.ServiceException) {
                 DownloadService.ServiceException e = (DownloadService.ServiceException) args.getException();
                 n.setStatus(e.getMessage());
@@ -108,7 +93,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                     String name = args.getException() == null ? null : Commons.LogExceptionReturn(args, args.getException());
 
                     if (name == null) {
-                        Toast.makeText(context, "Failed to autolog download error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, R.string.adapter_download_autolog_failed, Toast.LENGTH_LONG).show();
                         return;
                     } else dialog = new ErrorLogDialog(name, null);
                 } else dialog = new ErrorLogDialog(null, args.getException());
@@ -125,7 +110,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
         } else if (args.getStatus().isCancelled()) {
             if (holder instanceof FailedViewHolder) {
                 FailedViewHolder h = (FailedViewHolder) holder;
-                h.setStatus("Cancelled");
+                h.setStatus(context.getString(R.string.cancelled));
                 h.setInfoVisible(false);
                 h.setRetryListener(v -> {
                     Intent intent = new Intent(context, DownloadActivity.class);
@@ -143,55 +128,40 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                     case QUEUED:
                     case NETWORK_PENDING:
                         QueueViewHolder g = (QueueViewHolder) holder;
-                        g.setStatus("Waiting for download");
+                        g.setStatus(context.getString(R.string.adapter_download_network));
                         break;
                     case RUNNING:
                         RunningViewHolder i = (RunningViewHolder) holder;
-                        i.setStatus(String.format(Locale.ENGLISH, "%s of %s downloaded", Commons.FormatBytes(args.getCurrent()), Commons.FormatBytes(args.getTotal())));
+                        i.setStatus(String.format(Locale.ENGLISH, context.getString(R.string.adapter_download_downloading), Commons.FormatBytes(args.getCurrent()), Commons.FormatBytes(args.getTotal())));
                         i.setProgress((int) args.getCurrent(), (int) args.getTotal(), args.isIndeterminate());
                         i.setCancelListener(v -> service.cancel(args.getId()));
                         break;
-//                    case NETWORK_PENDING:
-//                        break;
-//                    case PAUSED:
-//                        RunningViewHolder m = (RunningViewHolder) holder;
-//                        m.setStatus("Download Paused");
-//                        m.setPause(true);
-//                        m.setProgress((int) args.current, (int) args.total, args.indeterminate);
-//                        break;
                     case COMPLETE:
                         if (args.getStatus().getConvert() == null) break;
                         switch (args.getStatus().getConvert()) {
                             case QUEUED:
                                 QueueViewHolder h = (QueueViewHolder) holder;
-                                h.setStatus("Download Completed, waiting for conversion");
+                                h.setStatus(context.getString(R.string.adapter_download_downloaded));
                                 break;
                             case RUNNING:
                                 RunningViewHolder j = (RunningViewHolder) holder;
                                 j.setCancelListener(v -> service.cancel(args.getId()));
-                                j.setStatus(String.format(Locale.ENGLISH, "%s converted", Commons.FormatBytes(args.getSize())));
+                                j.setStatus(String.format(Locale.ENGLISH, context.getString(R.string.adapter_download_converting), Commons.FormatBytes(args.getSize())));
                                 j.setProgress((int) args.getCurrent(), (int) args.getTotal(), false);
                                 break;
-//                            case PAUSED:
-//                                RunningViewHolder l = (RunningViewHolder) holder;
-//                                l.setStatus("Paused");
-//
-//                                l.setPause(true);
-//                                l.setProgress(0, 0, true);
-//                                break;
                             case SKIPPED:
                             case COMPLETE:
                                 if (args.getStatus().getMetadata() == null) {
                                     RunningViewHolder n = (RunningViewHolder) holder;
                                     n.setCancelListener(v -> service.cancel(args.getId()));
-                                    n.setStatus("Applying metadata");
+                                    n.setStatus(context.getString(R.string.adapter_download_metadata));
                                     n.setProgress(0, 0, true);
                                 } else {
                                     SuccessViewHolder o = (SuccessViewHolder) holder;
-                                    o.setStatus("SUCCESS");
+                                    o.setStatus(context.getString(R.string.success));
 
                                     if (!(args.getAssigned() == null || args.getCompleteDate() == null)) {
-                                        String text = "Took ";
+                                        String text = context.getString(R.string.adapter_download_elapsed);
 
                                         long elapsed = args.getCompleteDate().getTime() - args.getAssigned().getTime();
                                         short hour = (short) (elapsed / 3600_000);
@@ -199,15 +169,15 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                                         short second = (short) ((elapsed / 1000) % 60);
 
                                         if (hour > 0) {
-                                            text += hour + "h ";
-                                            if (minute < 10) text += "0";
-                                            text += minute + "m ";
-                                            if (second < 10) text += "0";
+                                            text += hour + context.getString(R.string.sym_hour) + ' ';
+                                            if (minute < 10) text += '0';
+                                            text += minute + context.getString(R.string.sym_minute) + ' ';
+                                            if (second < 10) text += '0';
                                         } else if (minute > 0) {
-                                            text += minute + "m ";
-                                            if (second < 10) text += "0";
+                                            text += minute + context.getString(R.string.sym_minute) + ' ';
+                                            if (second < 10) text += '0';
                                         }
-                                        text += second + "s";
+                                        text += second + context.getString(R.string.sym_seconds);
                                         o.setDate(text);
                                     }
 
@@ -232,13 +202,12 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                                 }
                         }
                     case CANCELLED:
-                        break;
                     case FAILED:
                         break;
                 }
                 //endregion
             } catch (ClassCastException e) {
-                Log.e(TAG, "Class cast exception");
+                Log.e(TAG, "Class cast exception > " + e.getMessage());
                 recycler.post(() -> notifyItemChanged(holder.getAdapterPosition(), null));
             }
         }
@@ -258,17 +227,12 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
         });
     }
 
+    //TODO: Setup Activity
     @Override
     public void onProgress(Download args, long progress, long max, long size, boolean indeterminate) {
         int index = getServiceDownloads().indexOf(args);
-        /*if (index < 0)
-            notifyDataSetChanged();
-        else*/ //UpdateAtPosition(index, args);
-        if (index >= 0) {
-            if (Looper.getMainLooper().getThread().equals(Thread.currentThread()))
-                UpdateAtPosition(index, args);
-            else Log.e(TAG, "Non-UI Thread detected");
-        } else Log.w(TAG, "onProgress indexOf returned -1");
+        if (index >= 0) UpdateAtPosition(index, args);
+        else Log.w(TAG, "onProgress indexOf returned -1");
         if (dialog != null) dialog.UpdatePartial(args);
     }
 
@@ -302,9 +266,10 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
     private List<Download> getServiceDownloads() {
 //        service.Sanitize();
         ArrayList<Download> list = new ArrayList<>(Arrays.asList(service.getAll()));
-        for (int i = 0; i < list.size(); i++)
+        for (int i = 0; i < list.size();)
             if (blacklist.contains(list.get(i).getId()))
-                list.remove(i--);
+                list.remove(i);
+            else i++;
         Collections.sort(list, (a, b) -> a.getAssigned() == null || b.getAssigned() == null ? 0 : b.getAssigned().compareTo(a.getAssigned()));
         return list;
     }

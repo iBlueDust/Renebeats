@@ -19,6 +19,7 @@ import com.yearzero.renebeats.R
 import com.yearzero.renebeats.download.DownloadService
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.util.*
 
 class ErrorLogDialog() : DialogFragment() {
 
@@ -82,7 +83,7 @@ class ErrorLogDialog() : DialogFragment() {
         Copy.setOnClickListener {
             val manager: ClipboardManager = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             manager.primaryClip = ClipData.newPlainText("error log", Payload.text)
-            Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.clipboard_copy), Toast.LENGTH_SHORT).show()
         }
         Share.setOnClickListener {
             val intent = Intent(Intent.ACTION_SEND)
@@ -103,16 +104,18 @@ class ErrorLogDialog() : DialogFragment() {
 //            Pan1.visibility = View.GONE
             saved = false
             if (throwable == null) {
-                Payload.text = "Unknown exception"
+                Payload.text = getString(R.string.dialog_errorlog_exception_unknown)
                 Save.isEnabled = false
             } else {
                 Save.isEnabled = true
                 Save.setOnClickListener {
                     if (!saved) {
                         val re = Commons.LogExceptionReturn(throwable)
-                        if (re == null) Toast.makeText(context, "Failed to save log", Toast.LENGTH_LONG).show()
-                        else {
-                            Toast.makeText(context, "Successfully logged error", Toast.LENGTH_SHORT).show()
+                        if (re == null) //                            Pan1.visibility = View.GONE
+                        {
+                            Toast.makeText(context, getString(R.string.dialog_errorlog_save_failed), Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(context, getString(R.string.dialog_errorlog_save), Toast.LENGTH_SHORT).show()
                             Payload.text = re
 //                            Pan1.visibility = View.GONE
                             saved = true
@@ -130,7 +133,7 @@ class ErrorLogDialog() : DialogFragment() {
                     (throwable as DownloadService.ServiceException).payload.printStackTrace(PrintWriter(extra))
 //                    Pan1.visibility = View.VISIBLE
 //                    Extra.text = extra.toString()
-                    Payload.text = "${Payload.text}\n\n============| PAYLOAD |============\n\n$extra"
+                    Payload.text = String.format(Locale.ENGLISH, "%s\n\n============| PAYLOAD |============\n\n%s", Payload.text.toString(), extra)
                 }
             }
         } else {
