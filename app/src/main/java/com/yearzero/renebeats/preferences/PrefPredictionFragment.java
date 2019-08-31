@@ -23,7 +23,7 @@ public class PrefPredictionFragment extends PreferenceFragment {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.pref_prediction);
 
-        Guesser = (ListPreference) findPreference(getString(R.string.pref_guesser_modes));
+        Guesser = (ListPreference) findPreference(getString(R.string.pref_guesser));
     }
 
 }

@@ -19,7 +19,7 @@ public class PrefDataFragment extends PreferenceFragment {
 
     private static final String TAG = "PrefDataFragment";
 
-    private Preference OutputDirectory, ClearCache, ClearPaused, ClearLogs, DeleteHistory, RestoreSettings;
+    private Preference OutputDirectory, ClearCache, /*ClearPaused, */ClearLogs, DeleteHistory, RestoreSettings;
 
     public PrefDataFragment() {
     }
@@ -27,14 +27,12 @@ public class PrefDataFragment extends PreferenceFragment {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.pref_data);
-        //TODO: Move download using to general
-        //TODO: Rename Guess Mode to Autofill Options
-        OutputDirectory = findPreference(getString(R.string.pref_data_outputdirectory));
+        OutputDirectory = findPreference(getString(R.string.pref_data_output));
         ClearCache = findPreference(getString(R.string.pref_data_clearcache));
-        ClearPaused = findPreference(getString(R.string.pref_data_clearpaused));
+//        ClearPaused = findPreference(getString(R.string.pref_data_clearpaused));
         ClearLogs = findPreference(getString(R.string.pref_data_clearlogs));
-        DeleteHistory = findPreference(getString(R.string.pref_data_deletehistory));
-        RestoreSettings = findPreference(getString(R.string.pref_data_restoresettings));
+        DeleteHistory = findPreference(getString(R.string.pref_data_clearhistory));
+        RestoreSettings = findPreference(getString(R.string.pref_data_restore));
 
         OutputDirectory.setSummary(Directories.getMusicPath());
         OutputDirectory.setOnPreferenceClickListener(p -> {
@@ -45,14 +43,14 @@ public class PrefDataFragment extends PreferenceFragment {
                     .withMemoryBar(true)
                     .allowAddFolder(true)
                     .allowCustomPath(true)
-                    .setDialogTitle("All downloads will be saved in...")
+                    .setDialogTitle(getString(R.string.pref_data_output_dialog))
                     .setType(StorageChooser.DIRECTORY_CHOOSER)
                     .build();
 
             dialog.setOnSelectListener(path -> {
                 Directories.setOutputDir(path);
                 if (PrefDataFragment.this.getView() != null)
-                    Snackbar.make(PrefDataFragment.this.getView(), "Output Folder has been changed", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(PrefDataFragment.this.getView(), getString(R.string.pref_data_output_success), Snackbar.LENGTH_LONG).show();
                 OutputDirectory.setSummary(Directories.getMusicPath());
             });
             dialog.show();
@@ -62,30 +60,30 @@ public class PrefDataFragment extends PreferenceFragment {
         ClearCache.setOnPreferenceClickListener(p -> {
             if (getContext() == null) return false;
             new TimeoutDialog(getContext())
-                    .setTitle("Clear Cache")
-                    .setMessage(String.format("Cache can only be cleared if there are no downloads running. Doing so while a download is running will most likely result in failure.\nCache is %s", Commons.FormatBytes(Directories.getCacheSize())))
-                    .setPositive("Delete", () -> {
-                        errorLog(Directories.clearCache(), "Cache has been cleared", "Failed to clear cache", "Error has been logged", "Failed to log error");
+                    .setTitle(getString(R.string.pref_data_clearcache_dialog))
+                    .setMessage(String.format(getString(R.string.pref_data_clearcache_dialog_msg), Commons.FormatBytes(Directories.getCacheSize())))
+                    .setPositive(getString(R.string.delete), () -> {
+                        errorLog(Directories.clearCache(), getString(R.string.pref_data_clearcache_success), getString(R.string.pref_data_clearcache_failed), "Error has been logged", "Failed to log error");
                         return true;
                     })
-                    .setNegative("Cancel", null)
+                    .setNegative(getString(R.string.cancel), null)
                     .setTimeout(5)
                     .show();
             return true;
         });
 
-        ClearPaused.setSummary("Has not been implemented yet");
+//        ClearPaused.setSummary("Has not been implemented yet");
 
         ClearLogs.setOnPreferenceClickListener(p -> {
             if (getContext() == null) return false;
             else new TimeoutDialog(getContext())
-                        .setTitle("Clear All Error Logs?")
-                        .setMessage(String.format("Logs are currently taking up %s", Commons.FormatBytes(Directories.getLogsSize())))
-                        .setPositive("Clear All", () -> {
-                            errorLog(Directories.clearLogs(), "Cleared all logs", "Failed to clear logs", "Error logged. Quite ironic eh?", "Failed to log error. Huh.");
+                        .setTitle(getString(R.string.pref_data_clearlogs_dialog))
+                        .setMessage(String.format(getString(R.string.pref_data_clearlogs_dialog_msg), Commons.FormatBytes(Directories.getLogsSize())))
+                        .setPositive(getString(R.string.clear_all), () -> {
+                            errorLog(Directories.clearLogs(), getString(R.string.pref_data_clearlogs_success), getString(R.string.pref_data_clearlogs_failed), "Error logged. Quite ironic eh?", "Failed to log error. Huh.");
                             return true;
                         })
-                        .setNegative("Cancel", null)
+                        .setNegative(getString(R.string.cancel), null)
                         .setTimeout(5)
                         .show();
             return true;
@@ -94,13 +92,13 @@ public class PrefDataFragment extends PreferenceFragment {
         DeleteHistory.setOnPreferenceClickListener(p -> {
             if (getContext() == null) return false;
             new TimeoutDialog(getContext())
-                    .setTitle("Delete Download History")
-                    .setMessage(String.format("Download History will be permanently deleted. There is no way to recover the data.\nHistory is %s", Commons.FormatBytes(Directories.getHistorySize())))
-                    .setPositive("Delete", () -> {
-                        errorLog(Directories.deleteHistory(), "History has been cleared", "Failed to clear history", "Error has been logged", "Failed to log error");
+                    .setTitle(getString(R.string.pref_data_clearhistory_dialog))
+                    .setMessage(String.format(getString(R.string.pref_data_clearhistory_dialog_msg), Commons.FormatBytes(Directories.getHistorySize())))
+                    .setPositive(getString(R.string.delete), () -> {
+                        errorLog(Directories.deleteHistory(), getString(R.string.pref_data_clearhistory_success), getString(R.string.pref_data_clearhistory_failed), "Error has been logged", "Failed to log error");
                         return true;
                     })
-                    .setNegative("Cancel", null)
+                    .setNegative(getString(R.string.cancel), null)
                     .setTimeout(5)
                     .show();
             return true;
@@ -108,11 +106,11 @@ public class PrefDataFragment extends PreferenceFragment {
 
         RestoreSettings.setOnPreferenceClickListener(p -> {
             if (Preferences.getRestore()) {
-                if (getContext() != null) Toast.makeText(getContext(), "Restore Cancelled", Toast.LENGTH_LONG).show();
-                p.setSummary("All preferences will be reverted to their initial state");
+                if (getContext() != null) Toast.makeText(getContext(), getString(R.string.restore_cancelled), Toast.LENGTH_LONG).show();
+                p.setSummary(R.string.pref_data_restore_inactive);
                 Preferences.setRestore(false);
             } else {
-                p.setSummary("Settings will be restored after the app is restarted. Tap to cancel.");
+                p.setSummary(R.string.pref_data_restore_active);
                 Preferences.setRestore(true);
             }
             Preferences.save();
@@ -127,11 +125,10 @@ public class PrefDataFragment extends PreferenceFragment {
             snackbar = Snackbar.make(getView(), success, Snackbar.LENGTH_LONG);
         else {
             snackbar = Snackbar.make(getView(), failed, Snackbar.LENGTH_LONG);
-            snackbar.setAction("save Log", v ->
+            snackbar.setAction(getString(R.string.save_log), v ->
                     Snackbar.make(getView(), Commons.LogException(exception) ? logSuccess : logFailed, Snackbar.LENGTH_LONG)
                             .show());
         }
-
         snackbar.show();
     }
 }

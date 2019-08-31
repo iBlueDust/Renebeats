@@ -61,6 +61,7 @@ public class Commons extends Application {
 //    public static DownloadReceiver downloadReceiver;
     public static Fetch fetch;
     private static Locale locale = Locale.ENGLISH;
+    public static final float displayThreshold = 480f;
 
     public static boolean LogException(Throwable ex) {
         return LogExceptionReturn(ex) != null;
@@ -148,7 +149,7 @@ public class Commons extends Application {
                 @Override
                 public void run() {
                     Looper.prepare();
-                    Toast.makeText(Commons.this, "An error has occured. Logging error...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Commons.this, getString(R.string.master_error), Toast.LENGTH_LONG).show();
                     Looper.loop();
                 }
             }.start();

@@ -31,19 +31,19 @@ public class PrefGeneralFragment extends PreferenceFragment {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.pref_general);
 
-        DownloadUsing = (ListPreference) findPreference(getString(R.string.pref_data_downloadusing));
-        QueryAmount = (ListPreference) findPreference(getString(R.string.pref_defaults_queryamount));
-        AlwaysLogFailed = (CheckBoxPreference) findPreference(getString(R.string.pref_defaults_alwayslog));
+        DownloadUsing = (ListPreference) findPreference(getString(R.string.pref_data_using));
+        QueryAmount = (ListPreference) findPreference(getString(R.string.pref_general_query));
+        AlwaysLogFailed = (CheckBoxPreference) findPreference(getString(R.string.pref_general_autolog));
         //        ConcurrentDownloads = (ListPreference) findPreference(getString(R.string.pref_defaults_concurrent));
-        GuesserModes = (ListPreference) findPreference(getString(R.string.pref_guesser_modes));
+        GuesserModes = (ListPreference) findPreference(getString(R.string.pref_guesser));
 
-        Format = (ListPreference) findPreference(getString(R.string.pref_defaults_format));
-        Speed = (ListPreference) findPreference(getString(R.string.pref_defaults_processspeed));
-        Bitrate = (ListPreference) findPreference(getString(R.string.pref_defaults_bitrate));
-        Overwrite = (ListPreference) findPreference(getString(R.string.pref_defaults_overwrite));
-        FileFormat = (ListPreference) findPreference(getString(R.string.pref_defaults_filename));
+        Format = (ListPreference) findPreference(getString(R.string.pref_general_format));
+        Speed = (ListPreference) findPreference(getString(R.string.pref_general_speed));
+        Bitrate = (ListPreference) findPreference(getString(R.string.pref_general_bitrate));
+        Overwrite = (ListPreference) findPreference(getString(R.string.pref_general_overwrite));
+        FileFormat = (ListPreference) findPreference(getString(R.string.pref_general_first));
 
-        Normalize = (CheckBoxPreference) findPreference(getString(R.string.pref_defaults_normalize));
+        Normalize = (CheckBoxPreference) findPreference(getString(R.string.pref_general_normalize));
 
         String[] downloadUsing = getResources().getStringArray(R.array.data);
         CharSequence[] entries = new CharSequence[downloadUsing.length];
@@ -126,11 +126,11 @@ public class PrefGeneralFragment extends PreferenceFragment {
         }
         Bitrate.setEntries(en);
         Bitrate.setEntryValues(keys);
-        DefaultListPrefRoutine(Bitrate, String.valueOf(Preferences.getBitrate()), Preferences.getBitrate() + " kbps", key -> {
+        DefaultListPrefRoutine(Bitrate, String.valueOf(Preferences.getBitrate()), Preferences.getBitrate() + ' ' + getString(R.string.kbps), key -> {
             Preferences.setFormat(key.toLowerCase());
             Preferences.save();
 
-            return key.toUpperCase() + " kbps";
+            return key.toUpperCase() + ' ' + getString(R.string.kbps);
         });
 
         String val2 = Preferences.getOverwrite().getValue();
@@ -146,7 +146,8 @@ public class PrefGeneralFragment extends PreferenceFragment {
         });
 
         CharSequence[] seq = FileFormat.getEntries();
-        DefaultListPrefRoutine(FileFormat, (String) seq[Preferences.getArtist_first() ? 0 : 1], Preferences.getArtist_first() ? "Artist then Title" : "Title then Artist", key -> {
+        CharSequence[] seqV = FileFormat.getEntryValues();
+        DefaultListPrefRoutine(FileFormat, (String) seqV[Preferences.getArtist_first() ? 0 : 1], Preferences.getArtist_first() ? getString(R.string.pref_general_first_artist) : getString(R.string.pref_general_first_titl), key -> {
             Preferences.setArtist_first(key.equals("artist first"));
             Preferences.save();
 
@@ -190,7 +191,7 @@ public class PrefGeneralFragment extends PreferenceFragment {
     }
 
     private void UpdateQueryAmtSummary() {
-        QueryAmount.setSummary("The number of videos shown when searching is " + Preferences.getQuery_amount());
+        QueryAmount.setSummary(getString(R.string.pref_general_query_prefix) + Preferences.getQuery_amount());
     }
 
 }

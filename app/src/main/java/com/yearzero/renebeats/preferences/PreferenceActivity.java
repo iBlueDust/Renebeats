@@ -25,7 +25,7 @@ public class PreferenceActivity extends de.mrapp.android.preference.activity.Pre
         }
         setToolbarElevation(0);
 
-        ShowLogs = fragment.findPreference(getString(R.string.pref_data_showlogs));
+        ShowLogs = fragment.findPreference(getString(R.string.pref_data_logs));
         ShowLogs.setOnPreferenceClickListener(p -> {
             startActivity(new Intent(PreferenceActivity.this, ErrorLogActivity.class));
             return true;

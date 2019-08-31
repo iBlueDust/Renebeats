@@ -23,7 +23,6 @@ public class HistoryDialog extends DownloadDialog {
     }
 
     @Override
-    @Deprecated
     public DownloadDialog setDownload(@NonNull Download download) {
         return super.setDownload(download);
     }

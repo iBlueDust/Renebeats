@@ -34,7 +34,7 @@ public class TimeoutDialog extends Dialog {
         }
     };
 
-    public TimeoutDialog(@NonNull Context context) {
+    TimeoutDialog(@NonNull Context context) {
         super(context);
     }
 

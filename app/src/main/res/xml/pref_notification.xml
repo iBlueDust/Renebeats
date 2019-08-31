@@ -3,21 +3,21 @@
 
     <androidx.preference.SwitchPreference
         android:key="@string/pref_notification_master"
-        android:title="Notifications" />
+        android:title="@string/pref_notification_master_title" />
 
     <androidx.preference.CheckBoxPreference
         android:key="@string/pref_notification_queue"
-        android:title="Queue"
-        android:summary="Show notifications of queued downloads" />
+        android:title="@string/pref_notification_queue_title"
+        android:summary="@string/pref_notification_queue_summary" />
 
     <androidx.preference.CheckBoxPreference
         android:key="@string/pref_notification_running"
-        android:title="Running"
-        android:summary="Show notifications of running downloads" />
+        android:title="@string/pref_notification_running_title"
+        android:summary="@string/pref_notification_running_summary" />
 
     <androidx.preference.CheckBoxPreference
         android:key="@string/pref_notification_completed"
-        android:title="Completed"
-        android:summary="Show notifications of completed downloads" />
+        android:title="@string/pref_notification_completed_title"
+        android:summary="@string/pref_notification_completed_summary" />
 
 </androidx.preference.PreferenceScreen>

@@ -32,7 +32,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:background="@android:color/transparent"
-            android:contentDescription="Close"
+            android:contentDescription="@string/close"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_close_gray_24dp"
@@ -62,7 +62,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Artist"
+                    android:text="@string/artist"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -86,7 +86,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Album"
+                    android:text="@string/album"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -109,7 +109,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Genres"
+                    android:text="@string/genres"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -132,7 +132,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Year"
+                    android:text="@string/year"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -155,7 +155,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Track #"
+                    android:text="@string/track_no"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -202,7 +202,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
             android:background="@color/ClearGray"
-            app:layout_constraintBottom_toBottomOf="@id/formatly"
+            app:layout_constraintBottom_toBottomOf="@id/layout_format"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mainly" />
@@ -216,14 +216,14 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
-            android:text="Format"
+            android:text="@string/format"
             android:textAppearance="@style/Text.Section"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/view2" />
 
         <TableLayout
-            android:id="@+id/formatly"
+            android:id="@+id/layout_format"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="32dp"
@@ -242,7 +242,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Format"
+                    android:text="@string/format"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -265,7 +265,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Bitrate"
+                    android:text="@string/bitrate"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -288,8 +288,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-
-                    android:text="Normalize"
+                    android:text="@string/normalize"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -298,8 +297,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_weight="2"
-                    android:ellipsize="end"
+                    android:textAllCaps=""
                     android:maxLines="2"
+                    android:ellipsize="end"
                     android:textAlignment="textEnd"
                     android:textAppearance="@style/Text.SemiLight" />
             </TableRow>
@@ -312,8 +312,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-
-                    android:text="Start"
+                    android:text="@string/start"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -336,8 +335,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-
-                    android:text="End"
+                    android:text="@string/end"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -360,8 +358,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-
-                    android:text="Overwrite"
+                    android:text="@string/overwrite"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -384,13 +381,13 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            android:text="Status"
+            android:text="@string/status"
             android:textAppearance="@style/Text.Section"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/formatly" />
+            app:layout_constraintTop_toBottomOf="@+id/layout_format" />
 
         <TableLayout
-            android:id="@+id/statusly"
+            android:id="@+id/layout_status"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -412,7 +409,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Download"
+                    android:text="@string/download"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -421,6 +418,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_weight="2"
+                    android:textAllCaps="true"
                     android:ellipsize="end"
                     android:maxLines="2"
                     android:textAlignment="textEnd"
@@ -435,7 +433,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Conversion"
+                    android:text="@string/conversion"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -445,6 +443,7 @@
                     android:layout_gravity="end"
                     android:layout_weight="2"
                     android:ellipsize="end"
+                    android:textAllCaps="true"
                     android:maxLines="2"
                     android:textAlignment="textEnd"
                     android:textAppearance="@style/Text.SemiLight" />
@@ -458,7 +457,8 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Metadata"
+                    android:textAllCaps="true"
+                    android:text="@string/metadata"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -481,7 +481,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Assigned at"
+                    android:text="@string/assigned_at"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -504,7 +504,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Completed at"
+                    android:text="@string/completed_at"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -529,7 +529,7 @@
             app:layout_constraintBottom_toBottomOf="@id/secret_main"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/statusly" />
+            app:layout_constraintTop_toBottomOf="@id/layout_status" />
 
         <TextView
             android:id="@+id/secret_lbl"
@@ -540,7 +540,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
-            android:text="Super Secret"
+            android:text="@string/super_secret"
             android:textAppearance="@style/Text.Section"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -570,7 +570,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="YouTube ID"
+                    android:text="@string/youtube_id"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -595,7 +595,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Download ID"
+                    android:text="@string/download_id"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -620,7 +620,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="URL"
+                    android:text="@string/url"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -645,7 +645,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Available Format"
+                    android:text="@string/available_format"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -671,7 +671,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Exception"
+                    android:text="@string/exception"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -698,7 +698,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Progress"
+                    android:text="@string/progress"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -723,7 +723,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
-            android:text="Paths"
+            android:text="@string/paths"
             android:textAppearance="@style/Text.Section"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -753,7 +753,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Download"
+                    android:text="@string/download"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -784,7 +784,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Conversion"
+                    android:text="@string/conversion"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -817,7 +817,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="Final (MTDT)"
+                    android:text="@string/final_metadata"
                     android:textAppearance="@style/Text.BoldAccent" />
 
                 <TextView
@@ -852,7 +852,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:background="@android:color/transparent"
-            android:text="Close"
+            android:text="@string/close"
             android:textColor="@color/Accent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

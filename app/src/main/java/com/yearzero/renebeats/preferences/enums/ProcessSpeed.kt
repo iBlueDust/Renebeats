@@ -1,5 +1,7 @@
 package com.yearzero.renebeats.preferences.enums
 
+import java.util.*
+
 enum class ProcessSpeed(val value: String) {
 
     ULTRAFAST("ultrafast"),
@@ -17,7 +19,7 @@ enum class ProcessSpeed(val value: String) {
         val Default = MEDIUM
 
         @JvmStatic
-        fun fromValue(value: String?): ProcessSpeed = when(value?.toLowerCase()) {
+        fun fromValue(value: String?): ProcessSpeed = when(value?.toLowerCase(Locale.ENGLISH)) {
                 "ultrafast" -> ULTRAFAST
                 "superfast" -> SUPERFAST
                 "veryfast" -> VERYFAST

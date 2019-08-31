@@ -57,7 +57,7 @@ public class DownloadReceiver extends BroadcastReceiver {
                                     .setColor(context.getResources().getColor(R.color.Accent))
                                     .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
                                     .setGroup(Notifications.CHANNEL_ID)
-                                    .setContentText("Cancelled")
+                                    .setContentText(context.getString(R.string.cancelled))
                                     .setProgress(0, 0, false)
                                     .setAutoCancel(true)
                                     .setOngoing(false)
@@ -97,12 +97,12 @@ public class DownloadReceiver extends BroadcastReceiver {
                     success = true;
                     builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
                     builder.setProgress(0, 0, false);
-                    Snackbar.make(activity.findViewById(R.id.main), "Success!", Snackbar.LENGTH_LONG).show();
+//                    Snackbar.make(activity.findViewById(R.id.main), "Success!", Snackbar.LENGTH_LONG).show();
 
                     if (data.getAssigned() == null || data.getCompleteDate() == null)
                         builder.setContentText("");
                     else {
-                        String text = "Succeeded after ";
+                        String text = activity.getString(R.string.receiver_succeed_prefix);
 
                         long elapsed = data.getCompleteDate().getTime() - data.getAssigned().getTime();
                         short hour = (short) (elapsed / 3600_000);

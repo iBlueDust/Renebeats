@@ -19,7 +19,7 @@
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
-            android:contentDescription="&lt;"
+            android:contentDescription="@string/sym_x"
             app:layout_constraintDimensionRatio="H,"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -35,7 +35,7 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
-            android:text="Error Logs"
+            android:text="@string/error_logs"
             android:textAppearance="@style/Text.Header.Big"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,6 +58,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="There are no logs!\nI feel accomplished :P"
+        android:text="@string/errorlog_empty"
         android:visibility="gone" />
 </RelativeLayout>

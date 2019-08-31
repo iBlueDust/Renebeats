@@ -10,41 +10,42 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter @Setter(AccessLevel.PACKAGE)
 public class HistoryLog implements Serializable {
     // Appcode (EA50) - "Class" (ClA5) - Class ID (415C_1066)
     private static long serialVersionUID = 0xEA50_C1A5_415C_1066L;
 
     //TODO: Merge with Download and use custom Serializer or Annotations?
 
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String version;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ int versionCode = 0;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ boolean convert = false;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ boolean normalize = false;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ boolean overwrite = false;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ short bitrate = 0;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ int track = 0;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ int year = 0;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ int id = 0;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ Integer start;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ Integer end;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String album;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String artist;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String availableFormat;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String conv;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String down;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String format;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String mtdt;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String title;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String url;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String youtubeID;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String genres;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ Date assigned;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ Date completed;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String status_download;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ String status_convert;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ Boolean status_meta = null;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ boolean invalid = false;
-    @Getter @Setter(AccessLevel.PACKAGE) /*private*/ Exception exception;
+    String version;
+    int versionCode = 0;
+    boolean convert = false;
+    boolean normalize = false;
+    boolean overwrite = false;
+    short bitrate = 0;
+    int track = 0;
+    int year = 0;
+    int id = 0;
+    Integer start;
+    Integer end;
+    String album;
+    String artist;
+    String availableFormat;
+    String conv;
+    String down;
+    String format;
+    String mtdt;
+    String title;
+    String url;
+    String youtubeID;
+    String genres;
+    Date assigned;
+    Date completed;
+    String status_download;
+    String status_convert;
+    Boolean status_meta = null;
+    boolean invalid = false;
+    Exception exception;
 
 
     public Status getStatus() {

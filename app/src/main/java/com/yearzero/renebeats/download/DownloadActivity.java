@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.SparseArray;
@@ -40,12 +41,12 @@ import com.yearzero.renebeats.R;
 import com.yearzero.renebeats.download.ui.DurationPicker;
 import com.yearzero.renebeats.notification.DownloadReceiver;
 import com.yearzero.renebeats.preferences.Preferences;
-import com.yearzero.renebeats.preferences.enums.GuesserMode;
 import com.yearzero.renebeats.preferences.enums.OverwriteMode;
 
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.File;
+import java.util.Locale;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
@@ -53,7 +54,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     private static final String TAG = "DownloadActivity";
 
     //TODO: File name appending suggestion (such as ' (1)') should also check running downloads to avoid request.getId() conflict (Accomplished by setting download concurrency to 1)
-    //TODO: Proper thumbnail placement when landscape/large screen
+    //TODO: Proper thumbnail placement when landscape/large screen (TEST PENDING)
 
     private ImageButton Home;
     private Button Download;
@@ -134,18 +135,11 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         Download.setOnClickListener(v -> Download());
 
         if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null) LoadThumbnail();
-        if (query.getTitle() != null) {
+        if (!query.getTitle().isEmpty()) {
             Display.setText(query.getTitle());
-            if (Preferences.getGuesser_mode() == GuesserMode.TITLE_UPLOADER) {
-                Title.setText(query.getTitle());
-                Artist.setText(query.getArtist());
-            } else if (Preferences.getGuesser_mode() == GuesserMode.PREDICT) {
-                String[] result = extractTitleAndArtist(query.getTitle(), query.getArtist());
-                Title.setText(result[0]);
-                Artist.setText(result[1]);
-            }
-        } else if (query.getArtist() != null) Artist.setText(query.getArtist());
-        if (query.getAlbum() != null) Album.setText(query.getAlbum());
+            UseGuesserMode();
+        } else Artist.setText(query.getArtist());
+        if (!query.getAlbum().isEmpty()) Album.setText(query.getAlbum());
         if (query.getYear() > 0) Year.setText(String.valueOf(query.getYear()));
         if (query instanceof Download) {
             Download d = (Download) query;
@@ -168,36 +162,49 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             videoMeta = (YouTubeExtractor.VideoMeta) b;
             onExtractionComplete(sparseArray, videoMeta);
         } else {
-            YouTubeExtractor yt = new YouTubeExtractor(this) {
+            at.huber.youtubeExtractor.YouTubeExtractor yt = new at.huber.youtubeExtractor.YouTubeExtractor(this) {
                 @Override
-                protected void onExtractionComplete(SparseArray<YtFile> data, VideoMeta videoMeta) {
+                protected void onExtractionComplete(SparseArray<at.huber.youtubeExtractor.YtFile> data, at.huber.youtubeExtractor.VideoMeta videoMeta) {
                     if (data == null) {
                         Log.e(TAG, "Retrieved SparseArray is null");
+                        if (retrieveDialog != null) retrieveDialog.dismiss();
                         return;
                     }
                     YouTubeExtractor.YtFile[] array = new YouTubeExtractor.YtFile[data.size()];
-                    for (int i = 0; i < array.length; i++) array[i] = data.valueAt(i);
-                    DownloadActivity.this.onExtractionComplete(array, videoMeta);
+                    for (int i = 0; i < array.length; i++) array[i] = new YouTubeExtractor.YtFile(data.valueAt(i));
+                    DownloadActivity.this.onExtractionComplete(array, new YouTubeExtractor.VideoMeta(videoMeta));
                 }
+
+//                @Override
+//                protected void onTimeout() {
+//                    if (retrieveDialog != null) retrieveDialog.dismiss();
+//
+//                    new AlertDialog.Builder(DownloadActivity.this)
+//                            .setTitle("Timeout")
+//                            .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
+//                            .setPositiveButton("OK", (dialogInterface, i) -> {
+//                                dialogInterface.dismiss();
+//                                onBackPressed();
+//                            }).show();
+//                }
+            };
+//            yt.setTimeout(Preferences.getTimeout());
+//            yt.extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID(), true, false);
+            yt.extract("https://www.youtube.com/watch?v=" + query.getYoutubeID(), true, false);
+            new CountDownTimer(Preferences.getTimeout(), Preferences.getTimeout()) {
+                @Override
+                public void onTick(long l) {}
 
                 @Override
-                protected void onTimeout() {
-                    if (retrieveDialog != null) retrieveDialog.dismiss();
-
-                    new AlertDialog.Builder(DownloadActivity.this)
-                            .setTitle("Timeout")
-                            .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
-                            .setPositiveButton("OK", (dialogInterface, i) -> {
-                                dialogInterface.dismiss();
-                                onBackPressed();
-                            }).show();
+                public void onFinish() {
+                    if (yt.getStatus() == AsyncTask.Status.RUNNING) {
+                        yt.cancel(true);
+                    }
                 }
-            };
-            yt.setTimeout(Preferences.getTimeout());
-            yt.extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID(), true, false);
+            }.start();
 
             retrieveDialog = new Dialog(this);
-            retrieveDialog.setTitle("Retrieving...");
+            retrieveDialog.setTitle(getString(R.string.download_retrieve));
             retrieveDialog.setCanceledOnTouchOutside(false);
             retrieveDialog.setContentView(R.layout.dialog_retrieving);
             retrieveDialog.findViewById(R.id.negative).setOnClickListener(v -> {
@@ -235,7 +242,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 //        Genres.addChipTerminator(';', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL);
 //        Genres.addChipTerminator('\n', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL);
 //        if (query.genres != null) Genres.setText(Arrays.asList(query.genres));
-        if (query.getGenres() != null) Genres.setText(query.getGenres());
+        Genres.setText(query.getGenres());
 
         Start.setOnClickListener(v -> {
             if (length <= 0) {
@@ -243,7 +250,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 return;
             }
             DurationPicker dialog = new DurationPicker(DownloadActivity.this);
-            dialog.setTitle("Set a start time");
+            dialog.setTitle(R.string.download_time_start);
 
             if (length > 3600)
                 dialog.setEnabled(DurationPicker.Mode.Hour);
@@ -257,7 +264,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 @Override
                 public String Validate(int time) {
                     if (time >= (end == null ? length : end))
-                        return "Start time cannot be equal or exceed the end time";
+                        return getString(R.string.download_time_start_end);
                     return null;
                 }
 
@@ -276,7 +283,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 return;
             }
             DurationPicker dialog = new DurationPicker(DownloadActivity.this);
-            dialog.setTitle("Set an end time");
+            dialog.setTitle(R.string.download_time_end);
             dialog.setTime(end == null ? 0 : end);
 
             if (length > 3600)
@@ -291,9 +298,9 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 @Override
                 public String Validate(int time) {
                     if (start != null && time <= start)
-                        return "End time cannot be equal or be less than the start time";
+                        return getString(R.string.download_time_end_start);
                     if (end != null && end > length)
-                        return "End time cannot exceed the video's size";
+                        return getString(R.string.download_time_end_length);
                     return null;
                 }
 
@@ -326,9 +333,11 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
         Normalize.setChecked(Preferences.getNormalize());
         NormalizeHelp.setOnClickListener(v -> new AlertDialog.Builder(DownloadActivity.this)
-                .setMessage("Some audio/videos may have a quieter audio than other audios. This is because sometimes an audio/video file does not use the full volume range available and thus resulting in its audio being very quiet. Normalization will increase the audio's volume in such that it will utilize the whole available volume range though it may take more time.")
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss()).show());
+                .setMessage(R.string.download_normalize_msg)
+                .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss()).show());
     }
+
+    //TODO: Reimplement timeout
 
     public void onExtractionComplete(YouTubeExtractor.YtFile[] data, YouTubeExtractor.VideoMeta videoMeta) {
         sparseArray = data;
@@ -336,27 +345,16 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
         if (videoMeta.getVideoLength() <= 0) {
             onBackPressed();
-            Toast.makeText(DownloadActivity.this, "Invalid video ID", Toast.LENGTH_LONG).show();
+            Toast.makeText(DownloadActivity.this, R.string.download_invalid_youtube_id, Toast.LENGTH_LONG).show();
             return;
         }
 
-        if (query.getTitle() == null) {
+        if (query.getTitle().isEmpty()) {
             query.setTitle(StringEscapeUtils.unescapeXml(videoMeta.getTitle()));
             Display.setText(query.getTitle());
 
-            switch (Preferences.getGuesser_mode()) {
-                case TITLE_UPLOADER:
-                    Artist.setText(query.getArtist());
-                case TITLE_ONLY:
-                    Title.setText(query.getTitle());
-                    break;
-                case PREDICT:
-                    String[] result = extractTitleAndArtist(query.getTitle(), query.getArtist());
-                    Title.setText(result[0]);
-                    Artist.setText(result[1]);
-                    break;
-            }
-        } else if (query.getArtist() == null) {
+            UseGuesserMode();
+        } else if (query.getArtist().isEmpty()) {
             query.setArtist(videoMeta.getAuthor());
             Artist.setText(query.getArtist());
         }
@@ -401,7 +399,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
         Bitrates = new Chip[cnt];
         String[] barr = getResources().getStringArray(R.array.bitrates);
-        for (int i = 0; i < barr.length; i++) barr[i] += " kbps";
+        for (int i = 0; i < barr.length; i++) barr[i] += ' ' + getString(R.string.kbps);
 
         for (int i = 0; i < cnt; i++) {
             Chip chip = new Chip(DownloadActivity.this, null, R.style.Widget_MaterialComponents_Chip_Choice);
@@ -417,13 +415,28 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
     }
 
+    private void UseGuesserMode() {
+        switch (Preferences.getGuesser_mode()) {
+            case TITLE_UPLOADER:
+                Artist.setText(query.getArtist());
+            case TITLE_ONLY:
+                Title.setText(query.getTitle());
+                break;
+            case PREDICT:
+                String[] result = extractTitleAndArtist(query.getTitle(), query.getArtist());
+                Title.setText(result[0]);
+                Artist.setText(result[1]);
+                break;
+        }
+    }
+
     public Download CreateDownload() {
         if (query == null || query.getYoutubeID() == null) return null;
 
         boolean invalid = false;
 
         if (Title.getText() == null || Title.getText().toString().isEmpty()) {
-            Title.setError("There must be a title");
+            Title.setError(getString(R.string.download_invalid_title));
             invalid = true;
         } else query.setTitle(Title.getText().toString());
 
@@ -449,7 +462,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             try {
                 query.setTrack(Integer.parseInt(Track.getText().toString()));
             } catch (NumberFormatException ignore) {
-                Track.setError("Invalid Track Number");
+                Track.setError(getString(R.string.download_invalid_track));
                 invalid = true;
             }
         }
@@ -459,7 +472,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 query.setYear(Integer.parseInt(Year.getText().toString()));
             } catch (NumberFormatException ignore) {
                 Snackbar.make(findViewById(R.id.main), "Invalid Year Number", Snackbar.LENGTH_LONG).show();
-                Year.setText("Invalid Year Number");
+                Year.setError(getString(R.string.download_invalid_year));
                 invalid = true;
             }
         }
@@ -483,24 +496,24 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     private void Download() {
         Download args = CreateDownload();
         if (args == null) {
-            Snackbar.make(findViewById(R.id.main), "Invalid Download Arguments", Snackbar.LENGTH_LONG)
-                    .setAction("Retry", v -> Download())
+            Snackbar.make(findViewById(R.id.main), R.string.download_invalid, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry, v -> Download())
                     .show();
             return;
         }
         String name = args.getFilenameWithExt();
-        args.setGenres(Genres.getText() == null ? null : Genres.getText().toString()); //getChipAndTokenValues().toArray(new String[0]);
+        args.setGenres(Genres.getText() == null ? "" : Genres.getText().toString()); //getChipAndTokenValues().toArray(new String[0]);
 
         if (Preferences.getOverwrite() == OverwriteMode.PROMPT && new File(Directories.getMUSIC(), name).exists()) {
             new AlertDialog.Builder(this)
-                    .setTitle("Conflicting File Names")
-                    .setMessage("There is already a file called " + name + " in the Music folder. A suffix such as '(1)' can be appended to the file name to avoid conflicts.")
-                    .setPositiveButton("Overwrite", (dialogInterface, i) -> {
+                    .setTitle(R.string.download_conflict)
+                    .setMessage(String.format(Locale.ENGLISH, getString(R.string.download_conflict_msg), name))
+                    .setPositiveButton(R.string.overwrite, (dialogInterface, i) -> {
                         args.setOverwrite(true);
                         ServiceCheck(args);
                     })
-                    .setNeutralButton("Cancel", null)
-                    .setNegativeButton("Append Suffix", (dialogInterface, i) -> {
+                    .setNeutralButton(R.string.cancel, null)
+                    .setNegativeButton(R.string.append_suffix, (dialogInterface, i) -> {
                         args.setOverwrite(false);
                         ServiceCheck(args);
                     })
@@ -531,14 +544,14 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
         if (match) {
             new AlertDialog.Builder(this)
-                    .setTitle("Already Running")
-                    .setMessage("Another instance of this download is already running")
-                    .setPositiveButton("Cancel and Run This One", (dialog, which) -> {
+                    .setTitle(R.string.download_already)
+                    .setMessage(R.string.download_already_msg)
+                    .setPositiveButton(R.string.download_already_positive, (dialog, which) -> {
                         service.cancel(args.getId());
                         InitDownload(args);
                     })
-                    .setNeutralButton("Run Again", (dialog, which) -> InitDownload(args))
-                    .setNegativeButton("Cancel", null)
+                    .setNeutralButton(R.string.retry, (dialog, which) -> InitDownload(args))
+                    .setNegativeButton(R.string.cancel, null)
                     .show();
         } else InitDownload(args);
     }
@@ -559,7 +572,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
-        Toast.makeText(getApplicationContext(), "Download started", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), getString(R.string.download_start), Toast.LENGTH_LONG).show();
     }
 
     // String[] format is [title, artist]

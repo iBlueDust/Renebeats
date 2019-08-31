@@ -32,7 +32,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_gray_24dp"
-        tools:ignore="VectorDrawableCompat" />
+        tools:ignore="VectorDrawableCompat"
+        android:contentDescription="@string/sym_x" />
 
     <ImageButton
         android:id="@+id/refresh"
@@ -45,7 +46,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_refresh_gray_24dp"
-        tools:ignore="VectorDrawableCompat" />
+        tools:ignore="VectorDrawableCompat"
+        android:contentDescription="@string/refresh" />
 
     <TextView
         android:id="@+id/title"
@@ -116,7 +118,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="8dp"
-        android:contentDescription="No Internet"
+        android:contentDescription="@string/no_internet"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/offline_msg"
         app:layout_constraintEnd_toEndOf="parent"
@@ -135,7 +137,7 @@
         android:layout_marginTop="128dp"
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
-        android:text="It seems that we can't connect to YouTube. Please check your connection and try again later."
+        android:text="@string/query_empty"
         android:gravity="center"
         android:textColor="@color/textGray"
         android:visibility="visible"
@@ -154,7 +156,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        android:text="Retry"
+        android:text="@string/retry"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

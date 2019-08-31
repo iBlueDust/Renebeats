@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <androidx.preference.Preference
-        android:key="@string/pref_data_outputdirectory"
-        android:title="Output Location" />
+        android:key="@string/pref_data_output"
+        android:title="@string/pref_data_output_title" />
 
     <androidx.preference.PreferenceCategory
-        android:title="Delete" >
+        android:title="@string/pref_data_cat_delete" >
 
         <androidx.preference.Preference
             android:key="@string/pref_data_clearcache"
-            android:title="Clear Cache"
-            android:summary="No downloads must be performing to clear cache" />
+            android:title="@string/pref_data_clearcache_title"
+            android:summary="@string/pref_data_clearcache_summary" />
 
-        <androidx.preference.Preference
-            android:key="@string/pref_data_clearpaused"
-            android:title="Clear Paused"
-            android:summary="All paused downloads will be cancelled" />
+<!--        <androidx.preference.Preference-->
+<!--            android:key="@string/pref_data_clearpaused"-->
+<!--            android:title="Clear Paused"-->
+<!--            android:summary="All paused downloads will be cancelled" />-->
 
         <androidx.preference.Preference
             android:key="@string/pref_data_clearlogs"
-            android:title="Clear Logs"
-            android:summary="Clear all error logs" />
+            android:title="@string/pref_data_clearlogs_title"
+            android:summary="@string/pref_data_clearlogs_summary" />
 
         <androidx.preference.Preference
-            android:key="@string/pref_data_deletehistory"
-            android:title="Delete History"
-            android:summary="Download history will be cleared permanently" />
+            android:key="@string/pref_data_clearhistory"
+            android:title="@string/pref_data_clearhistory_title"
+            android:summary="@string/pref_data_clear_history_summary" />
 
         <androidx.preference.Preference
-            android:key="@string/pref_data_restoresettings"
-            android:title="Restore All Preferences"
-            android:summary="All preferences will be reverted to their initial state" />
+            android:key="@string/pref_data_restore"
+            android:title="@string/pref_data_restore_title"
+            android:summary="@string/pref_data_restore_summary" />
 
     </androidx.preference.PreferenceCategory>
 </androidx.preference.PreferenceScreen>
