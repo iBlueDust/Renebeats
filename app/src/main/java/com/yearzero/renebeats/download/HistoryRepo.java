@@ -1,6 +1,7 @@
 package com.yearzero.renebeats.download;
 
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.util.Base64;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.yearzero.renebeats.Directories;
+import com.yearzero.renebeats.preferences.Preferences;
 
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -29,7 +31,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnegative;
 
-public class History {
+public class HistoryRepo {
     private static final String EXTENSION = "hist";
     private static final Kryo kryo = new Kryo();
     private static final String TAG = "History";
@@ -38,6 +40,7 @@ public class History {
         kryo.register(HistoryLog.class, 100);
         kryo.register(HistoryLog[].class, 101);
         kryo.register(Date.class, 200);
+        kryo.register(Exception.class, 300);
     }
 
     static Exception record(HistoryLog log) {
@@ -51,9 +54,8 @@ public class History {
         HistoryLog[] read = readSession(file);
 
         if (read == null) return new LogNotFoundException();
-        int logHash = shortHistHash(log);
         for (int i = 0; i < read.length; i++) {
-            if (shortHistHash(read[i]) == logHash) {
+            if (read[i].equals(log)) {
                 read[i] = log;
                 return writeSession(file, read);
             }
@@ -77,7 +79,7 @@ public class History {
         return readSession(getSessionFile(assigned));
     }
 
-    static Exception writeSession(File file, HistoryLog... logs) {
+    private static Exception writeSession(File file, HistoryLog... logs) {
         Output output = null;
         try {
             if (!file.exists()) {
@@ -99,14 +101,12 @@ public class History {
         return writeSession(getSessionFile(assigned), logs);
     }
 
-    //TODO: Do this
-    public static Exception deleteRecord(HistoryLog log) {
-        int hash = shortHistHash(log);
+    static Exception deleteRecord(HistoryLog log) {
         File file = getSessionFile(log.getAssigned());
         HistoryLog[] playground = readSession(file);
         if (playground != null)
             for (int i = 0; i < playground.length; i++)
-                if (shortHistHash(playground[i]) == hash)
+                if (playground[i].equals(log))
                     return writeSession(file, ArrayUtils.remove(playground, i));
         return new LogNotFoundException();
     }
@@ -116,26 +116,27 @@ public class History {
         cal.setTime(assigned);
         return new File(Directories.getHISTORY(), cal.get(Calendar.YEAR) + "/" + Base64.encodeToString(BigInteger.valueOf(assigned.getTime() / 86400000).toByteArray(), Base64.DEFAULT) + '.' + EXTENSION);
     }
-    private static int shortHistHash(HistoryLog data) {
-        int hash = 1369 + data.getTitle().hashCode();
-        hash = 37 * hash + data.getArtist().hashCode();
-        hash = 37 * hash + data.getFormat().hashCode();
-        hash = 37 * hash + data.getBitrate();
-        long ticks = data.getAssigned().getTime();
-        return 37 * hash + (int) (ticks ^ ticks >> 32);
-    }
 
-    private static int shortHistHash(Download data) {
-        int hash = 1369 + data.getTitle().hashCode();
-        hash = 37 * hash + data.getArtist().hashCode();
-        hash = 37 * hash + data.getFormat().hashCode();
-        hash = 37 * hash + data.getBitrate();
-        long ticks = data.getAssigned().getTime();
-        return 37 * hash + (int) (ticks ^ ticks >> 32);
-    }
+//    private static int shortHistHash(HistoryLog data) {
+//        int hash = 1369 + data.getTitle().hashCode();
+//        hash = 37 * hash + data.getArtist().hashCode();
+//        hash = 37 * hash + data.getFormat().hashCode();
+//        hash = 37 * hash + data.getBitrate();
+//        long ticks = data.getAssigned().getTime();
+//        return 37 * hash + (int) (ticks ^ ticks >> 32);
+//    }
+//
+//    private static int shortHistHash(Download data) {
+//        int hash = 1369 + data.getTitle().hashCode();
+//        hash = 37 * hash + data.getArtist().hashCode();
+//        hash = 37 * hash + data.getFormat().hashCode();
+//        hash = 37 * hash + data.getBitrate();
+//        long ticks = data.getAssigned().getTime();
+//        return 37 * hash + (int) (ticks ^ ticks >> 32);
+//    }
 
     static String getFilename(Download download) {
-        return Integer.toHexString(shortHistHash(download));
+        return Long.toHexString(download.getId());
     }
 
 //    public interface Callback<T, U> {
@@ -184,6 +185,7 @@ public class History {
         interface Callback {
             void onComplete(HistoryLog[] data);
             void onProgress(int progress, int total);
+            void onTimeout();
         }
 
         private Callback callback;
@@ -199,12 +201,11 @@ public class History {
             for (File dir : dirs)
                 files.addAll(Arrays.asList(dir.listFiles((FilenameFilter) new WildcardFileFilter("*." + EXTENSION, IOCase.INSENSITIVE))));
 
-            for (int i = 0; limit > files.size() && i < files.size(); i++) {
+            for (int i = 0; limit > result.size() && i < files.size(); i++) {
                 HistoryLog[] logs = readSession(files.get(i));
                 if (logs == null) Log.w(TAG, "RetrieveNTask - " + files.get(i).getPath() + " is an invalid session file");
                 else result.addAll(Arrays.asList(logs));
                 publishProgress(result.size());
-
             }
             return result.toArray(new HistoryLog[0]);
         }
@@ -215,6 +216,23 @@ public class History {
                 callback.onProgress(values[0], limit);
             }
             super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            new CountDownTimer(Preferences.getTimeout(), Preferences.getTimeout()) {
+                @Override
+                public void onTick(long l) {}
+
+                @Override
+                public void onFinish() {
+                    if (getStatus() == Status.RUNNING) {
+                        cancel();
+                        if (callback != null) callback.onTimeout();
+                    }
+                }
+            }.start();
+            super.onPreExecute();
         }
 
         @Override

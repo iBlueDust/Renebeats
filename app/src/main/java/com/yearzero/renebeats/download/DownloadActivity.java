@@ -1,6 +1,5 @@
 package com.yearzero.renebeats.download;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -46,6 +45,7 @@ import com.yearzero.renebeats.preferences.enums.OverwriteMode;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.Locale;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
@@ -53,7 +53,7 @@ import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 public class DownloadActivity extends AppCompatActivity implements ServiceConnection {
     private static final String TAG = "DownloadActivity";
 
-    //TODO: File name appending suggestion (such as ' (1)') should also check running downloads to avoid request.getId() conflict (Accomplished by setting download concurrency to 1)
+    //TODO: File name appending suggestion (such as ' (1)') should also check running downloads to avoid request.getDownloadId() conflict (Accomplished by setting download concurrency to 1)
     //TODO: Proper thumbnail placement when landscape/large screen (TEST PENDING)
 
     private ImageButton Home;
@@ -83,7 +83,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
     private DownloadService service;
 
-    @SuppressLint({"StaticFieldLeak", "WrongViewCast"})
+//    @SuppressLint({"StaticFieldLeak", "WrongViewCast"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,32 +162,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             videoMeta = (YouTubeExtractor.VideoMeta) b;
             onExtractionComplete(sparseArray, videoMeta);
         } else {
-            at.huber.youtubeExtractor.YouTubeExtractor yt = new at.huber.youtubeExtractor.YouTubeExtractor(this) {
-                @Override
-                protected void onExtractionComplete(SparseArray<at.huber.youtubeExtractor.YtFile> data, at.huber.youtubeExtractor.VideoMeta videoMeta) {
-                    if (data == null) {
-                        Log.e(TAG, "Retrieved SparseArray is null");
-                        if (retrieveDialog != null) retrieveDialog.dismiss();
-                        return;
-                    }
-                    YouTubeExtractor.YtFile[] array = new YouTubeExtractor.YtFile[data.size()];
-                    for (int i = 0; i < array.length; i++) array[i] = new YouTubeExtractor.YtFile(data.valueAt(i));
-                    DownloadActivity.this.onExtractionComplete(array, new YouTubeExtractor.VideoMeta(videoMeta));
-                }
-
-//                @Override
-//                protected void onTimeout() {
-//                    if (retrieveDialog != null) retrieveDialog.dismiss();
-//
-//                    new AlertDialog.Builder(DownloadActivity.this)
-//                            .setTitle("Timeout")
-//                            .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
-//                            .setPositiveButton("OK", (dialogInterface, i) -> {
-//                                dialogInterface.dismiss();
-//                                onBackPressed();
-//                            }).show();
-//                }
-            };
+            Extractor yt = new Extractor(this);
 //            yt.setTimeout(Preferences.getTimeout());
 //            yt.extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID(), true, false);
             yt.extract("https://www.youtube.com/watch?v=" + query.getYoutubeID(), true, false);
@@ -199,6 +174,15 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 public void onFinish() {
                     if (yt.getStatus() == AsyncTask.Status.RUNNING) {
                         yt.cancel(true);
+
+                        if (retrieveDialog != null) retrieveDialog.dismiss();
+                        new AlertDialog.Builder(DownloadActivity.this)
+                                .setTitle("Timeout")
+                                .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
+                                .setPositiveButton("OK", (dialogInterface, i) -> {
+                                    dialogInterface.dismiss();
+                                    onBackPressed();
+                                }).show();
                     }
                 }
             }.start();
@@ -336,8 +320,6 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 .setMessage(R.string.download_normalize_msg)
                 .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss()).show());
     }
-
-    //TODO: Reimplement timeout
 
     public void onExtractionComplete(YouTubeExtractor.YtFile[] data, YouTubeExtractor.VideoMeta videoMeta) {
         sparseArray = data;
@@ -547,7 +529,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                     .setTitle(R.string.download_already)
                     .setMessage(R.string.download_already_msg)
                     .setPositiveButton(R.string.download_already_positive, (dialog, which) -> {
-                        service.cancel(args.getId());
+                        service.cancel(args.getDownloadId());
                         InitDownload(args);
                     })
                     .setNeutralButton(R.string.retry, (dialog, which) -> InitDownload(args))
@@ -666,5 +648,27 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     @Override
     public void onServiceDisconnected(ComponentName name) {
         service = null;
+    }
+
+    private static class Extractor extends at.huber.youtubeExtractor.YouTubeExtractor {
+        private WeakReference<DownloadActivity> activity;
+
+        private Extractor(DownloadActivity activity) {
+            super(activity);
+            this.activity = new WeakReference<>(activity);
+        }
+
+        @Override
+        protected void onExtractionComplete(SparseArray<at.huber.youtubeExtractor.YtFile> data, at.huber.youtubeExtractor.VideoMeta videoMeta) {
+            DownloadActivity act = activity.get();
+            if (data == null) {
+                Log.e(TAG, "Retrieved SparseArray is null");
+                if (act != null && act.retrieveDialog != null) act.retrieveDialog.dismiss();
+                return;
+            }
+            YouTubeExtractor.YtFile[] array = new YouTubeExtractor.YtFile[data.size()];
+            for (int i = 0; i < array.length; i++) array[i] = new YouTubeExtractor.YtFile(data.valueAt(i));
+            if (act != null) act.onExtractionComplete(array, new YouTubeExtractor.VideoMeta(videoMeta));
+        }
     }
 }

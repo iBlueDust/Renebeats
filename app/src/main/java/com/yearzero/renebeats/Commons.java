@@ -39,8 +39,6 @@ import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
 
 public class Commons extends Application {
 
-    //TODO: String resources before release
-
     public static final int PERM_REQUEST = 0x24D1;
 
     private static final String TAG = "Commons";
@@ -136,7 +134,7 @@ public class Commons extends Application {
 
     public static void modifyDownloadState(boolean mobiledata) {
         Commons.fetch.setGlobalNetworkType(mobiledata ? NetworkType.ALL : NetworkType.WIFI_ONLY);
-        //TODO: This ^^^^ will freeze the download. And downloads are really slow for big files
+        //TODO: This ^^^^ will freeze the download
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -156,8 +154,6 @@ public class Commons extends Application {
             if (LogException(throwable))
                 Log.i(TAG, "Successfully logged unhandled exception");
             else Log.e(TAG, "Failed to log unhandled exception. Exiting...");
-
-            //TODO Improper restarting of malfunctioning activities (always triggers when starting activity if such thing happens or saveInstanceState causes malfunction
 
             try {
                 Thread.sleep(3500L);

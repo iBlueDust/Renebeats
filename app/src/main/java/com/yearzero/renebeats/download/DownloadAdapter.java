@@ -38,7 +38,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
     private FragmentManager manager;
     private ArrayList<Integer> blacklist = new ArrayList<>();
 
-    // TODO: Slide ViewHolders for more options
+    // TODO: Slide ViewHolders for more options (Testing)
 
     DownloadAdapter(Context context, DownloadService service, RecyclerView recycler, FragmentManager manager) {
         this.context = context;
@@ -69,7 +69,20 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
         holder.setTitle(args.getFilename() == null ? context.getString(R.string.sym_empty) : args.getFilename());
 //        holder.setIsRecyclable(true);
 
-        //TODO: Invalid has never been tested
+        holder.setOnClickListener(v -> {
+            dialog = new DownloadDialog()
+                    .setDownload(args);
+            dialog.show(manager, TAG);
+        });
+
+        holder.setOnLongClickListener(v -> {
+            dialog = new DownloadDialog()
+                    .setDownload(args)
+                    .setSecret(true);
+            dialog.show(manager, TAG);
+            return true;
+        });
+
         if (args.getStatus().isInvalid()) {
             FailedViewHolder n = (FailedViewHolder) holder;
             n.setStatus(context.getString(R.string.adapter_download_invalid));
@@ -134,7 +147,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                         RunningViewHolder i = (RunningViewHolder) holder;
                         i.setStatus(String.format(Locale.ENGLISH, context.getString(R.string.adapter_download_downloading), Commons.FormatBytes(args.getCurrent()), Commons.FormatBytes(args.getTotal())));
                         i.setProgress((int) args.getCurrent(), (int) args.getTotal(), args.isIndeterminate());
-                        i.setCancelListener(v -> service.cancel(args.getId()));
+                        i.setCancelListener(v -> service.cancel(args.getDownloadId()));
                         break;
                     case COMPLETE:
                         if (args.getStatus().getConvert() == null) break;
@@ -145,7 +158,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                                 break;
                             case RUNNING:
                                 RunningViewHolder j = (RunningViewHolder) holder;
-                                j.setCancelListener(v -> service.cancel(args.getId()));
+                                j.setCancelListener(v -> service.cancel(args.getDownloadId()));
                                 j.setStatus(String.format(Locale.ENGLISH, context.getString(R.string.adapter_download_converting), Commons.FormatBytes(args.getSize())));
                                 j.setProgress((int) args.getCurrent(), (int) args.getTotal(), false);
                                 break;
@@ -153,7 +166,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                             case COMPLETE:
                                 if (args.getStatus().getMetadata() == null) {
                                     RunningViewHolder n = (RunningViewHolder) holder;
-                                    n.setCancelListener(v -> service.cancel(args.getId()));
+                                    n.setCancelListener(v -> service.cancel(args.getDownloadId()));
                                     n.setStatus(context.getString(R.string.adapter_download_metadata));
                                     n.setProgress(0, 0, true);
                                 } else {
@@ -211,23 +224,8 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                 recycler.post(() -> notifyItemChanged(holder.getAdapterPosition(), null));
             }
         }
-
-        holder.setOnClickListener(v -> {
-            dialog = new DownloadDialog()
-                    .setDownload(args);
-            dialog.show(manager, TAG);
-        });
-
-        holder.setOnLongClickListener(v -> {
-            dialog = new DownloadDialog()
-                    .setDownload(args)
-                    .setSecret(true);
-            dialog.show(manager, TAG);
-            return true;
-        });
     }
 
-    //TODO: Setup Activity
     @Override
     public void onProgress(Download args, long progress, long max, long size, boolean indeterminate) {
         int index = getServiceDownloads().indexOf(args);
@@ -267,7 +265,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 //        service.Sanitize();
         ArrayList<Download> list = new ArrayList<>(Arrays.asList(service.getAll()));
         for (int i = 0; i < list.size();)
-            if (blacklist.contains(list.get(i).getId()))
+            if (blacklist.contains(list.get(i).getDownloadId()))
                 list.remove(i);
             else i++;
         Collections.sort(list, (a, b) -> a.getAssigned() == null || b.getAssigned() == null ? 0 : b.getAssigned().compareTo(a.getAssigned()));
@@ -275,12 +273,12 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
     }
 
     void blacklistAt(int index) {
-        blacklist.add(getServiceDownloads().get(index).getId());
+        blacklist.add(getServiceDownloads().get(index).getDownloadId());
         notifyItemRemoved(index);
     }
 
     void unBlacklistAt(int index) {
-        blacklist.remove((Integer) getServiceDownloads().get(index).getId());
+        blacklist.remove((Integer) getServiceDownloads().get(index).getDownloadId());
         notifyItemInserted(index);
     }
 

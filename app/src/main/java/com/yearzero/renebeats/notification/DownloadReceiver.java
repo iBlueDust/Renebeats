@@ -49,7 +49,7 @@ public class DownloadReceiver extends BroadcastReceiver {
                     if (remaining == null || !(Preferences.getNotifications() && Preferences.getNotifications_completed())) break;
                     for (Download d : remaining)
                         if (d.getStatus().isSuccessful())
-                            Notifications.manager.notify(getNotificationID(d.getId()), new NotificationCompat.Builder(activity, Notifications.DOWNLOAD_PROGRESS)
+                            Notifications.manager.notify(getNotificationID(d.getDownloadId()), new NotificationCompat.Builder(activity, Notifications.DOWNLOAD_PROGRESS)
                                     .setContentIntent(PendingIntent.getActivity(activity, 0, new Intent(context, MainActivity.class), 0))
                                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                                     .setSmallIcon(R.drawable.ic_notif)
@@ -328,7 +328,7 @@ public class DownloadReceiver extends BroadcastReceiver {
                     .setContentTitle("Done")
                     .build());
 
-            int id = getNotificationID(data.getId());
+            int id = getNotificationID(data.getDownloadId());
             if (success || !allowed) Notifications.manager.cancel(id);
             if (allowed) Notifications.manager.notify(id, builder.build());
         }

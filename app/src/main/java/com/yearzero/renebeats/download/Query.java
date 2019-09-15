@@ -8,7 +8,6 @@ import com.google.api.services.youtube.model.SearchResultSnippet;
 import com.google.api.services.youtube.model.ThumbnailDetails;
 import com.yearzero.renebeats.preferences.Preferences;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.Serializable;
@@ -157,44 +156,44 @@ public class Query implements Serializable {
         }
     }
 
-    @Override
-    public int hashCode() {
-        int result = 37;
-
-        result = 37 * result + album.hashCode();
-        result = 37 * result + artist.hashCode();
-        result = 37 * result + genres.hashCode();
-        result = 37 * result + (thumbDefault == null ? 0 : thumbDefault.hashCode());
-        result = 37 * result + (thumbHigh == null ? 0 : thumbHigh.hashCode());
-        result = 37 * result + (thumbMax == null ? 0 : thumbMax.hashCode());
-        result = 37 * result + (thumbMedium == null ? 0 : thumbMedium.hashCode());
-        result = 37 * result + (thumbStandard == null ? 0 : thumbStandard.hashCode());
-        result = 37 * result + title.hashCode();
-        result = 37 * result + track;
-        result = 37 * result + year;
-        result = 37 * result + (youtubeID == null ? 0 : youtubeID.hashCode());
-
-        return result;
-    }
-
-    @Override
-    public boolean equals(@Nullable Object other) {
-        if (this == other) return true;
-        if (!(other instanceof Query)) return false;
-        Query cast = (Query) other;
-
-        if (!(StringUtils.equals(youtubeID, cast.youtubeID) &&
-                StringUtils.equals(title, cast.title) &&
-                StringUtils.equals(album, cast.album) &&
-                StringUtils.equals(artist, cast.artist) &&
-                year == cast.year && track == cast.track &&
-                StringUtils.equals(genres, cast.genres) &&
-                StringUtils.equals(thumbMax, cast.thumbMax) &&
-                StringUtils.equals(thumbHigh, cast.thumbHigh) &&
-                StringUtils.equals(thumbMedium, cast.thumbMedium) &&
-                StringUtils.equals(thumbDefault, cast.thumbDefault))) return false;
-        return StringUtils.equals(thumbStandard, cast.thumbStandard);
-    }
+//    @Override
+//    public int hashCode() {
+//        int result = 37;
+//
+//        result = 37 * result + album.hashCode();
+//        result = 37 * result + artist.hashCode();
+//        result = 37 * result + genres.hashCode();
+//        result = 37 * result + (thumbDefault == null ? 0 : thumbDefault.hashCode());
+//        result = 37 * result + (thumbHigh == null ? 0 : thumbHigh.hashCode());
+//        result = 37 * result + (thumbMax == null ? 0 : thumbMax.hashCode());
+//        result = 37 * result + (thumbMedium == null ? 0 : thumbMedium.hashCode());
+//        result = 37 * result + (thumbStandard == null ? 0 : thumbStandard.hashCode());
+//        result = 37 * result + title.hashCode();
+//        result = 37 * result + track;
+//        result = 37 * result + year;
+//        result = 37 * result + (youtubeID == null ? 0 : youtubeID.hashCode());
+//
+//        return result;
+//    }
+//
+//    @Override
+//    public boolean equals(@Nullable Object other) {
+//        if (this == other) return true;
+//        if (!(other instanceof Query)) return false;
+//        Query cast = (Query) other;
+//
+//        if (!(StringUtils.equals(youtubeID, cast.youtubeID) &&
+//                StringUtils.equals(title, cast.title) &&
+//                StringUtils.equals(album, cast.album) &&
+//                StringUtils.equals(artist, cast.artist) &&
+//                year == cast.year && track == cast.track &&
+//                StringUtils.equals(genres, cast.genres) &&
+//                StringUtils.equals(thumbMax, cast.thumbMax) &&
+//                StringUtils.equals(thumbHigh, cast.thumbHigh) &&
+//                StringUtils.equals(thumbMedium, cast.thumbMedium) &&
+//                StringUtils.equals(thumbDefault, cast.thumbDefault))) return false;
+//        return StringUtils.equals(thumbStandard, cast.thumbStandard);
+//    }
 
     static List<Query> castListXML(@NonNull List<SearchResult> list) {
         ArrayList<Query> result = new ArrayList<>();
@@ -224,10 +223,10 @@ public class Query implements Serializable {
 //        return youtubeID;
 //    }
 //
-////    public Query setYoutubeID(@Nullable String youtubeID) {
-////        this.youtubeID = youtubeID;
-////        return this;
-////    }
+//    public Query setYoutubeID(@Nullable String youtubeID) {
+//        this.youtubeID = youtubeID;
+//        return this;
+//    }
 //
 //    @Nullable
 //    public String getTitle() {
@@ -331,5 +330,5 @@ public class Query implements Serializable {
 //    void setThumbStandard(@Nullable String thumbStandard) {
 //        this.thumbStandard = thumbStandard;
 //    }
-//    //endregion
+    //endregion
 }
