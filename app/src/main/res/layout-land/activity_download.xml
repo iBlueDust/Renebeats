@@ -426,7 +426,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@android:color/transparent"
-                android:contentDescription="\?"
+                android:contentDescription="@string/sym_question"
                 android:scaleType="centerInside"
                 app:layout_constraintBottom_toBottomOf="@+id/exception"
                 app:layout_constraintStart_toEndOf="@+id/exception"

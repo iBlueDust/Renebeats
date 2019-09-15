@@ -247,7 +247,7 @@ public class DownloadService extends Service {
                 current.getStatus().setConvert(null);
                 current.getStatus().setMetadata(null);
 
-                Exception e = History.record(HistoryLog.generate(current));
+                Exception e = HistoryRepo.record(HistoryLog.generate(current));
                 if (e != null) {
                     Log.e(TAG, "Failed to record download history");
                     e.printStackTrace();
@@ -271,7 +271,7 @@ public class DownloadService extends Service {
 //                    break;
 //                case RUNNING:
 //                case PAUSED:
-//                    paused.append(d.getId(), d);
+//                    paused.append(d.getDownloadId(), d);
 //                    break;
 //
 //                case CANCELLED:
@@ -333,38 +333,38 @@ public class DownloadService extends Service {
 //        }
 //
 //        List<Integer> ids = new ArrayList<>();
-//        for (int i = 0; i < paused.size(); i++) ids.add(paused.get(paused.keyAt(i)).getId());
+//        for (int i = 0; i < paused.size(); i++) ids.add(paused.get(paused.keyAt(i)).getDownloadId());
 //
-//        for (long id : ids) {
-//            Commons.fetch.getDownloadsByRequestIdentifier(id, result -> {
+//        for (long downloadId : ids) {
+//            Commons.fetch.getDownloadsByRequestIdentifier(downloadId, result -> {
 //                for (com.tonyodev.fetch2.Download d : result) {
 //                    switch (d.getStatus()) {
 //                        case ADDED:
 //                        case QUEUED:
-//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.QUEUED);
+//                            paused.get(d.getDownloadId()).getStatus().setDownload(Status.Download.QUEUED);
 //                            break;
 //                        case DOWNLOADING:
-//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.RUNNING);
+//                            paused.get(d.getDownloadId()).getStatus().setDownload(Status.Download.RUNNING);
 //                            break;
 //                        case PAUSED:
-//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.PAUSED);
+//                            paused.get(d.getDownloadId()).getStatus().setDownload(Status.Download.PAUSED);
 //                            break;
 //                        case CANCELLED:
 //                        case DELETED:
 //                        case REMOVED:
-//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.CANCELLED);
+//                            paused.get(d.getDownloadId()).getStatus().setDownload(Status.Download.CANCELLED);
 //                            break;
 //                        case FAILED:
-//                            paused.get(d.getId()).getStatus().setDownload(Status.Download.FAILED);
+//                            paused.get(d.getDownloadId()).getStatus().setDownload(Status.Download.FAILED);
 //                            break;
 //                        case COMPLETED:
-//                            Download p = paused.get(d.getId());
+//                            Download p = paused.get(d.getDownloadId());
 //                            p.getStatus().setDownload(Status.Download.COMPLETE);
 //                            if (p.isConvert()) convertQueue.add(p);
 //                            else Metadata(p);
 //                            break;
 //                        default:
-//                            Download(paused.get(d.getId()));
+//                            Download(paused.get(d.getDownloadId()));
 //                    }
 //                }
 //            });
@@ -392,7 +392,7 @@ public class DownloadService extends Service {
         short i = 0;
         if (!(Directories.getBIN().exists() || Directories.getBIN().mkdirs()))
             Log.w(TAG, "Failed to create BIN folder");
-        else current.setDown(String.format(Locale.ENGLISH, "%s.%s", History.getFilename(current), current.getAvailableFormat()));
+        else current.setDown(String.format(Locale.ENGLISH, "%s.%s", HistoryRepo.getFilename(current), current.getAvailableFormat()));
 
         current.getStatus().setConvert(null);
         current.getStatus().setMetadata(null);
@@ -405,7 +405,7 @@ public class DownloadService extends Service {
         request.setNetworkType(Preferences.getMobiledata() ? NetworkType.ALL : NetworkType.WIFI_ONLY);
         request.setPriority(Priority.HIGH);
         request.setEnqueueAction(EnqueueAction.REPLACE_EXISTING);
-        current.setId(request.getId());
+        current.setDownloadId(request.getId());
         request.setGroupId(GROUP_ID);
         downloadMap.put(request.getId(), current);
         Commons.fetch.enqueue(request, null, null);
@@ -578,7 +578,7 @@ public class DownloadService extends Service {
         args.setException(successful ? null : e);
         if (!completed.contains(args)) completed.add(args);
 
-        Exception f = History.completeRecord(HistoryLog.generate(args));
+        Exception f = HistoryRepo.completeRecord(HistoryLog.generate(args));
         if (f != null) {
             Log.e(TAG, "Failed to record download history");
             f.printStackTrace();
@@ -662,16 +662,16 @@ public class DownloadService extends Service {
 
     }
 
-//    public void pause(int id) {
-//        if (convertProgress != null && convertProgress.getId() == id) {
+//    public void pause(int downloadId) {
+//        if (convertProgress != null && convertProgress.getDownloadId() == downloadId) {
 //            converter.killProcess();
 //            convertPause.add(convertProgress);
 //            convertProgress.setPause(true);
 //            convertProgress = null;
 //            Convert();
 //        } else {
-//            Commons.fetch.pause(id);
-//            Download d = downloadMap.get(id);
+//            Commons.fetch.pause(downloadId);
+//            Download d = downloadMap.get(downloadId);
 //            if (d != null) d.setPause(true);
 //        }
 //    }
@@ -682,10 +682,10 @@ public class DownloadService extends Service {
 //        Commons.fetch.pauseGroup(GROUP_ID);
 //    }
 //
-//    public void resume(int id) {
+//    public void resume(int downloadId) {
 //        boolean not = true;
 //        for (Download d : convertPause) {
-//            if (d.getId() == id) {
+//            if (d.getDownloadId() == downloadId) {
 //                convertQueue.add(d);
 //                d.setPause(false);
 //                Convert();
@@ -694,8 +694,8 @@ public class DownloadService extends Service {
 //            }
 //        }
 //        if (not) {
-//            Commons.fetch.resume(id);
-//            Download d = downloadMap.get(id);
+//            Commons.fetch.resume(downloadId);
+//            Download d = downloadMap.get(downloadId);
 //            if (d != null) d.setPause(true);
 //        }
 //    }
@@ -716,7 +716,7 @@ public class DownloadService extends Service {
 //    }
 
     public void cancel(int id) {
-        if (convertProgress != null && convertProgress.getId() == id) {
+        if (convertProgress != null && convertProgress.getDownloadId() == id) {
             if (converter != null) converter.killProcess();
             convertProgress.setCompleteDate(new Date());
             convertProgress.setCurrent(0);

@@ -10,8 +10,8 @@ android {
     multiDexEnabled true
     resConfigs "en"
     targetSdkVersion 28
-    versionCode 601
-    versionName "alpha0.6.1"
+    versionCode 700
+    versionName "alpha0.7"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     // CODE | VERSION NAME
@@ -59,10 +59,10 @@ android {
 //}
 
 dependencies {
-  compileOnly 'org.projectlombok:lombok:1.18.8'
-  annotationProcessor 'org.projectlombok:lombok:1.18.8'
+  compileOnly 'org.projectlombok:lombok:1.18.10'
+  annotationProcessor 'org.projectlombok:lombok:1.18.10'
   implementation fileTree(include: ['*.jar'], dir: 'libs')
-  implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+  implementation 'androidx.appcompat:appcompat:1.1.0'
   implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
   implementation 'androidx.cardview:cardview:1.0.0'
   implementation 'androidx.recyclerview:recyclerview:1.0.0'
@@ -70,7 +70,7 @@ dependencies {
   implementation 'com.google.android.gms:play-services-auth:17.0.0'
   implementation 'com.squareup.picasso:picasso:2.71828'
   implementation 'pub.devrel:easypermissions:0.3.0'
-  implementation 'de.hdodenhof:circleimageview:3.0.0'
+  implementation 'de.hdodenhof:circleimageview:3.0.1'
   implementation 'jp.wasabeef:picasso-transformations:2.2.1'
   implementation 'com.github.michael-rapp:android-preference-activity:7.0.1'
   implementation 'androidx.tonyodev.fetch2:xfetch2:3.1.1'
@@ -79,7 +79,7 @@ dependencies {
   implementation 'com.google.code.gson:gson:2.8.5'
   implementation 'com.sothree.slidinguppanel:library:3.4.0'
   implementation 'com.esotericsoftware:kryo:5.0.0-RC4'
-  implementation 'org.apache.commons:commons-text:1.6'
+  implementation 'org.apache.commons:commons-text:1.8'
   implementation 'commons-io:commons-io:2.6'
   implementation 'com.facebook.shimmer:shimmer:0.4.0'
   implementation 'com.github.codekidX:storage-chooser:2.0.4.4'
@@ -95,7 +95,7 @@ dependencies {
   implementation('com.google.api-client:google-api-client-android:1.25.0') {
     exclude group: 'org.apache.httpcomponents'
   }
-  implementation('com.google.apis:google-api-services-youtube:v3-rev205-1.25.0') {
+  implementation('com.google.apis:google-api-services-youtube:v3-rev99-1.17.0-rc') {
     exclude group: 'org.apache.httpcomponents'
   }
 

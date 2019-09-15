@@ -3,6 +3,7 @@ package com.yearzero.renebeats.preferences
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import android.os.Build
 import android.text.format.DateFormat
 import com.yearzero.renebeats.BuildConfig
 import com.yearzero.renebeats.Directories
@@ -139,10 +140,12 @@ object Preferences {
         return DateFormat.getLongDateFormat(context).format(date)
     }
 
+    // 1 Dec 1991
     @JvmStatic fun formatDateMedium(context: Context, date: Date): String {
         return DateFormat.getMediumDateFormat(context).format(date)
     }
 
+    // 12/01/1991
     @JvmStatic fun formatDate(context: Context, date: Date): String {
         return DateFormat.getDateFormat(context).format(date)
     }
@@ -150,4 +153,10 @@ object Preferences {
     @JvmStatic fun formatTime(context: Context, date: Date): String {
         return DateFormat.getTimeFormat(context).format(date)
     }
+
+    @Suppress("DEPRECATION")
+    @JvmStatic fun getMainLocale(context: Context): Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        context.resources.configuration.locales[0]
+    else
+        context.resources.configuration.locale
 }

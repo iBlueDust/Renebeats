@@ -297,7 +297,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_weight="2"
-                    android:textAllCaps=""
+                    android:textAllCaps="true"
                     android:maxLines="2"
                     android:ellipsize="end"
                     android:textAlignment="textEnd"

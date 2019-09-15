@@ -137,10 +137,10 @@ public class DownloadDialog extends DialogFragment {
         Track.setText(String.valueOf(download.getTrack()));
         Format.setText(download.getFormat().toUpperCase());
         Bitrate.setText(String.format(Locale.ENGLISH, "%d %s", download.getBitrate(), getString(R.string.kbps)));
-        Normalize.setText(download.isNormalize() ? getString(R.string.cap_on) : getString(R.string.cap_off));
+        Normalize.setText(download.isNormalize() ? R.string.on : R.string.off);
         Start.setText(download.getStart() == null ? empty : IntToHMS(download.getStart()));
         End.setText(download.getEnd() == null ? empty : IntToHMS(download.getEnd()));
-        Overwrite.setText(download.getOverwrite() ? getString(R.string.tru) : getString(R.string.fals));
+        Overwrite.setText(download.getOverwrite() ? R.string.tru : R.string.fals);
 
         DLText.setText(empty);
         Conversion.setText(empty);
@@ -150,7 +150,7 @@ public class DownloadDialog extends DialogFragment {
         Completed.setText(download == null || download.getCompleteDate() == null || getContext() == null ? empty : Preferences.formatDateLong(getContext(), download.getCompleteDate()));
 
         YouTubeID.setText(download == null ? empty : download.getYoutubeID());
-        ID.setText(download == null ? empty : Long.toHexString(download.getId()));
+        ID.setText(download == null ? empty : Long.toHexString(download.getDownloadId()));
         //        URL.setText(download == null || download.url == null ? empty : download.url);
         AvailFormat.setText(download == null || download.getAvailableFormat() == null ? empty : download.getAvailableFormat().toUpperCase());
         Exception.setText(download == null || download.getException() == null ? empty : download.getException().getMessage());
@@ -158,13 +158,13 @@ public class DownloadDialog extends DialogFragment {
         if (download.getUrl() == null || download.getUrl().isEmpty())
             URL.setText(empty);
         else {
-            URL.setText(getString(R.string.dialog_download_url));
+            URL.setText(R.string.dialog_download_url);
             URL.setOnClickListener(view -> {
                     if (getContext() != null)
                         new AlertDialog.Builder(getContext())
                             .setTitle(R.string.url)
                             .setMessage(download.getUrl())
-                            .setPositiveButton(R.string.go, (dialog, which) -> {
+                            .setPositiveButton(getString(R.string.go), (dialog, which) -> {
                                 Intent intent = new Intent(Intent.ACTION_VIEW);
                                 intent.setData(Uri.parse(download.getUrl()));
                                 startActivity(intent);
@@ -239,7 +239,7 @@ public class DownloadDialog extends DialogFragment {
         else Conversion.setText(status.getConvert().getValue());
 
         if (status == null || status.getMetadata() == null) Metadata.setText(R.string.sym_empty);
-        else if (status.getMetadata()) Metadata.setText(getString(R.string.completed));
+        else if (status.getMetadata()) Metadata.setText(R.string.completed);
         else Metadata.setText(R.string.failed);
     }
 

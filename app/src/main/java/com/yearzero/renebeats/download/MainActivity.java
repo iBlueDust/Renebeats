@@ -11,7 +11,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -109,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 new YoutubeQueryTask(MainActivity.this, getPackageName())
                         .setTimeout(Preferences.getTimeout())
                         .setSignature(getSignature(getPackageManager(), getPackageName()))
-                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
+                        .execute/*OnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, */(query);
             } else {
                 OfflineAction.setText(R.string.retry);
                 OfflineImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
@@ -222,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     }
 
     private void Query(String query) {
+        OfflineSetVisibility(false);
         MainActivity.query = query;
         queries = null;
 
@@ -257,9 +257,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     public void onComplete(java.util.List<SearchResult> results) {
         queries = results;
-        int visibility = View.GONE;
+        OfflineSetVisibility(false);
+
         if (results == null) {
-            visibility = View.VISIBLE;
+            OfflineSetVisibility(true);
             OfflineImg.setImageResource(R.drawable.ic_cloud_off_secondarydark_96dp);
             OfflineMsg.setText(R.string.main_error_connection_msg);
             OfflineAction.setText(R.string.retry);
@@ -272,21 +273,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             OfflineAction.setOnClickListener(v -> onBackPressed());
             queryAdapter.resetList();
         } else queryAdapter.resetList(Query.castListXML(results));
-
-        OfflineImg.setVisibility(visibility);
-        OfflineMsg.setVisibility(visibility);
-        OfflineAction.setVisibility(visibility);
     }
 
     public void onTimeout() {
         queryAdapter.resetList();
         OfflineImg.setImageResource(R.drawable.ic_timer_lightgray_96dp);
-        OfflineImg.setVisibility(View.VISIBLE);
         OfflineMsg.setText(R.string.main_error_timeout);
-        OfflineMsg.setVisibility(View.VISIBLE);
-        OfflineAction.setVisibility(View.VISIBLE);
         OfflineAction.setText(R.string.retry);
         OfflineAction.setOnClickListener(v -> Query(query));
+
+        OfflineSetVisibility(true);
+    }
+
+    private void OfflineSetVisibility(boolean visible) {
+        int visibility = visible ? View.VISIBLE : View.GONE;
+
+        OfflineImg.setVisibility(visibility);
+        OfflineMsg.setVisibility(visibility);
+        OfflineAction.setVisibility(visibility);
     }
 
     @Override
@@ -464,6 +468,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         }
     }
 
+    //TODO: Use this
     static class DownloadSwipeCallback extends ItemTouchHelper.SimpleCallback {
         private Activity activity;
         private RecyclerView.Adapter<BasicViewHolder> adapter;
