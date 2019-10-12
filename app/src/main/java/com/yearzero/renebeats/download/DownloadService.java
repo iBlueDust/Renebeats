@@ -236,6 +236,7 @@ public class DownloadService extends Service {
             if (v != null) {
                 Log.e(TAG, "Invalid Argument: " + v.getMessage());
                 current.getStatus().setInvalid(true);
+                record(current);
                 onFinish(current, false, v);
                 return START_STICKY;
             }
@@ -247,11 +248,7 @@ public class DownloadService extends Service {
                 current.getStatus().setConvert(null);
                 current.getStatus().setMetadata(null);
 
-                Exception e = HistoryRepo.record(HistoryLog.generate(current));
-                if (e != null) {
-                    Log.e(TAG, "Failed to record download history");
-                    e.printStackTrace();
-                }
+                record(current);
 
                 onProgress(0, 0, true, current);
                 Download(current);
@@ -260,7 +257,15 @@ public class DownloadService extends Service {
         return START_STICKY;
     }
 
-//    private void LoadPackage(Download[] pkg) {
+    private void record(Download current) {
+        Exception e = HistoryRepo.record(HistoryLog.generate(current));
+        if (e != null) {
+            Log.e(TAG, "Failed to record download history");
+            e.printStackTrace();
+        }
+    }
+
+    //    private void LoadPackage(Download[] pkg) {
 //        LongSparseArray<Download> paused = new LongSparseArray<>();
 //
 //        for (Download d : pkg) {

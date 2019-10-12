@@ -5,7 +5,7 @@
     <string name="adapter_download_converting">%s converted</string>
     <string name="adapter_download_downloaded">Download Completed, waiting for conversion</string>
     <string name="adapter_download_downloading">%s of %s downloaded</string>
-    <string name="adapter_download_elapsed">Took </string>
+    <string name="adapter_download_elapsed">Took&#160;</string>
     <string name="adapter_download_invalid">Invalid download parameters. Please try again.</string>
     <string name="adapter_download_metadata">Applying metadata</string>
     <string name="adapter_download_network">Waiting for download</string>
@@ -155,11 +155,11 @@
     <string name="main_error_empty">Your search didn\'t come out with any results</string>
     <string name="main_error_timeout">Request timed out</string>
     <string name="main_header_are">s are</string>
-    <string name="main_header_completed">%d download %s completed</string>
-    <string name="main_header_empty">No downloads are running currently</string>
-    <string name="main_header_has">has</string>
+    <string name="main_header_completed">%d download%s completed</string>
+    <string name="main_header_empty">No downloads are currently running</string>
+    <string name="main_header_has">&#160;</string>
     <string name="main_header_have">s have</string>
-    <string name="main_header_is"> is</string>
+    <string name="main_header_is">&#160;is</string>
     <string name="main_header_queued">%d download%s queued</string>
     <string name="main_header_running">%d download%s running</string>
     <string name="main_search">Search or Paste a URL</string>
