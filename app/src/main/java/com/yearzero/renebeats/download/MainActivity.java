@@ -101,23 +101,21 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 ErrorMsg.setText(R.string.error_wifi_msg);
                 ErrorAction.setText(R.string.error_wifi_action);
                 ErrorAction.setOnClickListener(v -> Commons.modifyDownloadState(true));
+
+//                OfflineAction.setText(R.string.retry);
+//                OfflineImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
+//                OfflineMsg.setText(R.string.no_internet);
+//                OfflineAction.setVisibility(View.VISIBLE);
+//                OfflineImg.setVisibility(View.VISIBLE);
+//                OfflineMsg.setVisibility(View.VISIBLE);
+//                OfflineAction.setOnClickListener(v -> Query());
             } else ErrorCard.setVisibility(View.GONE);
 
-            if (mWifi.isConnected()) {
-                queryAdapter.resetList(Collections.nCopies(Preferences.getQuery_amount(), null));
-                new YoutubeQueryTask(MainActivity.this, getPackageName())
-                        .setTimeout(Preferences.getTimeout())
-                        .setSignature(getSignature(getPackageManager(), getPackageName()))
-                        .execute/*OnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, */(query);
-            } else {
-                OfflineAction.setText(R.string.retry);
-                OfflineImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
-                OfflineMsg.setText(R.string.no_internet);
-                OfflineAction.setVisibility(View.VISIBLE);
-                OfflineImg.setVisibility(View.VISIBLE);
-                OfflineMsg.setVisibility(View.VISIBLE);
-                OfflineAction.setOnClickListener(v -> Query());
-            }
+            queryAdapter.resetList(Collections.nCopies(Preferences.getQuery_amount(), null));
+            new YoutubeQueryTask(MainActivity.this, getPackageName())
+                    .setTimeout(Preferences.getTimeout())
+                    .setSignature(getSignature(getPackageManager(), getPackageName()))
+                    .execute/*OnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, */(query);
         }
     };
     private boolean WifiListenerRegistered;

@@ -23,6 +23,8 @@ import kotlin.collections.ArrayList
 
 class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback {
 
+    //TODO: HistoryActivity now works when a download is running (TESTING NEEDED)
+
     companion object {
         @JvmStatic val TAG = "HistoryActivity"
     }
@@ -123,7 +125,7 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback 
         if (fetch?.status == AsyncTask.Status.RUNNING)
             fetch!!.cancel(true)
         fetch = HistoryRepo.RetrieveNTask().setCallback(this)
-        fetch!!.execute(10)
+        fetch!!.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, 10)
 
         Swipe.isRefreshing = true
     }
@@ -261,7 +263,7 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback 
                     sections.add(HistorySection(context, result.valueAt(n)))
                 }
             } else return null
-            return sections.toArray(emptyArray<HistorySection>())
+            return sections.reversed().toTypedArray()
         }
 
         // Packed integer so that if sorted, the corresponding values will also be sorted by the group's collective date
@@ -279,8 +281,7 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback 
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             if (viewHolder is BasicViewHolder) {
-                val downloadAdapter = adapter
-                val item = downloadAdapter.getItemAt(viewHolder.adapterPosition)
+                val item = adapter.getItemAt(viewHolder.adapterPosition)
                 HistoryRepo.deleteRecord(item)
                 activity.refresh()
                 val title = if (viewHolder.getTitle().toString().trim { it <= ' ' }.isNotEmpty()) viewHolder.getTitle().toString() else activity.getString(R.string.one_download)

@@ -86,6 +86,8 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
         if (args.getStatus().isInvalid()) {
             FailedViewHolder n = (FailedViewHolder) holder;
             n.setStatus(context.getString(R.string.adapter_download_invalid));
+
+            ErrorButtons(n, args);
         } else if (args.getStatus().isFailed()) {
             //region FailedViewHolder
             FailedViewHolder n = (FailedViewHolder) holder;
@@ -100,25 +102,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 
             //TODO: Instead of switch statements based on status, what if it was based on ViewHolder type?
 
-            n.setInfoListener(v -> {
-                ErrorLogDialog dialog;
-                if (Preferences.getAlways_log_failed()) {
-                    String name = args.getException() == null ? null : Commons.LogExceptionReturn(args, args.getException());
-
-                    if (name == null) {
-                        Toast.makeText(context, R.string.adapter_download_autolog_failed, Toast.LENGTH_LONG).show();
-                        return;
-                    } else dialog = new ErrorLogDialog(name, null);
-                } else dialog = new ErrorLogDialog(null, args.getException());
-
-                dialog.show(manager, TAG);
-            });
-
-            n.setRetryListener(v -> {
-                Intent intent = new Intent(context, DownloadActivity.class);
-                intent.putExtra(InternalArgs.DATA, args);
-                context.startActivity(intent);
-            });
+            ErrorButtons(n, args);
             //endregion
         } else if (args.getStatus().isCancelled()) {
             if (holder instanceof FailedViewHolder) {
@@ -224,6 +208,28 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                 recycler.post(() -> notifyItemChanged(holder.getAdapterPosition(), null));
             }
         }
+    }
+
+    private void ErrorButtons(FailedViewHolder viewHolder, Download args) {
+        viewHolder.setInfoListener(v -> {
+            ErrorLogDialog dialog;
+            if (Preferences.getAlways_log_failed()) {
+                String name = args.getException() == null ? null : Commons.LogExceptionReturn(args, args.getException());
+
+                if (name == null) {
+                    Toast.makeText(context, R.string.adapter_download_autolog_failed, Toast.LENGTH_LONG).show();
+                    return;
+                } else dialog = new ErrorLogDialog(name, null);
+            } else dialog = new ErrorLogDialog(null, args.getException());
+
+            dialog.show(manager, TAG);
+        });
+
+        viewHolder.setRetryListener(v -> {
+            Intent intent = new Intent(context, DownloadActivity.class);
+            intent.putExtra(InternalArgs.DATA, args);
+            context.startActivity(intent);
+        });
     }
 
     @Override
