@@ -93,11 +93,13 @@ class HistorySection(private val context: Context, private val array: ArrayList<
                 return@OnLongClickListener true
             })
         }
-        //TODO Add support for sectionType
+        //TODO Add support for sectionType (P.S. sectionType? What's that?
+
         when (holder) {
             is FailedViewHolder -> {
+
                 holder.setRetryListener(View.OnClickListener {
-                    val intent = Intent(context, DownloadService::class.java)
+                    val intent = Intent(context, DownloadActivity::class.java)
                     intent.putExtra(InternalArgs.DATA, cast)
                     context.startActivity(intent)
                 })
@@ -120,6 +122,7 @@ class HistorySection(private val context: Context, private val array: ArrayList<
                 val empty = context.getString(R.string.sym_empty)
                 holder.setStatus(context.getString(R.string.success))
                 holder.setDate("${if (uwu.assigned == null) empty else Preferences.formatTime(context, uwu.assigned!!)} $empty ${if (uwu.completed == null) empty else Preferences.formatTime(context, uwu.completed!!)}")
+
                 holder.setRetryListener(View.OnClickListener {
                     val intent = Intent(context, DownloadActivity::class.java)
                     intent.putExtra(InternalArgs.DATA, cast)

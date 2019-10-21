@@ -1,6 +1,7 @@
 package com.yearzero.renebeats.download;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,6 +12,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -33,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.common.io.BaseEncoding;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -115,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             new YoutubeQueryTask(MainActivity.this, getPackageName())
                     .setTimeout(Preferences.getTimeout())
                     .setSignature(getSignature(getPackageManager(), getPackageName()))
-                    .execute/*OnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, */(query);
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);
         }
     };
     private boolean WifiListenerRegistered;
@@ -271,6 +275,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             OfflineAction.setOnClickListener(v -> onBackPressed());
             queryAdapter.resetList();
         } else queryAdapter.resetList(Query.castListXML(results));
+    }
+
+    public void onError(Exception e) {
+        if (e instanceof GoogleJsonResponseException) {
+            OfflineImg.setImageResource(R.drawable.ic_error_gray_24dp);
+            OfflineMsg.setText(R.string.main_error_quota);
+            OfflineAction.setText(R.string.main_error_quota_action);
+            OfflineAction.setOnClickListener(v -> {
+                try {
+                    // try starting the app if it is installed
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:")));
+                } catch (ActivityNotFoundException ex) {
+                    // else, open the website instead
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com")));
+                }
+            });
+            OfflineSetVisibility(true);
+        }
     }
 
     public void onTimeout() {

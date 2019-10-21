@@ -123,6 +123,10 @@ public class QueryActivity extends AppCompatActivity implements YoutubeQueryTask
         OfflineAction.setVisibility(visi);
     }
 
+    public void onError(Exception e) {
+        e.printStackTrace();
+    }
+
     @Override
     public void onTimeout() {
         OfflineImg.setImageResource(R.drawable.ic_timer_lightgray_96dp);

@@ -165,7 +165,9 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             Extractor yt = new Extractor(this);
 //            yt.setTimeout(Preferences.getTimeout());
 //            yt.extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID(), true, false);
-            yt.extract("https://www.youtube.com/watch?v=" + query.getYoutubeID(), true, false);
+            yt.setParseDashManifest(true);
+            yt.setIncludeWebM(true);
+            yt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID());
             new CountDownTimer(Preferences.getTimeout(), Preferences.getTimeout()) {
                 @Override
                 public void onTick(long l) {}

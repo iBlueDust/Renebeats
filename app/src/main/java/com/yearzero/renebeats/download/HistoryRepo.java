@@ -22,9 +22,11 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -111,10 +113,17 @@ public class HistoryRepo {
         return new LogNotFoundException();
     }
 
+    private static int getSessionId(String filename) throws IllegalArgumentException {
+        return new BigInteger(Base64.decode(filename.substring(0, filename.length() - (2 + EXTENSION.length())), Base64.DEFAULT)).intValue();
+    }
+
     private static File getSessionFile(Date assigned) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(assigned);
-        return new File(Directories.getHISTORY(), cal.get(Calendar.YEAR) + "/" + Base64.encodeToString(BigInteger.valueOf(assigned.getTime() / 86400000).toByteArray(), Base64.DEFAULT) + '.' + EXTENSION);
+        String encoded = Base64.encodeToString(ByteBuffer.allocate(4).putInt((int) (assigned.getTime() / 86400000)).array(), Base64.DEFAULT);
+        return new File(Directories.getHISTORY(), cal.get(Calendar.YEAR) + "/" + encoded.substring(0, encoded.length() - 1) + '.' + EXTENSION);
+//        int date = cal.get(Calendar.DATE);
+//        return new File(Directories.getHISTORY(), cal.get(Calendar.YEAR) + "/" + (date < 10 ? '0' + date : date) + '.' + EXTENSION);
     }
 
 //    private static int shortHistHash(HistoryLog data) {
@@ -200,6 +209,14 @@ public class HistoryRepo {
             ArrayList<File> files = new ArrayList<>();
             for (File dir : dirs)
                 files.addAll(Arrays.asList(dir.listFiles((FilenameFilter) new WildcardFileFilter("*." + EXTENSION, IOCase.INSENSITIVE))));
+
+            Collections.sort(files, (a, b) -> {
+                try {
+                    return getSessionId(b.getName()) - getSessionId(a.getName());
+                } catch (IllegalArgumentException e) {
+                    return 0;
+                }
+            });
 
             for (int i = 0; limit > result.size() && i < files.size(); i++) {
                 HistoryLog[] logs = readSession(files.get(i));
