@@ -1,8 +1,12 @@
 package com.yearzero.renebeats.download
 
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.IBinder
 import android.util.SparseArray
 import android.view.View
 import android.widget.ImageButton
@@ -21,7 +25,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback {
+class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback, ServiceConnection {
 
     //TODO: HistoryActivity now works when a download is running (TESTING NEEDED)
 
@@ -34,6 +38,8 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback 
     private lateinit var List: RecyclerView
     private lateinit var Swipe: SwipeRefreshLayout
     private lateinit var Empty: TextView
+
+    private var service: DownloadService? = null
 
 //    private var task = History.RetrieveNTask()
     private val adapter = HistoryAdapter(this)
@@ -137,7 +143,10 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback 
 
         array = it ?: emptyArray()
 
-        if (it != null && it.isNotEmpty()) SegmentDataTask(this, adapter).execute(*it)
+        if (it!!.isNotEmpty()) {
+            if (service == null) SegmentDataTask(this, adapter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
+            else SegmentDataTask(this, adapter, service!!.queue + service!!.running).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
+        }
         else Empty.visibility = View.VISIBLE
     }
 
@@ -153,9 +162,38 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback 
 //            }
 //        else super.onBackPressed()
 
+    override fun onResume() {
+        super.onResume()
+        bindService(Intent(this, DownloadService::class.java), this, 0)
+    }
+
+    override fun onPause() {
+        unbindService(this)
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        if (service != null) application.onTerminate()
+        super.onDestroy()
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        this.service = (service as DownloadService.LocalBinder).service
+        refresh()
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        service = null
+    }
+
     private class SegmentDataTask private constructor(private val activity: WeakReference<HistoryActivity>, private val adapter: HistoryAdapter) :
             AsyncTask<HistoryLog, Void, Array<HistorySection>>() {
         constructor(activity: HistoryActivity, adapter: HistoryAdapter) : this(WeakReference(activity), adapter)
+        constructor(activity: HistoryActivity, adapter: HistoryAdapter, serviceList: Array<Download>) : this(WeakReference(activity), adapter) {
+            this.serviceList = serviceList
+        }
+
+        private var serviceList = emptyArray<Download>()
 
 //        companion object {
 //            @JvmStatic val THRESHOLD = 10
@@ -242,7 +280,11 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback 
 //            }
 
             // Split to day groups immediately
-            for (log in params) {
+            mainLoop@ for (log in params) {
+                for (running in serviceList)
+                    if (running == log)
+                        break@mainLoop
+
                 val calendar = Calendar.getInstance()
                 calendar.time = log.date
                 val year = calendar.get(Calendar.YEAR)

@@ -23,7 +23,7 @@
             app:layout_constraintDimensionRatio="H,"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/download"
-            app:srcCompat="@drawable/ic_close_gray_24dp"
+            app:srcCompat="@drawable/ic_arrow_left_gray_24dp"
             tools:ignore="VectorDrawableCompat" />
 
         <com.google.android.material.button.MaterialButton

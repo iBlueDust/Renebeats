@@ -2,9 +2,11 @@ package com.yearzero.renebeats.download;
 
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
@@ -17,9 +19,11 @@ import java.util.List;
 
 public class YoutubeQueryTask extends AsyncTask<String, Void, List<SearchResult>> {
 
+    private static final String TAG = "YoutubeQueryTask";
+
     public interface Callbacks {
         void onComplete(List<SearchResult> results);
-
+        void onError(Exception e);
         void onTimeout();
     }
 
@@ -27,6 +31,8 @@ public class YoutubeQueryTask extends AsyncTask<String, Void, List<SearchResult>
     private String pkgName;
     private String sha1;
     private int timeout;
+
+    private Exception exception;
 
     YoutubeQueryTask(Callbacks listener, @NonNull String pkgName) {
         this.listener = listener;
@@ -79,14 +85,22 @@ public class YoutubeQueryTask extends AsyncTask<String, Void, List<SearchResult>
 
             SearchListResponse searchResponse = search.execute();
             return searchResponse.getItems();
+        } catch (GoogleJsonResponseException e) {
+            Log.e(TAG, "Error code: " + e.getStatusCode());
+            exception = e;
         } catch (Exception e) {
             e.printStackTrace();
+            exception = e;
         }
         return null;
     }
 
     @Override
     protected void onPostExecute(List<SearchResult> results) {
-        if (listener != null) listener.onComplete(results);
+        if (listener != null) {
+            listener.onComplete(results);
+            if (results == null && exception != null)
+                listener.onError(exception);
+        }
     }
 }
