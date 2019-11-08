@@ -40,6 +40,7 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.common.io.BaseEncoding;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.tonyodev.fetch2.NetworkType;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.R;
@@ -98,13 +99,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-            if (!(mWifi.isConnected() || Preferences.getMobiledata())) {
+            if (!mWifi.isConnected() && !Preferences.getMobiledata() && Commons.getDownloadNetworkType() != NetworkType.ALL) {
                 ErrorCard.setVisibility(View.VISIBLE);
                 ErrorImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
                 ErrorTitle.setText(getString(R.string.no_wifi));
                 ErrorMsg.setText(R.string.error_wifi_msg);
                 ErrorAction.setText(R.string.error_wifi_action);
-                ErrorAction.setOnClickListener(v -> Commons.modifyDownloadState(true));
+                ErrorAction.setOnClickListener(v -> {
+                    Commons.setDownloadNetworkType(true);
+                    ErrorCard.setVisibility(View.GONE);
+                });
 
 //                OfflineAction.setText(R.string.retry);
 //                OfflineImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
@@ -236,21 +240,32 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private void UpdateInfo() {
         if (service != null) {
-            int running = service.getRunning().length;
+            List<Download> queued = service.getQueue();
+
+            int waiting = 0;
+            for (Download que : queued) {
+                if (que.getStatus().getDownload() == Status.Download.NETWORK_PENDING) waiting++;
+            }
+
+            if (waiting > 0) {
+                InfoTitle.setText(String.format(Commons.getLocale(), getString(R.string.main_header_waiting), waiting, waiting == 1 ? getString(R.string.main_header_is) : getString(R.string.main_header_are)));
+                return;
+            }
+
+            int running = service.getRunning().size();
             if (running > 0) {
                 InfoTitle.setText(String.format(Locale.ENGLISH, getString(R.string.main_header_running), running, running == 1 ? getString(R.string.main_header_is) : getString(R.string.main_header_are)));
                 return;
             }
 
-            int completed = service.getCompleted().length;
+            int completed = service.getCompleted().size();
             if (completed > 0) {
                 InfoTitle.setText(String.format(Locale.ENGLISH, getString(R.string.main_header_completed), completed, completed == 1 ? getString(R.string.main_header_has) : getString(R.string.main_header_have)));
                 return;
             }
 
-            int queued = service.getQueue().length;
-            if (queued > 0) {
-                InfoTitle.setText(String.format(Locale.ENGLISH, getString(R.string.main_header_queued), queued, queued == 1 ? getString(R.string.main_header_is) : getString(R.string.main_header_are)));
+            if (queued.size() > 0) {
+                InfoTitle.setText(String.format(Locale.ENGLISH, getString(R.string.main_header_queued), queued.size(), queued.size() == 1 ? getString(R.string.main_header_is) : getString(R.string.main_header_are)));
                 return;
             }
         }

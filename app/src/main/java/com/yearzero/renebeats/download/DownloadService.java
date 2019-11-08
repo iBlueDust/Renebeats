@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.android.gms.common.util.ArrayUtils;
 import com.tonyodev.fetch2.EnqueueAction;
 import com.tonyodev.fetch2.Error;
 import com.tonyodev.fetch2.FetchListener;
@@ -200,13 +199,13 @@ public class DownloadService extends Service {
                 if (request != Integer.MIN_VALUE) req.putExtra(InternalArgs.REQ_ID, request);
 
                 if ((requestFlag & InternalArgs.FLAG_QUEUE) == InternalArgs.FLAG_QUEUE)
-                    req.putExtra(InternalArgs.REQ_QUEUE, getQueue());
+                    req.putExtra(InternalArgs.REQ_QUEUE, getQueue().toArray(new Download[0]));
 
                 if ((requestFlag & InternalArgs.FLAG_RUNNING) == InternalArgs.FLAG_RUNNING)
-                    req.putExtra(InternalArgs.REQ_RUNNING, getRunning());
+                    req.putExtra(InternalArgs.REQ_RUNNING, getRunning().toArray(new Download[0]));
 
                 if ((requestFlag & InternalArgs.FLAG_COMPLETED) == InternalArgs.FLAG_COMPLETED)
-                    req.putExtra(InternalArgs.REQ_COMPLETED, getCompleted());
+                    req.putExtra(InternalArgs.REQ_COMPLETED, getCompleted().toArray(new Download[0]));
 
                 LocalBroadcastManager.getInstance(DownloadService.this).sendBroadcast(req);
 
@@ -637,7 +636,7 @@ public class DownloadService extends Service {
 
         Intent intent = new Intent(TAG);
         intent.putExtra(InternalArgs.RESULT, InternalArgs.DESTROY);
-        intent.putExtra(InternalArgs.DATA, getAll());
+        intent.putExtra(InternalArgs.DATA, getAll().toArray(new Download[0]));
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
         Commons.fetch.removeListener(fetchListener);
@@ -721,6 +720,8 @@ public class DownloadService extends Service {
 //    }
 
     public void cancel(int id) {
+        Download current = null;
+        int index = downloadMap.indexOfKey(id);
         if (convertProgress != null && convertProgress.getDownloadId() == id) {
             if (converter != null) converter.killProcess();
             convertProgress.setCompleteDate(new Date());
@@ -729,10 +730,19 @@ public class DownloadService extends Service {
             convertProgress.setSize(0);
             convertProgress.setIndeterminate(true);
             convertProgress.getStatus().setConvert(Status.Convert.CANCELLED);
+            current = convertProgress;
             onFinish(convertProgress, false, new ServiceException("Cancelled"));
             convertProgress = null;
             Convert();
-        } else if (downloadMap.indexOfKey(id) >= 0) Commons.fetch.cancel(id);
+        } else if (index >= 0) {
+            Commons.fetch.cancel(id);
+            current = downloadMap.valueAt(index);
+        }
+
+        Intent intent = new Intent(TAG);
+        intent.putExtra(InternalArgs.DATA, current);
+        intent.putExtra(InternalArgs.RESULT, InternalArgs.CANCELLED);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private void UpdateMaps(com.tonyodev.fetch2.Download download, Download args) {
@@ -852,18 +862,21 @@ public class DownloadService extends Service {
         if (bad) Log.w(TAG, "Failed to empty BIN");
     }
 
-    public Download[] getAll() {
-        Download[] downloads = new Download[downloadMap.size()];
-        for (int i = 0; i < downloadMap.size(); i++) downloads[i] = downloadMap.valueAt(i);
-        Download[] list = ArrayUtils.concat(downloads, convertQueue.toArray(new Download[0]), completed.toArray(new Download[0]));
-        return convertProgress == null ? list : ArrayUtils.appendToArray(list, convertProgress);
+    public List<Download> getAll() {
+        ArrayList<Download> downloads = new ArrayList<>();
+        for (int i = 0; i < downloadMap.size(); i++) downloads.add(downloadMap.valueAt(i));
+        downloads.addAll(convertQueue);
+        downloads.addAll(completed);
+        if (convertProgress != null) downloads.add(convertProgress);
+        return downloads;
     }
 
-    public Download[] getQueue() {
-        Download[] list = new Download[downloadMap.size()];
+    public List<Download> getQueue() {
+        ArrayList<Download> list = new ArrayList<>();
         for (int i = 0; i < downloadMap.size(); i++) {
             Download d = downloadMap.valueAt(i);
-            if (d.getStatus().getDownload() == Status.Download.QUEUED) list[i] = d;
+            Status.Download sd = d.getStatus().getDownload();
+            if (sd == Status.Download.NETWORK_PENDING || sd == Status.Download.QUEUED) list.add(d);
         }
         return list;
     }
@@ -872,19 +885,20 @@ public class DownloadService extends Service {
 //        return convertPause.toArray(new Download[0]);
 //    }
 
-    public Download[] getRunning() {
-        Download[] downloads = new Download[downloadMap.size()];
+    public List<Download> getRunning() {
+        ArrayList<Download> downloads = new ArrayList<>();
         for (int i = 0; i < downloadMap.size(); i++) {
             Download d = downloadMap.valueAt(i);
             if (d.getStatus().getDownload() == Status.Download.RUNNING || d.getStatus().getDownload() == Status.Download.PAUSED)
-                downloads[i] = downloadMap.valueAt(i);
+                downloads.add(downloadMap.valueAt(i));
         }
-        Download[] list = ArrayUtils.concat(downloads, convertQueue.toArray(new Download[0]));
-        return convertProgress == null ? list : ArrayUtils.appendToArray(list, convertProgress);
+        downloads.addAll(convertQueue);
+        if (convertProgress != null) downloads.add(convertProgress);
+        return downloads;
     }
 
-    public Download[] getCompleted() {
-        return completed.toArray(new Download[0]);
+    public List<Download> getCompleted() {
+        return new ArrayList<>(completed);
     }
 
     private void CallbackWarn(Download download, String msg) {

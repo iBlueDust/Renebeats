@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
@@ -59,6 +60,7 @@ public class Commons extends Application {
 //    public static DownloadReceiver downloadReceiver;
     public static Fetch fetch;
     private static Locale locale = Locale.ENGLISH;
+    private static NetworkType globalNetworkType;
     public static final float displayThreshold = 480f;
 
     public static boolean LogException(Throwable ex) {
@@ -132,9 +134,15 @@ public class Commons extends Application {
         return name;
     }
 
-    public static void modifyDownloadState(boolean mobiledata) {
-        Commons.fetch.setGlobalNetworkType(mobiledata ? NetworkType.ALL : NetworkType.WIFI_ONLY);
-        //TODO: This ^^^^ will freeze the download
+    public static void setDownloadNetworkType(boolean mobiledata) {
+        globalNetworkType = mobiledata ? NetworkType.ALL : NetworkType.WIFI_ONLY;
+        Commons.fetch.setGlobalNetworkType(globalNetworkType);
+        // This ^^^^ will override all following downloads
+    }
+
+    @Nullable
+    public static NetworkType getDownloadNetworkType() {
+        return globalNetworkType;
     }
 
     @SuppressLint("CommitPrefEdits")
