@@ -5,10 +5,11 @@
     <string name="adapter_download_converting">%s converted</string>
     <string name="adapter_download_downloaded">Download Completed, waiting for conversion</string>
     <string name="adapter_download_downloading">%s of %s downloaded</string>
-    <string name="adapter_download_elapsed">Took&#160;</string>
+    <string name="adapter_download_elapsed">Took </string>
     <string name="adapter_download_invalid">Invalid download parameters. Please try again.</string>
     <string name="adapter_download_metadata">Applying metadata</string>
     <string name="adapter_download_network">Waiting for download</string>
+    <string name="adapter_download_waiting">Waiting for network</string>
     <string name="adapter_history_autolog_failed">Failed to autolog download error</string>
     <string name="album">Album</string>
     <string name="app_icon">App Icon</string>
@@ -153,15 +154,19 @@
     <string name="main_empty">No downloads are currently running</string>
     <string name="main_error_connection_msg">It seems that we can\'t connect to YouTube. Please check your connection and try again later.</string>
     <string name="main_error_empty">Your search didn\'t come out with any results</string>
+    <string name="main_error_quota">Uh oh! Sorry but it seems like we\'re having problems searching Youtube for you. Please try sharing Youtube videos from the Youtube app to Renebeats for the time being.</string>
+    <string name="main_error_quota_action">Open Youtube</string>
     <string name="main_error_timeout">Request timed out</string>
     <string name="main_header_are">s are</string>
     <string name="main_header_completed">%d download%s completed</string>
     <string name="main_header_empty">No downloads are currently running</string>
-    <string name="main_header_has">&#160;</string>
+    <string name="main_header_has"> </string>
     <string name="main_header_have">s have</string>
-    <string name="main_header_is">&#160;is</string>
+    <string name="main_header_is"> is</string>
     <string name="main_header_queued">%d download%s queued</string>
     <string name="main_header_running">%d download%s running</string>
+    <string name="main_header_runningwaiting">%d running, %d waiting for network</string>
+    <string name="main_header_waiting">%d download%s waiting for network</string>
     <string name="main_search">Search or Paste a URL</string>
     <string name="master_error">An error has occurred. Logging error…</string>
     <string name="metadata">Metadata</string>
@@ -296,7 +301,7 @@
         <item>40</item>
     </string-array>
     <string name="query_empty">It seems that we can\'t connect to YouTube. Please check your connection and try again later.</string>
-    <string name="receiver_succeed_prefix">Succeeded after</string>
+    <string name="receiver_succeed_prefix">Succeeded after </string>
     <string name="refresh">Refresh</string>
     <string name="restore_cancelled">Restore Cancelled</string>
     <string name="retry">Retry</string>
@@ -317,6 +322,7 @@
     <string name="sym_hour">h</string>
     <string name="sym_i">i</string>
     <string name="sym_minute">m</string>
+    <string name="sym_question">\?</string>
     <string name="sym_question_mark">\?</string>
     <string name="sym_seconds">s</string>
     <string name="sym_separator">-</string>
@@ -335,7 +341,4 @@
     <string name="yesterday">Yesterday</string>
     <string name="youtube">YouTube</string>
     <string name="youtube_id">YouTube ID</string>
-    <string name="sym_question">\?</string>
-    <string name="main_error_quota">Uh oh! Sorry but it seems like we\'re having problems searching Youtube for you. Please try sharing Youtube videos from the Youtube app to Renebeats for the time being.</string>
-    <string name="main_error_quota_action">Open Youtube</string>
 </resources>

@@ -56,7 +56,7 @@ public class PrefGeneralFragment extends PreferenceFragment {
             ListPreference list = (ListPreference) preference;
             Preferences.setMobiledata("1".equals(newValue));
             Preferences.save();
-            Commons.modifyDownloadState(Preferences.getMobiledata());
+            Commons.setDownloadNetworkType(Preferences.getMobiledata());
 
             preference.setSummary(list.getEntries()[Preferences.getMobiledata() ? 1 : 0]);
             return true;

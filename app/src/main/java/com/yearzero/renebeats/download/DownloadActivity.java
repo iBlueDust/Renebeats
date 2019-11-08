@@ -28,7 +28,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.android.gms.common.util.ArrayUtils;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
@@ -46,6 +45,7 @@ import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
@@ -516,7 +516,8 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         }
         String name = args.getFilenameWithExt();
 
-        Download[] array = ArrayUtils.concat(service.getQueue(), service.getRunning());
+        ArrayList<Download> array = new ArrayList<>(service.getQueue());
+        array.addAll(service.getRunning());
         boolean match = false;
 
         for (Download d : array) {

@@ -145,7 +145,7 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 
         if (it!!.isNotEmpty()) {
             if (service == null) SegmentDataTask(this, adapter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
-            else SegmentDataTask(this, adapter, service!!.queue + service!!.running).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
+            else SegmentDataTask(this, adapter, listOf(service!!.queue, service!!.running).flatten()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
         }
         else Empty.visibility = View.VISIBLE
     }
@@ -187,13 +187,13 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
     }
 
     private class SegmentDataTask private constructor(private val activity: WeakReference<HistoryActivity>, private val adapter: HistoryAdapter) :
-            AsyncTask<HistoryLog, Void, Array<HistorySection>>() {
+            AsyncTask<HistoryLog, Void, List<HistorySection>>() {
         constructor(activity: HistoryActivity, adapter: HistoryAdapter) : this(WeakReference(activity), adapter)
-        constructor(activity: HistoryActivity, adapter: HistoryAdapter, serviceList: Array<Download>) : this(WeakReference(activity), adapter) {
+        constructor(activity: HistoryActivity, adapter: HistoryAdapter, serviceList: List<Download>) : this(WeakReference(activity), adapter) {
             this.serviceList = serviceList
         }
 
-        private var serviceList = emptyArray<Download>()
+        private var serviceList = emptyList<Download>()
 
 //        companion object {
 //            @JvmStatic val THRESHOLD = 10
@@ -219,9 +219,9 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
             super.onPreExecute()
         }
 
-        override fun onPostExecute(result: Array<HistorySection>) {
+        override fun onPostExecute(result: List<HistorySection>) {
             adapter.clearAll()
-            adapter.addSection(*result)
+            adapter.addSection(*result.toTypedArray())
 
             val act = activity.get()
             if (act != null) {
@@ -231,7 +231,7 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
             super.onPostExecute(result)
         }
 
-        override fun doInBackground(vararg params: HistoryLog): Array<HistorySection>? {
+        override fun doInBackground(vararg params: HistoryLog): List<HistorySection>? {
             val result = SparseArray<Node>()
 
             // Split data into year groups
@@ -305,7 +305,7 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
                     sections.add(HistorySection(context, result.valueAt(n)))
                 }
             } else return null
-            return sections.reversed().toTypedArray()
+            return sections.reversed()
         }
 
         // Packed integer so that if sorted, the corresponding values will also be sorted by the group's collective date

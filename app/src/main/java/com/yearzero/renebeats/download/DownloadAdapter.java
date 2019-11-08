@@ -23,7 +23,6 @@ import com.yearzero.renebeats.errorlog.ErrorLogDialog;
 import com.yearzero.renebeats.preferences.Preferences;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -123,9 +122,14 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                 //region Status Main
                 switch (args.getStatus().getDownload()) {
                     case QUEUED:
-                    case NETWORK_PENDING:
                         QueueViewHolder g = (QueueViewHolder) holder;
                         g.setStatus(context.getString(R.string.adapter_download_network));
+                        g.setCancelListener(v -> service.cancel(args.getDownloadId()));
+                        break;
+                    case NETWORK_PENDING:
+                        QueueViewHolder z = (QueueViewHolder) holder;
+                        z.setStatus(context.getString(R.string.adapter_download_waiting));
+                        z.setCancelListener(v -> service.cancel(args.getDownloadId()));
                         break;
                     case RUNNING:
                         RunningViewHolder i = (RunningViewHolder) holder;
@@ -269,7 +273,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 
     private List<Download> getServiceDownloads() {
 //        service.Sanitize();
-        ArrayList<Download> list = new ArrayList<>(Arrays.asList(service.getAll()));
+        ArrayList<Download> list = new ArrayList<>(service.getAll());
         for (int i = 0; i < list.size();)
             if (blacklist.contains(list.get(i).getDownloadId()))
                 list.remove(i);
