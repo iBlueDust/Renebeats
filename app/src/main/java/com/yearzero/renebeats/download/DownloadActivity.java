@@ -1,18 +1,14 @@
 package com.yearzero.renebeats.download;
 
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -22,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,19 +31,14 @@ import com.squareup.picasso.Picasso;
 import com.yearzero.renebeats.Directories;
 import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.R;
-import com.yearzero.renebeats.download.ui.DurationPicker;
 import com.yearzero.renebeats.notification.DownloadReceiver;
 import com.yearzero.renebeats.preferences.Preferences;
 import com.yearzero.renebeats.preferences.enums.OverwriteMode;
 
-import org.apache.commons.text.StringEscapeUtils;
-
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import at.huber.youtubeExtractor.YtFile;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class DownloadActivity extends AppCompatActivity implements ServiceConnection {
@@ -64,27 +54,16 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     private TextView Display;
     private Button Start, End, Swap, Youtube;
     private ChipGroup FormatGroup, BitrateGroup;
-    private Chip[] Bitrates, Formats;
+    private Chip[] Formats;
     private TextInputEditText Title, Artist, Album, Track, Year, Genres;
 //    private NachoTextView Genres;
     private CheckBox Normalize;
     private ImageButton NormalizeHelp;
-    private Dialog retrieveDialog;
-
-    private static String loc_sparse = "renebeats/download_activity sparseArray";
-    private static String loc_meta = "renebeats/download_activity videoMeta";
-    private static String loc_length = "renebeats/download_activity length";
-
-    private YouTubeExtractor.YtFile[] sparseArray;
-    private YouTubeExtractor.VideoMeta videoMeta;
-    private int length = -1;
 
     private Query query;
-    private Integer start, end;
 
     private DownloadService service;
 
-//    @SuppressLint({"StaticFieldLeak", "WrongViewCast"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,8 +103,6 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         Year = findViewById(R.id.year);
         Track = findViewById(R.id.track);
         Genres = findViewById(R.id.genres);
-        Start = findViewById(R.id.start);
-        End = findViewById(R.id.end);
         Normalize = findViewById(R.id.exception);
         NormalizeHelp = findViewById(R.id.normalize_help);
 
@@ -142,67 +119,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         } else Artist.setText(query.getArtist());
         if (!query.getAlbum().isEmpty()) Album.setText(query.getAlbum());
         if (query.getYear() > 0) Year.setText(String.valueOf(query.getYear()));
-        if (query instanceof Download) {
-            Download d = (Download) query;
-            this.start = d.getStart();
-            this.end = d.getEnd();
-        }
 
-        Object a, b;
-        if (savedInstanceState == null) {
-            a = null;
-            b = null;
-        } else {
-            a = savedInstanceState.get(loc_sparse);
-            b = savedInstanceState.get(loc_meta);
-            length = savedInstanceState.getInt(loc_length, length);
-        }
-
-        if (length >= 0 && a instanceof YouTubeExtractor.YtFile[] && b instanceof YouTubeExtractor.VideoMeta) {
-            sparseArray = (YouTubeExtractor.YtFile[]) a;
-            videoMeta = (YouTubeExtractor.VideoMeta) b;
-            onExtractionComplete(sparseArray, videoMeta);
-        } else {
-            Extractor yt = new Extractor(this);
-//            yt.setTimeout(Preferences.getTimeout());
-//            yt.extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID(), true, false);
-            yt.setParseDashManifest(true);
-            yt.setIncludeWebM(true);
-            yt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID());
-
-            new CountDownTimer(Preferences.getTimeout(), Preferences.getTimeout()) {
-                @Override
-                public void onTick(long l) {}
-
-                @Override
-                public void onFinish() {
-                    if (yt.getStatus() == AsyncTask.Status.RUNNING) {
-                        yt.cancel(true);
-
-                        if (retrieveDialog != null) retrieveDialog.dismiss();
-                        new AlertDialog.Builder(DownloadActivity.this)
-                                .setTitle("Timeout")
-                                .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
-                                .setPositiveButton("OK", (dialogInterface, i) -> {
-                                    dialogInterface.dismiss();
-                                    onBackPressed();
-                                }).show();
-                    }
-                }
-            }.start();
-
-            retrieveDialog = new Dialog(this);
-            retrieveDialog.setTitle(getString(R.string.download_retrieve));
-            retrieveDialog.setCanceledOnTouchOutside(false);
-            retrieveDialog.setContentView(R.layout.dialog_retrieving);
-            retrieveDialog.findViewById(R.id.negative).setOnClickListener(v -> {
-                retrieveDialog.dismiss();
-                onBackPressed();
-            });
-            retrieveDialog.show();
-        }
-
-//        FormatGroup.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, formats));
         String[] farr = getResources().getStringArray(R.array.formats);
         int index = -1;
         for (int i = 0; i < farr.length; i++) {
@@ -226,80 +143,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         }
         FormatGroup.check(Formats[index].getId());
 
-//        Genres.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL);
-//        Genres.addChipTerminator(';', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL);
-//        Genres.addChipTerminator('\n', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL);
-//        if (query.genres != null) Genres.setText(Arrays.asList(query.genres));
         Genres.setText(query.getGenres());
-
-        Start.setOnClickListener(v -> {
-            if (length <= 0) {
-                Log.e(TAG, "Length is 0");
-                return;
-            }
-            DurationPicker dialog = new DurationPicker(DownloadActivity.this);
-            dialog.setTitle(R.string.download_time_start);
-
-            if (length > 3600)
-                dialog.setEnabled(DurationPicker.Mode.Hour);
-            else if (length > 60)
-                dialog.setEnabled(DurationPicker.Mode.Minute);
-            else dialog.setEnabled(DurationPicker.Mode.Second);
-
-            dialog.setTime(start == null ? 0 : start);
-            dialog.setMaxTime(length);
-            dialog.setCallbacks(new DurationPicker.Callbacks() {
-                @Override
-                public String Validate(int time) {
-                    if (time >= (end == null ? length : end))
-                        return getString(R.string.download_time_start_end);
-                    return null;
-                }
-
-                @Override
-                public void onSubmit(int time) {
-                    start = time;
-                    RefreshTimeRange();
-                }
-            });
-            dialog.show();
-        });
-
-        End.setOnClickListener(v -> {
-            if (length <= 0) {
-                Log.e(TAG, "Length is 0");
-                return;
-            }
-            DurationPicker dialog = new DurationPicker(DownloadActivity.this);
-            dialog.setTitle(R.string.download_time_end);
-            dialog.setTime(end == null ? 0 : end);
-
-            if (length > 3600)
-                dialog.setEnabled(DurationPicker.Mode.Hour);
-            else if (length > 60)
-                dialog.setEnabled(DurationPicker.Mode.Minute);
-            else dialog.setEnabled(DurationPicker.Mode.Second);
-
-            dialog.setTime(end == null ? length : end);
-            dialog.setMaxTime(length);
-            dialog.setCallbacks(new DurationPicker.Callbacks() {
-                @Override
-                public String Validate(int time) {
-                    if (start != null && time <= start)
-                        return getString(R.string.download_time_end_start);
-                    if (end != null && end > length)
-                        return getString(R.string.download_time_end_length);
-                    return null;
-                }
-
-                @Override
-                public void onSubmit(int time) {
-                    end = time;
-                    RefreshTimeRange();
-                }
-            });
-            dialog.show();
-        });
 
         Swap.setOnClickListener(view -> {
             if (Title.getText() == null || Artist.getText() == null) return;
@@ -323,83 +167,79 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         NormalizeHelp.setOnClickListener(v -> new AlertDialog.Builder(DownloadActivity.this)
                 .setMessage(R.string.download_normalize_msg)
                 .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss()).show());
-    }
 
-    public void onExtractionComplete(YouTubeExtractor.YtFile[] data, YouTubeExtractor.VideoMeta videoMeta) {
-        sparseArray = data;
-        this.videoMeta = videoMeta;
-
-        if (videoMeta.getVideoLength() <= 0) {
-            onBackPressed();
-            Toast.makeText(DownloadActivity.this, R.string.download_invalid_youtube_id, Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        if (query.getTitle().isEmpty()) {
-            query.setTitle(StringEscapeUtils.unescapeXml(videoMeta.getTitle()));
-            Display.setText(query.getTitle());
-
-            UseGuesserMode();
-        } else if (query.getArtist().isEmpty()) {
-            query.setArtist(videoMeta.getAuthor());
-            Artist.setText(query.getArtist());
-        }
-
-        boolean thumbnail = false;
-        if (query.getThumbMax() == null) {
-            query.setThumbMax(videoMeta.getMaxResImageUrl());
-            thumbnail = true;
-        }
-        if (query.getThumbHigh() == null) {
-            query.setThumbHigh(videoMeta.getHqImageUrl());
-            thumbnail = true;
-        }
-        if (query.getThumbMedium() == null) {
-            query.setThumbMedium(videoMeta.getMqImageUrl());
-            thumbnail = true;
-        }
-        if (query.getThumbDefault() == null) {
-            query.setThumbDefault(videoMeta.getThumbUrl());
-            thumbnail = true;
-        }
-        if (query.getThumbStandard() == null) {
-            query.setThumbStandard(videoMeta.getSdImageUrl());
-            thumbnail = true;
-        }
-
-        if (thumbnail) LoadThumbnail();
-
-        int maxbit = Integer.MIN_VALUE;
-        length = (int) videoMeta.getVideoLength();
-
-        if (retrieveDialog != null && retrieveDialog.isShowing()) retrieveDialog.dismiss();
-
-        RefreshTimeRange();
-
-        if (data == null) return;
-        for (YouTubeExtractor.YtFile datum : data)
-            maxbit = Math.max(datum.getFormat().getAudioBitrate(), maxbit);
-
-        int cnt = 0;
-        for (int i = 0; i < Preferences.getBITRATES().length && Preferences.getBITRATES()[i] <= maxbit; i++) cnt++;
-
-        Bitrates = new Chip[cnt];
         String[] barr = getResources().getStringArray(R.array.bitrates);
-        for (int i = 0; i < barr.length; i++) barr[i] += ' ' + getString(R.string.kbps);
-
-        for (int i = 0; i < cnt; i++) {
+        int lastChipId = -1;
+        for (int i = 0; i < barr.length; i++) {
             Chip chip = new Chip(DownloadActivity.this, null, R.style.Widget_MaterialComponents_Chip_Choice);
-            chip.setText(barr[i]);
+            chip.setText(String.format("%s %s", barr[i], getString(R.string.kbps)));
             chip.setCheckable(true);
             chip.setChipStrokeColorResource(R.color.Accent);
             chip.setChipStrokeWidth(1f);
             chip.setOnClickListener(v -> ((Chip) v).setChecked(true));
-            Bitrates[i] = chip;
+
+            lastChipId = chip.getId();
             BitrateGroup.addView(chip, i, new ChipGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
-        BitrateGroup.check(Bitrates[Bitrates.length - 1].getId());
-
+        if (lastChipId >= 0) BitrateGroup.check(lastChipId);
     }
+
+//    public void onExtractionComplete(YouTubeExtractor.YtFile[] data, YouTubeExtractor.VideoMeta videoMeta) {
+//        sparseArray = data;
+//        this.videoMeta = videoMeta;
+//
+//        if (videoMeta.getVideoLength() <= 0) {
+//            onBackPressed();
+//            Toast.makeText(DownloadActivity.this, R.string.download_invalid_youtube_id, Toast.LENGTH_LONG).show();
+//            return;
+//        }
+//
+//        if (query.getTitle().isEmpty()) {
+//            query.setTitle(StringEscapeUtils.unescapeXml(videoMeta.getTitle()));
+//            Display.setText(query.getTitle());
+//
+//            UseGuesserMode();
+//        } else if (query.getArtist().isEmpty()) {
+//            query.setArtist(videoMeta.getAuthor());
+//            Artist.setText(query.getArtist());
+//        }
+//
+//        boolean thumbnail = false;
+//        if (query.getThumbMax() == null) {
+//            query.setThumbMax(videoMeta.getMaxResImageUrl());
+//            thumbnail = true;
+//        }
+//        if (query.getThumbHigh() == null) {
+//            query.setThumbHigh(videoMeta.getHqImageUrl());
+//            thumbnail = true;
+//        }
+//        if (query.getThumbMedium() == null) {
+//            query.setThumbMedium(videoMeta.getMqImageUrl());
+//            thumbnail = true;
+//        }
+//        if (query.getThumbDefault() == null) {
+//            query.setThumbDefault(videoMeta.getThumbUrl());
+//            thumbnail = true;
+//        }
+//        if (query.getThumbStandard() == null) {
+//            query.setThumbStandard(videoMeta.getSdImageUrl());
+//            thumbnail = true;
+//        }
+//
+//        if (thumbnail) LoadThumbnail();
+//
+//        int maxbit = Integer.MIN_VALUE;
+//        length = (int) videoMeta.getVideoLength();
+//
+//        if (retrieveDialog != null && retrieveDialog.isShowing()) retrieveDialog.dismiss();
+//
+//        RefreshTimeRange();
+//
+//        if (data == null) return;
+//        for (YouTubeExtractor.YtFile datum : data)
+//            maxbit = Math.max(datum.getFormat().getAudioBitrate(), maxbit);
+//
+//    }
 
     private void UseGuesserMode() {
         switch (Preferences.getGuesser_mode()) {
@@ -410,12 +250,15 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 break;
             case PREDICT:
                 String[] result = extractTitleAndArtist(query.getTitle(), query.getArtist());
-                Title.setText(result[0]);
-                Artist.setText(result[1]);
+                if (result != null) {
+                    Title.setText(result[0]);
+                    Artist.setText(result[1]);
+                }
                 break;
         }
     }
 
+    // Create download object
     public Download CreateDownload() {
         if (query == null || query.getYoutubeID() == null) return null;
 
@@ -471,14 +314,11 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 query,
                 bitrate,
                 format,
-                sparseArray,
-                start,
-                end != null && end == Math.floor(length) ? null : end,
-                Normalize.isChecked(),
-                length
+                Normalize.isChecked()
         );
     }
 
+    // Validate fields
     private void Download() {
         Download args = CreateDownload();
         if (args == null) {
@@ -510,6 +350,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         }
     }
 
+    // Check if the download is already running
     private void ServiceCheck(Download args) {
         if (service == null) {
             InitDownload(args);
@@ -543,17 +384,16 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         } else InitDownload(args);
     }
 
+    // Send Intent to DownloadService to start the download
     private void InitDownload(Download args) {
-//        if (Commons.downloadReceiver == null) {
-//            Commons.downloadReceiver = new DownloadReceiver(this, true);
-//            LocalBroadcastManager.getInstance(this).registerReceiver(Commons.downloadReceiver, new IntentFilter(DownloadService.TAG));
-//        }
+        // Register DownloadReceiver to enable notifications
         LocalBroadcastManager.getInstance(this).registerReceiver(new DownloadReceiver(this), new IntentFilter(DownloadService.TAG));
 
         Intent service = new Intent(this, DownloadService.class);
         service.putExtra(InternalArgs.DATA, args);
         startService(service);
 
+        // Return to MainActivity
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(InternalArgs.INDEX, 0);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -586,44 +426,6 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 .into(Image);
     }
 
-    private void RefreshTimeRange() {
-        StringBuilder start = new StringBuilder();
-        StringBuilder end = new StringBuilder();
-
-        short sh = this.start == null ? 0 : (short) Math.floor(this.start / 3600f);
-        short sm = this.start == null ? 0 : (short) (Math.floor(this.start / 60f) % 60);
-        short ss = this.start == null ? 0 : (short) (this.start % 60);
-
-        short eh = (short) Math.floor((this.end == null ? length : this.end) / 3600f);
-        short em = (short) (Math.floor((this.end == null ? length : this.end) / 60f) % 60);
-        short es = (short) ((this.end == null ? length : this.end) % 60);
-
-        if (eh > 0) {
-            start.append(sh).append(':');
-            end.append(eh).append(':');
-            if (sm < 10) start.append('0');
-            if (em < 10) end.append('0');
-        }
-
-        start.append(sm).append(':');
-        if (ss < 10) start.append('0');
-        start.append(ss);
-        end.append(em).append(':');
-        if (es < 10) end.append('0');
-        end.append(es);
-        Start.setText(start.toString());
-        End.setText(end.toString());
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putSerializable(loc_sparse, sparseArray);
-        outState.putSerializable(loc_meta, videoMeta);
-        outState.putInt(loc_length, length);
-    }
-
     @Override
     protected void onPause() {
         unbindService(this);
@@ -637,15 +439,6 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     }
 
     @Override
-    protected void onDestroy() {
-        if (retrieveDialog != null) retrieveDialog.dismiss();
-        length = -1;
-        sparseArray = null;
-        videoMeta = null;
-        super.onDestroy();
-    }
-
-    @Override
     public void onServiceConnected(ComponentName name, IBinder binder) {
         service = ((DownloadService.LocalBinder) binder).getService();
     }
@@ -653,27 +446,5 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     @Override
     public void onServiceDisconnected(ComponentName name) {
         service = null;
-    }
-
-    private static class Extractor extends at.huber.youtubeExtractor.YouTubeExtractor {
-        private WeakReference<DownloadActivity> activity;
-
-        private Extractor(DownloadActivity activity) {
-            super(activity);
-            this.activity = new WeakReference<>(activity);
-        }
-
-        @Override
-        protected void onExtractionComplete(SparseArray<YtFile> data, at.huber.youtubeExtractor.VideoMeta videoMeta) {
-            DownloadActivity act = activity.get();
-            if (data == null) {
-                Log.e(TAG, "Retrieved SparseArray is null");
-                if (act != null && act.retrieveDialog != null) act.retrieveDialog.dismiss();
-                return;
-            }
-            YouTubeExtractor.YtFile[] array = new YouTubeExtractor.YtFile[data.size()];
-            for (int i = 0; i < array.length; i++) array[i] = new YouTubeExtractor.YtFile(data.valueAt(i));
-            if (act != null) act.onExtractionComplete(array, new YouTubeExtractor.VideoMeta(videoMeta));
-        }
     }
 }

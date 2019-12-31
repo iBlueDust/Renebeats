@@ -9,16 +9,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
-import com.tonyodev.fetch2.Fetch;
-import com.tonyodev.fetch2.FetchConfiguration;
-import com.tonyodev.fetch2.NetworkType;
 import com.yearzero.renebeats.download.Download;
 import com.yearzero.renebeats.download.DownloadService;
 import com.yearzero.renebeats.download.HistoryLog;
@@ -58,9 +54,8 @@ public class Commons extends Application {
     // ArtistTitleArrangement - AF11_AFAE
 
 //    public static DownloadReceiver downloadReceiver;
-    public static Fetch fetch;
     private static Locale locale = Locale.ENGLISH;
-    private static NetworkType globalNetworkType;
+//    private static NetworkType globalNetworkType;
     public static final float displayThreshold = 480f;
 
     public static boolean LogException(Throwable ex) {
@@ -134,16 +129,16 @@ public class Commons extends Application {
         return name;
     }
 
-    public static void setDownloadNetworkType(boolean mobiledata) {
-        globalNetworkType = mobiledata ? NetworkType.ALL : NetworkType.WIFI_ONLY;
-        Commons.fetch.setGlobalNetworkType(globalNetworkType);
-        // This ^^^^ will override all following downloads
-    }
+//    public static void setDownloadNetworkType(boolean mobiledata) {
+//        globalNetworkType = mobiledata ? NetworkType.ALL : NetworkType.WIFI_ONLY;
+//        Commons.fetch.setGlobalNetworkType(globalNetworkType);
+//        // This ^^^^ will override all following downloads
+//    }
 
-    @Nullable
-    public static NetworkType getDownloadNetworkType() {
-        return globalNetworkType;
-    }
+//    @Nullable
+//    public static NetworkType getDownloadNetworkType() {
+//        return globalNetworkType;
+//    }
 
     @SuppressLint("CommitPrefEdits")
     @Override
@@ -175,10 +170,6 @@ public class Commons extends Application {
         locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? getResources().getConfiguration().getLocales().get(0) : getResources().getConfiguration().locale;
         Preferences.initialize(this);
         Directories.reinitialize(this);
-
-        fetch = Fetch.Impl.getInstance(new FetchConfiguration.Builder(this)
-            .setDownloadConcurrentLimit(Preferences.getConcurrency())
-            .build());
 
         AndroidAudioConverter.load(this, new ILoadCallback() {
             @Override

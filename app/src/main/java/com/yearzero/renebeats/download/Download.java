@@ -7,7 +7,6 @@ import com.yearzero.renebeats.preferences.Preferences;
 import com.yearzero.renebeats.preferences.enums.OverwriteMode;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -24,14 +23,11 @@ public class Download extends Query implements Serializable {
     private final static long serialVersionUID = 0xEA50_C1A5_D010_AD00L;
 
               private short bitrate;
-              private Integer start;
-              private Integer end;
               private boolean indeterminate = true;
               private boolean normalize = false;
               private boolean convert = false;
               private long current;
               private long total;
-              private long size;
               private long id = UUID.randomUUID().getLeastSignificantBits();
               private Exception exception;
               private int downloadId = 0;
@@ -45,7 +41,6 @@ public class Download extends Query implements Serializable {
     @NonNull  private Status status = new Status();
               private Date assigned;
               private Date completeDate;
-              private YouTubeExtractor.YtFile[] sparseArray;
 
     //Note: the field names are linked to Commons.java:112
 
@@ -59,13 +54,9 @@ public class Download extends Query implements Serializable {
         this.status = new Status();
     }
 
-    Download(@NonNull Query query, short bitrate, @NonNull String format, @Nullable YouTubeExtractor.YtFile[] sparseArray, Integer start, Integer end, boolean normalize, long size) {
+    Download(@NonNull Query query, short bitrate, @NonNull String format, boolean normalize) {
         this(query, bitrate, format);
-        this.sparseArray = sparseArray;
-        this.start = start;
-        this.end = end;
         this.normalize = normalize;
-        this.size = size;
     }
 
 //    Download(@NonNull Query query, short bitrate, @NonNull String format, @Nullable SparseArray<YouTubeExtractor.YtFile> sparseArray, Integer start, Integer end, boolean normalize, long size) {
@@ -79,19 +70,6 @@ public class Download extends Query implements Serializable {
 
     String getFilenameWithExt() {
         return getFilename() + '.' + getFormat();
-    }
-
-    void extractFromSparse() {
-        int high_bit = -1;
-
-        for (YouTubeExtractor.YtFile file : sparseArray) {
-            if (file == null || file.getFormat().getAudioBitrate() <= high_bit || high_bit >= bitrate)
-                continue;
-            high_bit = file.getFormat().getAudioBitrate();
-            url = file.getUrl();
-            availableFormat = file.getFormat().getExt();
-            convert = !(format.toLowerCase().equals(file.getFormat().getExt().toLowerCase()) && high_bit == bitrate);
-        }
     }
 
     @Override
@@ -109,16 +87,12 @@ public class Download extends Query implements Serializable {
         result = 37 * result + (int) (completeDate == null ? 0 : complete ^ complete >>> 32);
         result = 37 * result + (down == null ? 0 : down.hashCode());
         result = 37 * result + downloadId;
-        result = 37 * result + (end == null ? 0 : end + 1);
         result = 37 * result + (exception == null ? 0 : exception.hashCode());
         result = 37 * result + format.hashCode();
         result = 37 * result + (int) (id ^ id >>> 32);
         result = 37 * result + (indeterminate ? 0 : 1);
         result = 37 * result + (mtdt == null ? 0 : mtdt.hashCode());
         result = 37 * result + (normalize ? 0 : 1);
-        result = 37 * result + (int) (size ^ size >>> 32);
-        result = 37 * result + (sparseArray == null ? 0 : Arrays.hashCode(sparseArray));
-        result = 37 * result + (start == null ? 0 : start + 1);
         result = 37 * result + status.pack();
         result = 37 * result + (int) (total ^ total >>> 32);
         result = 37 * result + (url == null ? 0 : url.hashCode());

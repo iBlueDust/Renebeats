@@ -1,5 +1,6 @@
 package com.yearzero.renebeats.download;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.yearzero.renebeats.BuildConfig;
@@ -32,8 +33,6 @@ public class HistoryLog implements Serializable {
     private int year = 0;
     private int downloadId = 0;
     private long id = 0;
-    private Integer start;
-    private Integer end;
     private String album;
     private String artist;
     private String availableFormat;
@@ -76,11 +75,7 @@ public class HistoryLog implements Serializable {
         Download d = new Download(new Query(youtubeID, title, artist, album, year, track, genres),
                 bitrate,
                 format == null ? Preferences.getFormat() : format,
-                new YouTubeExtractor.YtFile[0],
-                this.start,
-                end,
-                normalize,
-                0L
+                normalize
         );
         d.setConvert(convert);
         d.setOverwrite(overwrite);
@@ -103,14 +98,14 @@ public class HistoryLog implements Serializable {
         return d;
     }
 
-    public static HistoryLog generate(Download data) {
+    public static HistoryLog generate(@NonNull Download data) {
         HistoryLog log = cast(data);
         log.version = BuildConfig.VERSION_NAME;
         log.versionCode = BuildConfig.VERSION_CODE;
         return log;
     }
 
-    private static HistoryLog cast(Download data) {
+    private static HistoryLog cast(@NonNull Download data) {
         HistoryLog log = new HistoryLog();
 
         log.convert = data.isConvert();
@@ -124,9 +119,6 @@ public class HistoryLog implements Serializable {
 
         log.downloadId = data.getDownloadId();
         log.id = data.getId();
-
-        log.start = data.getStart();
-        log.end = data.getEnd();
 
         log.album = data.getAlbum();
         log.artist = data.getArtist();
@@ -162,127 +154,4 @@ public class HistoryLog implements Serializable {
         else return false;
     }
 
-        public static long getSerialVersionUID() {
-            return serialVersionUID;
         }
-
-        public String getVersion() {
-            return version;
-        }
-
-        public int getVersionCode() {
-            return versionCode;
-        }
-
-        public boolean isConvert() {
-            return convert;
-        }
-
-        public boolean isNormalize() {
-            return normalize;
-        }
-
-        public boolean isOverwrite() {
-            return overwrite;
-        }
-
-        public short getBitrate() {
-            return bitrate;
-        }
-
-        public int getTrack() {
-            return track;
-        }
-
-        public int getYear() {
-            return year;
-        }
-
-        public int getDownloadId() {
-            return downloadId;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public Integer getStart() {
-            return start;
-        }
-
-        public Integer getEnd() {
-            return end;
-        }
-
-        public String getAlbum() {
-            return album;
-        }
-
-        public String getArtist() {
-            return artist;
-        }
-
-        public String getAvailableFormat() {
-            return availableFormat;
-        }
-
-        public String getConv() {
-            return conv;
-        }
-
-        public String getDown() {
-            return down;
-        }
-
-        public String getFormat() {
-            return format;
-        }
-
-        public String getMtdt() {
-            return mtdt;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public String getYoutubeID() {
-            return youtubeID;
-        }
-
-        public String getGenres() {
-            return genres;
-        }
-
-        public Date getAssigned() {
-            return assigned;
-        }
-
-        public Date getCompleted() {
-            return completed;
-        }
-
-        public String getStatus_download() {
-            return status_download;
-        }
-
-        public String getStatus_convert() {
-            return status_convert;
-        }
-
-        public Boolean getStatus_meta() {
-            return status_meta;
-        }
-
-        public boolean isInvalid() {
-            return invalid;
-        }
-
-        public Exception getException() {
-            return exception;
-        }
-}
