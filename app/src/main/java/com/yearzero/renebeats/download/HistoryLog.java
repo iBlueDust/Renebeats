@@ -1,5 +1,6 @@
 package com.yearzero.renebeats.download;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.yearzero.renebeats.BuildConfig;
@@ -10,12 +11,7 @@ import java.util.Date;
 
 import javax.annotation.ParametersAreNullableByDefault;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-
 @ParametersAreNullableByDefault
-@Getter @Setter(AccessLevel.PACKAGE)
 public class HistoryLog implements Serializable {
     // Appcode (EA50) - "Class" (ClA5) - Class ID (415C_1066)
     private static long serialVersionUID = 0xEA50_C1A5_415C_1066L;
@@ -76,7 +72,7 @@ public class HistoryLog implements Serializable {
         Download d = new Download(new Query(youtubeID, title, artist, album, year, track, genres),
                 bitrate,
                 format == null ? Preferences.getFormat() : format,
-                new YouTubeExtractor.YtFile[0],
+                url,
                 this.start,
                 end,
                 normalize,
@@ -92,7 +88,6 @@ public class HistoryLog implements Serializable {
         d.setConv(conv);
         d.setDown(down);
         d.setMtdt(mtdt);
-        d.setUrl(url);
 
         d.setAssigned(assigned);
         d.setCompleteDate(completed);
@@ -103,14 +98,14 @@ public class HistoryLog implements Serializable {
         return d;
     }
 
-    public static HistoryLog generate(Download data) {
+    public static HistoryLog generate(@NonNull Download data) {
         HistoryLog log = cast(data);
         log.version = BuildConfig.VERSION_NAME;
         log.versionCode = BuildConfig.VERSION_CODE;
         return log;
     }
 
-    private static HistoryLog cast(Download data) {
+    private static HistoryLog cast(@NonNull Download data) {
         HistoryLog log = new HistoryLog();
 
         log.convert = data.isConvert();
@@ -162,127 +157,123 @@ public class HistoryLog implements Serializable {
         else return false;
     }
 
-        public static long getSerialVersionUID() {
-            return serialVersionUID;
-        }
+    public String getVersion() {return this.version;}
 
-        public String getVersion() {
-            return version;
-        }
+    public int getVersionCode() {return this.versionCode;}
 
-        public int getVersionCode() {
-            return versionCode;
-        }
+    public boolean isConvert() {return this.convert;}
 
-        public boolean isConvert() {
-            return convert;
-        }
+    public boolean isNormalize() {return this.normalize;}
 
-        public boolean isNormalize() {
-            return normalize;
-        }
+    public boolean isOverwrite() {return this.overwrite;}
 
-        public boolean isOverwrite() {
-            return overwrite;
-        }
+    public short getBitrate() {return this.bitrate;}
 
-        public short getBitrate() {
-            return bitrate;
-        }
+    public int getTrack() {return this.track;}
 
-        public int getTrack() {
-            return track;
-        }
+    public int getYear() {return this.year;}
 
-        public int getYear() {
-            return year;
-        }
+    public int getDownloadId() {return this.downloadId;}
 
-        public int getDownloadId() {
-            return downloadId;
-        }
+    public long getId() {return this.id;}
 
-        public long getId() {
-            return id;
-        }
+    public Integer getStart() {return this.start;}
 
-        public Integer getStart() {
-            return start;
-        }
+    public Integer getEnd() {return this.end;}
 
-        public Integer getEnd() {
-            return end;
-        }
+    public String getAlbum() {return this.album;}
 
-        public String getAlbum() {
-            return album;
-        }
+    public String getArtist() {return this.artist;}
 
-        public String getArtist() {
-            return artist;
-        }
+    public String getAvailableFormat() {return this.availableFormat;}
 
-        public String getAvailableFormat() {
-            return availableFormat;
-        }
+    public String getConv() {return this.conv;}
 
-        public String getConv() {
-            return conv;
-        }
+    public String getDown() {return this.down;}
 
-        public String getDown() {
-            return down;
-        }
+    public String getFormat() {return this.format;}
 
-        public String getFormat() {
-            return format;
-        }
+    public String getMtdt() {return this.mtdt;}
 
-        public String getMtdt() {
-            return mtdt;
-        }
+    public String getTitle() {return this.title;}
 
-        public String getTitle() {
-            return title;
-        }
+    public String getUrl() {return this.url;}
 
-        public String getUrl() {
-            return url;
-        }
+    public String getYoutubeID() {return this.youtubeID;}
 
-        public String getYoutubeID() {
-            return youtubeID;
-        }
+    public String getGenres() {return this.genres;}
 
-        public String getGenres() {
-            return genres;
-        }
+    public Date getAssigned() {return this.assigned;}
 
-        public Date getAssigned() {
-            return assigned;
-        }
+    public Date getCompleted() {return this.completed;}
 
-        public Date getCompleted() {
-            return completed;
-        }
+    public String getStatus_download() {return this.status_download;}
 
-        public String getStatus_download() {
-            return status_download;
-        }
+    public String getStatus_convert() {return this.status_convert;}
 
-        public String getStatus_convert() {
-            return status_convert;
-        }
+    public Boolean getStatus_meta() {return this.status_meta;}
 
-        public Boolean getStatus_meta() {
-            return status_meta;
-        }
+    public boolean isInvalid() {return this.invalid;}
 
-        public boolean isInvalid() {
-            return invalid;
-        }
+    public Exception getException() {return this.exception;}
 
-        public Exception getException() {
-            return exception;
-        }
+    void setVersion(String version) {this.version = version; }
+
+    void setVersionCode(int versionCode) {this.versionCode = versionCode; }
+
+    void setConvert(boolean convert) {this.convert = convert; }
+
+    void setNormalize(boolean normalize) {this.normalize = normalize; }
+
+    void setOverwrite(boolean overwrite) {this.overwrite = overwrite; }
+
+    void setBitrate(short bitrate) {this.bitrate = bitrate; }
+
+    void setTrack(int track) {this.track = track; }
+
+    void setYear(int year) {this.year = year; }
+
+    void setDownloadId(int downloadId) {this.downloadId = downloadId; }
+
+    void setId(long id) {this.id = id; }
+
+    void setStart(Integer start) {this.start = start; }
+
+    void setEnd(Integer end) {this.end = end; }
+
+    void setAlbum(String album) {this.album = album; }
+
+    void setArtist(String artist) {this.artist = artist; }
+
+    void setAvailableFormat(String availableFormat) {this.availableFormat = availableFormat; }
+
+    void setConv(String conv) {this.conv = conv; }
+
+    void setDown(String down) {this.down = down; }
+
+    void setFormat(String format) {this.format = format; }
+
+    void setMtdt(String mtdt) {this.mtdt = mtdt; }
+
+    void setTitle(String title) {this.title = title; }
+
+    void setUrl(String url) {this.url = url; }
+
+    void setYoutubeID(String youtubeID) {this.youtubeID = youtubeID; }
+
+    void setGenres(String genres) {this.genres = genres; }
+
+    void setAssigned(Date assigned) {this.assigned = assigned; }
+
+    void setCompleted(Date completed) {this.completed = completed; }
+
+    void setStatus_download(String status_download) {this.status_download = status_download; }
+
+    void setStatus_convert(String status_convert) {this.status_convert = status_convert; }
+
+    void setStatus_meta(Boolean status_meta) {this.status_meta = status_meta; }
+
+    void setInvalid(boolean invalid) {this.invalid = invalid; }
+
+    void setException(Exception exception) {this.exception = exception; }
 }

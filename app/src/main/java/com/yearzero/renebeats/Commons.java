@@ -19,6 +19,8 @@ import com.squareup.picasso.Picasso;
 import com.tonyodev.fetch2.Fetch;
 import com.tonyodev.fetch2.FetchConfiguration;
 import com.tonyodev.fetch2.NetworkType;
+import com.yausername.youtubedl_android.YoutubeDL;
+import com.yausername.youtubedl_android.YoutubeDLException;
 import com.yearzero.renebeats.download.Download;
 import com.yearzero.renebeats.download.DownloadService;
 import com.yearzero.renebeats.download.HistoryLog;
@@ -175,6 +177,12 @@ public class Commons extends Application {
         locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? getResources().getConfiguration().getLocales().get(0) : getResources().getConfiguration().locale;
         Preferences.initialize(this);
         Directories.reinitialize(this);
+
+        try {
+            YoutubeDL.getInstance().init(this);
+        } catch (YoutubeDLException e) {
+            Log.e(TAG, "Failed to initialize YouTubeDL", e);
+        }
 
         fetch = Fetch.Impl.getInstance(new FetchConfiguration.Builder(this)
             .setDownloadConcurrentLimit(Preferences.getConcurrency())
