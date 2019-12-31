@@ -7,7 +7,6 @@ import com.yearzero.renebeats.preferences.Preferences;
 import com.yearzero.renebeats.preferences.enums.OverwriteMode;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -45,7 +44,6 @@ public class Download extends Query implements Serializable {
     @NonNull  private Status status = new Status();
               private Date assigned;
               private Date completeDate;
-              private YouTubeExtractor.YtFile[] sparseArray;
 
     //Note: the field names are linked to Commons.java:112
 
@@ -59,9 +57,9 @@ public class Download extends Query implements Serializable {
         this.status = new Status();
     }
 
-    Download(@NonNull Query query, short bitrate, @NonNull String format, @Nullable YouTubeExtractor.YtFile[] sparseArray, Integer start, Integer end, boolean normalize, long size) {
+    Download(@NonNull Query query, short bitrate, @NonNull String format, String url, Integer start, Integer end, boolean normalize, long size) {
         this(query, bitrate, format);
-        this.sparseArray = sparseArray;
+        this.url = url;
         this.start = start;
         this.end = end;
         this.normalize = normalize;
@@ -79,19 +77,6 @@ public class Download extends Query implements Serializable {
 
     String getFilenameWithExt() {
         return getFilename() + '.' + getFormat();
-    }
-
-    void extractFromSparse() {
-        int high_bit = -1;
-
-        for (YouTubeExtractor.YtFile file : sparseArray) {
-            if (file == null || file.getFormat().getAudioBitrate() <= high_bit || high_bit >= bitrate)
-                continue;
-            high_bit = file.getFormat().getAudioBitrate();
-            url = file.getUrl();
-            availableFormat = file.getFormat().getExt();
-            convert = !(format.toLowerCase().equals(file.getFormat().getExt().toLowerCase()) && high_bit == bitrate);
-        }
     }
 
     @Override
@@ -117,7 +102,6 @@ public class Download extends Query implements Serializable {
         result = 37 * result + (mtdt == null ? 0 : mtdt.hashCode());
         result = 37 * result + (normalize ? 0 : 1);
         result = 37 * result + (int) (size ^ size >>> 32);
-        result = 37 * result + (sparseArray == null ? 0 : Arrays.hashCode(sparseArray));
         result = 37 * result + (start == null ? 0 : start + 1);
         result = 37 * result + status.pack();
         result = 37 * result + (int) (total ^ total >>> 32);

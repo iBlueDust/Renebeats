@@ -5,10 +5,8 @@ import android.os.CountDownTimer;
 import android.util.Base64;
 import android.util.Log;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.KryoException;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.yearzero.renebeats.Directories;
 import com.yearzero.renebeats.preferences.Preferences;
 
@@ -16,11 +14,14 @@ import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.Writer;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -35,15 +36,15 @@ import javax.annotation.Nonnegative;
 
 public class HistoryRepo {
     private static final String EXTENSION = "hist";
-    private static final Kryo kryo = new Kryo();
+//    private static final Kryo kryo = new Kryo();
     private static final String TAG = "History";
 
-    static {
-        kryo.register(HistoryLog.class, 100);
-        kryo.register(HistoryLog[].class, 101);
-        kryo.register(Date.class, 200);
-        kryo.register(Exception.class, 300);
-    }
+//    static {
+//        kryo.register(HistoryLog.class, 100);
+//        kryo.register(HistoryLog[].class, 101);
+//        kryo.register(Date.class, 200);
+//        kryo.register(Exception.class, 300);
+//    }
 
     static Exception record(HistoryLog log) {
         File file = getSessionFile(log.getAssigned());
@@ -67,9 +68,15 @@ public class HistoryRepo {
 
     private static HistoryLog[] readSession(File file) {
         if (file.exists()) {
-            try (Input input = new Input(new FileInputStream(file))) {
-                return kryo.readObject(input, HistoryLog[].class);
-            } catch (IOException | KryoException e) {
+//            try (Input input = new Input(new FileInputStream(file))) {
+            try (FileReader reader = new FileReader(file)) {
+//                return kryo.readObject(input, HistoryLog[].class);
+
+                BufferedReader bufferedReader = new BufferedReader(reader);
+
+                return new Gson().fromJson(bufferedReader, HistoryLog[].class);
+//                return json;
+            } catch (IOException | JsonParseException e) {
                 e.printStackTrace();
                 Log.e(TAG, "record() - Overwriting History session file");
             }
@@ -82,20 +89,25 @@ public class HistoryRepo {
     }
 
     private static Exception writeSession(File file, HistoryLog... logs) {
-        Output output = null;
+//        Output output = null;
         try {
             if (!file.exists()) {
                 if (!(file.getParentFile().exists() || file.getParentFile().mkdirs())) Log.e(TAG,"record() - Failed to create parent dirs");
                 if (!file.createNewFile()) Log.e(TAG, "record() - Failed to create file");
             }
-            output = new Output(new FileOutputStream(file));
-            kryo.writeObject(output, logs);
-        } catch (IOException | KryoException e) {
+
+            Writer output = new BufferedWriter(new FileWriter(file));
+            output.write(new Gson().toJson(logs));
+            output.close();
+
+//            output = new Output(new FileOutputStream(file));
+//            kryo.writeObject(output, logs);
+        } catch (IOException | JsonParseException e) {
             e.printStackTrace();
             return e;
-        } finally {
+        } /*finally {
             if (output != null) output.close();
-        }
+        }*/
         return null;
     }
 
@@ -207,8 +219,11 @@ public class HistoryRepo {
             ArrayList<HistoryLog> result = new ArrayList<>();
             File[] dirs = Directories.getHISTORY().listFiles((dir, name) -> new File(dir, name).isDirectory() && Pattern.matches("\\d+", name));
             ArrayList<File> files = new ArrayList<>();
-            for (File dir : dirs)
-                files.addAll(Arrays.asList(dir.listFiles((FilenameFilter) new WildcardFileFilter("*." + EXTENSION, IOCase.INSENSITIVE))));
+
+            // This null check is necessary
+            if (dirs != null)
+                for (File dir : dirs)
+                    files.addAll(Arrays.asList(dir.listFiles((FilenameFilter) new WildcardFileFilter("*." + EXTENSION, IOCase.INSENSITIVE))));
 
             Collections.sort(files, (a, b) -> {
                 try {

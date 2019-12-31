@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -32,7 +31,12 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
+import com.yausername.youtubedl_android.YoutubeDL;
+import com.yausername.youtubedl_android.YoutubeDLException;
+import com.yausername.youtubedl_android.mapper.VideoFormat;
+import com.yausername.youtubedl_android.mapper.VideoInfo;
 import com.yearzero.renebeats.Directories;
 import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.R;
@@ -41,10 +45,7 @@ import com.yearzero.renebeats.notification.DownloadReceiver;
 import com.yearzero.renebeats.preferences.Preferences;
 import com.yearzero.renebeats.preferences.enums.OverwriteMode;
 
-import org.apache.commons.text.StringEscapeUtils;
-
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -70,20 +71,14 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     private ImageButton NormalizeHelp;
     private Dialog retrieveDialog;
 
-    private static String loc_sparse = "renebeats/download_activity sparseArray";
-    private static String loc_meta = "renebeats/download_activity videoMeta";
-    private static String loc_length = "renebeats/download_activity length";
-
-    private YouTubeExtractor.YtFile[] sparseArray;
-    private YouTubeExtractor.VideoMeta videoMeta;
-    private int length = -1;
+    private static String loc_info = "renebeats/download_activity thumbnail";
 
     private Query query;
     private Integer start, end;
 
     private DownloadService service;
+    private VideoInfo videoInfo;
 
-//    @SuppressLint({"StaticFieldLeak", "WrongViewCast"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +87,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         if (actionBar != null) actionBar.setDisplayShowTitleEnabled(false);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
+        // Get query from intent and validate it
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) {
             onBackPressed();
@@ -111,6 +107,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             Log.d(TAG, "YTShare Trimmed " + query.getYoutubeID());
         }
 
+        // Initialize UI view fields
         Home = findViewById(R.id.home);
         Download = findViewById(R.id.download);
         Image = findViewById(R.id.image);
@@ -134,6 +131,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         Home.setOnClickListener(v -> onBackPressed());
         Download.setOnClickListener(v -> Download());
 
+        // Initialize UI based on query
         if (query.getThumbnail(Query.ThumbnailQuality.MaxRes) != null) LoadThumbnail();
         if (!query.getTitle().isEmpty()) {
             Display.setText(query.getTitle());
@@ -147,47 +145,19 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             this.end = d.getEnd();
         }
 
-        Object a, b;
-        if (savedInstanceState == null) {
-            a = null;
-            b = null;
-        } else {
-            a = savedInstanceState.get(loc_sparse);
-            b = savedInstanceState.get(loc_meta);
-            length = savedInstanceState.getInt(loc_length, length);
+        if (savedInstanceState != null) {
+            try {
+                videoInfo = (VideoInfo) savedInstanceState.get(loc_info);
+            } catch (ClassCastException e) {
+                Log.w(TAG, "VideoInfo couldn't be retrieved from savedInstanceState");
+            }
         }
 
-        if (length >= 0 && a instanceof YouTubeExtractor.YtFile[] && b instanceof YouTubeExtractor.VideoMeta) {
-            sparseArray = (YouTubeExtractor.YtFile[]) a;
-            videoMeta = (YouTubeExtractor.VideoMeta) b;
-            onExtractionComplete(sparseArray, videoMeta);
+        if (videoInfo != null) {
+            onExtractionComplete(videoInfo);
         } else {
-            Extractor yt = new Extractor(this);
-//            yt.setTimeout(Preferences.getTimeout());
-//            yt.extractOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID(), true, false);
-            yt.setParseDashManifest(true);
-            yt.setIncludeWebM(true);
-            yt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID());
-            new CountDownTimer(Preferences.getTimeout(), Preferences.getTimeout()) {
-                @Override
-                public void onTick(long l) {}
-
-                @Override
-                public void onFinish() {
-                    if (yt.getStatus() == AsyncTask.Status.RUNNING) {
-                        yt.cancel(true);
-
-                        if (retrieveDialog != null) retrieveDialog.dismiss();
-                        new AlertDialog.Builder(DownloadActivity.this)
-                                .setTitle("Timeout")
-                                .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
-                                .setPositiveButton("OK", (dialogInterface, i) -> {
-                                    dialogInterface.dismiss();
-                                    onBackPressed();
-                                }).show();
-                    }
-                }
-            }.start();
+            FetchVideoInfo task = new FetchVideoInfo(query.getYoutubeID()).setCallback(this::onExtractionComplete);
+            task.execute();
 
             retrieveDialog = new Dialog(this);
             retrieveDialog.setTitle(getString(R.string.download_retrieve));
@@ -198,9 +168,32 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 onBackPressed();
             });
             retrieveDialog.show();
+
+            new CountDownTimer(Preferences.getTimeout(), Preferences.getTimeout()) {
+                @Override
+                public void onTick(long l) {}
+
+                @Override
+                public void onFinish() {
+                    if (task.getStatus() == AsyncTask.Status.RUNNING) {
+                        if (retrieveDialog != null) retrieveDialog.dismiss();
+
+                        try {
+                            new AlertDialog.Builder(DownloadActivity.this)
+                                    .setTitle("Timeout")
+                                    .setMessage("It has taken longer than expected to retrieve the data. Try again later.")
+                                    .setPositiveButton("OK", (dialogInterface, i) -> {
+                                        dialogInterface.dismiss();
+                                        onBackPressed();
+                                    }).show();
+                        } catch (WindowManager.BadTokenException e) {
+                            Log.w(TAG, "Activity has been closed. Attempted to show timeout dialog.");
+                        }
+                    }
+                }
+            }.start();
         }
 
-//        FormatGroup.setAdapter(new ArrayAdapter<>(DownloadActivity.this, android.R.layout.simple_spinner_dropdown_item, formats));
         String[] farr = getResources().getStringArray(R.array.formats);
         int index = -1;
         for (int i = 0; i < farr.length; i++) {
@@ -231,25 +224,25 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         Genres.setText(query.getGenres());
 
         Start.setOnClickListener(v -> {
-            if (length <= 0) {
+            if (videoInfo.duration <= 0) {
                 Log.e(TAG, "Length is 0");
                 return;
             }
             DurationPicker dialog = new DurationPicker(DownloadActivity.this);
             dialog.setTitle(R.string.download_time_start);
 
-            if (length > 3600)
+            if (videoInfo.duration > 3600)
                 dialog.setEnabled(DurationPicker.Mode.Hour);
-            else if (length > 60)
+            else if (videoInfo.duration > 60)
                 dialog.setEnabled(DurationPicker.Mode.Minute);
             else dialog.setEnabled(DurationPicker.Mode.Second);
 
             dialog.setTime(start == null ? 0 : start);
-            dialog.setMaxTime(length);
+            dialog.setMaxTime(videoInfo.duration);
             dialog.setCallbacks(new DurationPicker.Callbacks() {
                 @Override
                 public String Validate(int time) {
-                    if (time >= (end == null ? length : end))
+                    if (time >= (end == null ? videoInfo.duration : end))
                         return getString(R.string.download_time_start_end);
                     return null;
                 }
@@ -264,7 +257,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         });
 
         End.setOnClickListener(v -> {
-            if (length <= 0) {
+            if (videoInfo.duration <= 0) {
                 Log.e(TAG, "Length is 0");
                 return;
             }
@@ -272,20 +265,20 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             dialog.setTitle(R.string.download_time_end);
             dialog.setTime(end == null ? 0 : end);
 
-            if (length > 3600)
+            if (videoInfo.duration > 3600)
                 dialog.setEnabled(DurationPicker.Mode.Hour);
-            else if (length > 60)
+            else if (videoInfo.duration > 60)
                 dialog.setEnabled(DurationPicker.Mode.Minute);
             else dialog.setEnabled(DurationPicker.Mode.Second);
 
-            dialog.setTime(end == null ? length : end);
-            dialog.setMaxTime(length);
+            dialog.setTime(end == null ? videoInfo.duration : end);
+            dialog.setMaxTime(videoInfo.duration);
             dialog.setCallbacks(new DurationPicker.Callbacks() {
                 @Override
                 public String Validate(int time) {
                     if (start != null && time <= start)
                         return getString(R.string.download_time_end_start);
-                    if (end != null && end > length)
+                    if (end != null && end > videoInfo.duration)
                         return getString(R.string.download_time_end_length);
                     return null;
                 }
@@ -323,60 +316,42 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss()).show());
     }
 
-    public void onExtractionComplete(YouTubeExtractor.YtFile[] data, YouTubeExtractor.VideoMeta videoMeta) {
-        sparseArray = data;
-        this.videoMeta = videoMeta;
+    public void onExtractionComplete(VideoInfo videoInfo) {
+        this.videoInfo = videoInfo;
+        retrieveDialog.dismiss();
 
-        if (videoMeta.getVideoLength() <= 0) {
+        if (videoInfo.duration <= 0) {
             onBackPressed();
             Toast.makeText(DownloadActivity.this, R.string.download_invalid_youtube_id, Toast.LENGTH_LONG).show();
             return;
         }
 
         if (query.getTitle().isEmpty()) {
-            query.setTitle(StringEscapeUtils.unescapeXml(videoMeta.getTitle()));
+            query.setTitle(videoInfo.title);
             Display.setText(query.getTitle());
 
             UseGuesserMode();
         } else if (query.getArtist().isEmpty()) {
-            query.setArtist(videoMeta.getAuthor());
+            query.setArtist(videoInfo.uploader);
             Artist.setText(query.getArtist());
         }
 
-        boolean thumbnail = false;
-        if (query.getThumbMax() == null) {
-            query.setThumbMax(videoMeta.getMaxResImageUrl());
-            thumbnail = true;
-        }
-        if (query.getThumbHigh() == null) {
-            query.setThumbHigh(videoMeta.getHqImageUrl());
-            thumbnail = true;
-        }
-        if (query.getThumbMedium() == null) {
-            query.setThumbMedium(videoMeta.getMqImageUrl());
-            thumbnail = true;
-        }
-        if (query.getThumbDefault() == null) {
-            query.setThumbDefault(videoMeta.getThumbUrl());
-            thumbnail = true;
-        }
-        if (query.getThumbStandard() == null) {
-            query.setThumbStandard(videoMeta.getSdImageUrl());
-            thumbnail = true;
-        }
-
-        if (thumbnail) LoadThumbnail();
+        // Fill missing thumbnails (I don't think this is necessary honestly
+        if (query.getThumbMax() == null) query.setThumbMax(videoInfo.thumbnail);
+        if (query.getThumbHigh() == null) query.setThumbHigh(videoInfo.thumbnail);
+        if (query.getThumbMedium() == null) query.setThumbMedium(videoInfo.thumbnail);
+        if (query.getThumbDefault() == null) query.setThumbDefault(videoInfo.thumbnail);
+        if (query.getThumbStandard() == null) query.setThumbStandard(videoInfo.thumbnail);
+        LoadThumbnail();
 
         int maxbit = Integer.MIN_VALUE;
-        length = (int) videoMeta.getVideoLength();
 
         if (retrieveDialog != null && retrieveDialog.isShowing()) retrieveDialog.dismiss();
 
         RefreshTimeRange();
 
-        if (data == null) return;
-        for (YouTubeExtractor.YtFile datum : data)
-            maxbit = Math.max(datum.getFormat().getAudioBitrate(), maxbit);
+        for (VideoFormat format : videoInfo.formats)
+            maxbit = Math.max(format.abr, maxbit);
 
         int cnt = 0;
         for (int i = 0; i < Preferences.getBITRATES().length && Preferences.getBITRATES()[i] <= maxbit; i++) cnt++;
@@ -464,17 +439,35 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         if (invalid) return null;
 
         String format = ((Chip) findViewById(FormatGroup.getCheckedChipId())).getText().toString().toLowerCase().trim();
+        String url = null;
+        String availableFormat = null;
+        boolean convert = true;
+        // region Extract URL
+            int high_bit = -1;
 
-        return new Download(
+            for (VideoFormat videoFormat : videoInfo.formats) {
+                if (videoFormat == null || videoFormat.abr <= high_bit || high_bit >= bitrate)
+                    continue;
+                high_bit = videoFormat.abr;
+                url = videoFormat.url;
+                availableFormat = videoFormat.ext;
+                convert = !(format.toLowerCase().equals(videoFormat.ext.toLowerCase()) && high_bit == bitrate);
+            }
+            // endregion
+
+        Download download = new Download(
                 query,
                 bitrate,
                 format,
-                sparseArray,
+                url,
                 start,
-                end != null && end == Math.floor(length) ? null : end,
+                end != null && end == Math.floor(videoInfo.duration) ? null : end,
                 Normalize.isChecked(),
-                length
+                videoInfo.duration
         );
+            download.setAvailableFormat(availableFormat);
+            download.setConvert(convert);
+            return download;
     }
 
     private void Download() {
@@ -585,6 +578,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     }
 
     private void RefreshTimeRange() {
+        if (videoInfo == null) return;
         StringBuilder start = new StringBuilder();
         StringBuilder end = new StringBuilder();
 
@@ -592,9 +586,9 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         short sm = this.start == null ? 0 : (short) (Math.floor(this.start / 60f) % 60);
         short ss = this.start == null ? 0 : (short) (this.start % 60);
 
-        short eh = (short) Math.floor((this.end == null ? length : this.end) / 3600f);
-        short em = (short) (Math.floor((this.end == null ? length : this.end) / 60f) % 60);
-        short es = (short) ((this.end == null ? length : this.end) % 60);
+        short eh = (short) Math.floor((this.end == null ? videoInfo.duration : this.end) / 3600f);
+        short em = (short) (Math.floor((this.end == null ? videoInfo.duration : this.end) / 60f) % 60);
+        short es = (short) ((this.end == null ? videoInfo.duration : this.end) % 60);
 
         if (eh > 0) {
             start.append(sh).append(':');
@@ -616,10 +610,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        outState.putSerializable(loc_sparse, sparseArray);
-        outState.putSerializable(loc_meta, videoMeta);
-        outState.putInt(loc_length, length);
+        outState.putString(loc_info, new Gson().toJson(videoInfo));
     }
 
     @Override
@@ -630,16 +621,14 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
     @Override
     protected void onResume() {
-        super.onResume();
         bindService(new Intent(this, DownloadService.class), this, 0);
+        super.onResume();
     }
 
     @Override
     protected void onDestroy() {
         if (retrieveDialog != null) retrieveDialog.dismiss();
-        length = -1;
-        sparseArray = null;
-        videoMeta = null;
+        videoInfo = null;
         super.onDestroy();
     }
 
@@ -653,25 +642,38 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         service = null;
     }
 
-    private static class Extractor extends at.huber.youtubeExtractor.YouTubeExtractor {
-        private WeakReference<DownloadActivity> activity;
+    private static class FetchVideoInfo extends AsyncTask<Void, Void, VideoInfo> {
+        interface Callback {
+            void onExtractionComplete(VideoInfo videoInfo);
+        }
 
-        private Extractor(DownloadActivity activity) {
-            super(activity);
-            this.activity = new WeakReference<>(activity);
+        private Callback callback;
+        private String id;
+
+        FetchVideoInfo(String id) {
+            this.id = id;
+        }
+
+        FetchVideoInfo setCallback(Callback callback) {
+            this.callback = callback;
+            return this;
         }
 
         @Override
-        protected void onExtractionComplete(SparseArray<at.huber.youtubeExtractor.YtFile> data, at.huber.youtubeExtractor.VideoMeta videoMeta) {
-            DownloadActivity act = activity.get();
-            if (data == null) {
-                Log.e(TAG, "Retrieved SparseArray is null");
-                if (act != null && act.retrieveDialog != null) act.retrieveDialog.dismiss();
-                return;
+        protected VideoInfo doInBackground(Void... voids) {
+            try {
+                return YoutubeDL.getInstance().getInfo("https://www.youtube.com/watch?v=" + id);
+            } catch (YoutubeDLException | InterruptedException e) {
+                e.printStackTrace();
             }
-            YouTubeExtractor.YtFile[] array = new YouTubeExtractor.YtFile[data.size()];
-            for (int i = 0; i < array.length; i++) array[i] = new YouTubeExtractor.YtFile(data.valueAt(i));
-            if (act != null) act.onExtractionComplete(array, new YouTubeExtractor.VideoMeta(videoMeta));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(VideoInfo videoInfo) {
+            if (callback != null) callback.onExtractionComplete(videoInfo);
+            super.onPostExecute(videoInfo);
         }
     }
+
 }
