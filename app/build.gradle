@@ -5,56 +5,57 @@ apply plugin: 'kotlin-android-extensions'
 android {
   compileSdkVersion 28
   defaultConfig {
-    applicationId "com.yearzero.renebeats"
-    minSdkVersion 16
-    multiDexEnabled true
-    resConfigs "en"
-    targetSdkVersion 28
-    versionCode 702
-    versionName "alpha0.7.2"
-    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+	applicationId "com.yearzero.renebeats"
+	minSdkVersion 16
+	multiDexEnabled true
+	resConfigs "en"
+	targetSdkVersion 28
+	versionCode 10000
+	versionName "1.0.0"
+	testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-    // CODE | VERSION NAME
-    //    0 | Initial Version
-    //    1 | alpha0.1
-    //    2 | alpha0.2
-    //    3 | alpha0.3
-    //    4 | alpha0.4
-    //    5 | alpha0.5
-    //    6 | alpha0.6
-    //  601 | alpha0.6.1
-    //  700 | alpha0.7.0
-    //  701 | alpha0.7.1
-    //  702 | alpha0.7.2
-    //  703 | alpha0.7.3
+	//    CODE | VERSION NAME
+	//       0 | Initial Version
+	//       1 | alpha0.1
+	//       2 | alpha0.2
+	//       3 | alpha0.3
+	//       4 | alpha0.4
+	//       5 | alpha0.5
+	//       6 | alpha0.6
+	//     601 | alpha0.6.1
+	//     700 | alpha0.7.0
+	//     701 | alpha0.7.1
+	//     702 | alpha0.7.2
+	//     703 | alpha0.7.3
+	  // 10000 | 1.0.0
   }
   buildTypes {
-    release {
-      minifyEnabled true
-      shrinkResources true
+	release {
+	  minifyEnabled true
+	  shrinkResources true
 //      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-    }
+	  proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+	}
 
-    buildTypes.all {
-      buildConfigField 'String', 'YT_API_KEY', YouTubeAPIKey
+	buildTypes.all {
+	  buildConfigField 'String', 'YT_API_KEY', YouTubeAPIKey
 
-      buildConfigField 'String', 'Notif_Downloading', Notif_Downloading
-      buildConfigField 'String', 'Notif_ChannelID', Notif_ChannelID
-      buildConfigField 'Integer', 'Notif_BaseID', Notif_BaseID
+	  buildConfigField 'String', 'Notif_Downloading', Notif_Downloading
+	  buildConfigField 'String', 'Notif_ChannelID', Notif_ChannelID
+	  buildConfigField 'Integer', 'Notif_BaseID', Notif_BaseID
 
-      buildConfigField 'String', 'Dir_Permanent_ChildPath', Dir_Permanent_ChildPath
-      buildConfigField 'String', 'Dir_BIN_ChildPath', Dir_BIN_ChildPath
-      buildConfigField 'String', 'Dir_LOGS_ChildPath', Dir_LOGS_ChildPath
-      buildConfigField 'String', 'Dir_History_ChildPath', Dir_History_ChildPath
-      buildConfigField 'String', 'Dir_Downloads_File', Dir_Downloads_File
-    }
+	  buildConfigField 'String', 'Dir_Permanent_ChildPath', Dir_Permanent_ChildPath
+	  buildConfigField 'String', 'Dir_BIN_ChildPath', Dir_BIN_ChildPath
+	  buildConfigField 'String', 'Dir_LOGS_ChildPath', Dir_LOGS_ChildPath
+	  buildConfigField 'String', 'Dir_History_ChildPath', Dir_History_ChildPath
+	  buildConfigField 'String', 'Dir_Downloads_File', Dir_Downloads_File
+	}
   }
   compileOptions {
 //    sourceCompatibility = '1.8'
 //    targetCompatibility = '1.8'
-      sourceCompatibility JavaVersion.VERSION_1_8
-      targetCompatibility JavaVersion.VERSION_1_8
+	  sourceCompatibility JavaVersion.VERSION_1_8
+	  targetCompatibility JavaVersion.VERSION_1_8
   }
 }
 
@@ -90,10 +91,10 @@ dependencies {
 	implementation 'com.github.yausername.youtubedl-android:library:0.7.0'
 
   implementation('com.google.api-client:google-api-client-android:1.30.7') {
-    exclude group: 'org.apache.httpcomponents'
+	exclude group: 'org.apache.httpcomponents'
   }
   implementation('com.google.apis:google-api-services-youtube:v3-rev99-1.17.0-rc') {
-    exclude group: 'org.apache.httpcomponents'
+	exclude group: 'org.apache.httpcomponents'
   }
 
   testImplementation 'junit:junit:4.12'
@@ -101,6 +102,6 @@ dependencies {
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
   implementation('com.github.evgenyneu:js-evaluator-for-android:v5.0.0') {
-    exclude module: 'appcompat-v7'
+	exclude module: 'appcompat-v7'
   }
 }
