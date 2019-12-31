@@ -143,11 +143,15 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 
         array = it ?: emptyArray()
 
+        // Segment the History logs if it is not empty
         if (it!!.isNotEmpty()) {
             if (service == null) SegmentDataTask(this, adapter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
             else SegmentDataTask(this, adapter, listOf(service!!.queue, service!!.running).flatten()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
         }
-        else Empty.visibility = View.VISIBLE
+        else {
+            Empty.visibility = View.VISIBLE
+            Swipe.isRefreshing = false
+        }
     }
 
     override fun onTimeout() {

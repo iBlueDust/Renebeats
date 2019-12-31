@@ -48,6 +48,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import at.huber.youtubeExtractor.YtFile;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class DownloadActivity extends AppCompatActivity implements ServiceConnection {
@@ -168,6 +169,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             yt.setParseDashManifest(true);
             yt.setIncludeWebM(true);
             yt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://www.youtube.com/watch?v=" + query.getYoutubeID());
+
             new CountDownTimer(Preferences.getTimeout(), Preferences.getTimeout()) {
                 @Override
                 public void onTick(long l) {}
@@ -662,7 +664,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         }
 
         @Override
-        protected void onExtractionComplete(SparseArray<at.huber.youtubeExtractor.YtFile> data, at.huber.youtubeExtractor.VideoMeta videoMeta) {
+        protected void onExtractionComplete(SparseArray<YtFile> data, at.huber.youtubeExtractor.VideoMeta videoMeta) {
             DownloadActivity act = activity.get();
             if (data == null) {
                 Log.e(TAG, "Retrieved SparseArray is null");
