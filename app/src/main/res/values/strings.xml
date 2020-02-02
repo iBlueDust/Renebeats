@@ -20,14 +20,6 @@
     <string name="available_format">Available Format</string>
     <string name="back">Back</string>
     <string name="bitrate">Bitrate</string>
-    <string-array name="bitrates">
-        <item>64</item>
-        <item>96</item>
-        <item>128</item>
-        <item>192</item>
-        <item>256</item>
-        <item>320</item>
-    </string-array>
     <string name="cancel">Cancel</string>
     <string name="cancelled">Cancelled</string>
     <string name="clear_all">Clear All</string>
@@ -104,8 +96,8 @@
     <string name="failed">Failed</string>
     <string name="fals">False</string>
     <string-array name="file_name">
-        <item>[Artist] - [Title]</item>
-        <item>[Title] - [Artist]</item>
+        <item>Artist then Title</item>
+        <item>Title then Artist</item>
     </string-array>
     <string-array name="file_name_entries">
         <item>artist first</item>
@@ -128,15 +120,12 @@
         <item>Use video title as song title</item>
         <item>Just use video title and uploader</item>
         <item>Guess the title and artist from the video title</item>
-        <!--<item>Guess title and artist from title (Title first)</item>-->
-        <!--<item>Guess title and artist from title (Artist first)</item>-->
     </string-array>
     <string-array name="guesser_entries">
         <item>off</item>
+        <item>title</item>
         <item>simple</item>
         <item>predict</item>
-        <!--<item>title first</item>-->
-        <!--<item>artist first</item>-->
     </string-array>
     <string name="history">History</string>
     <string name="history_delete">Delete History Log</string>
@@ -149,7 +138,7 @@
     <string name="history_segment_timeout">Data Segmentation Parsing Timeout</string>
     <string name="history_unhid">Restored %s</string>
     <string name="illegal_argument_exception">IllegalArgumentException</string>
-    <string name="kbps">kbps</string>
+    <string name="kbps">%d kbps</string>
     <string name="last_month">Last Month</string>
     <string name="last_year">Last Year</string>
     <string name="main_empty">No downloads are currently running</string>
@@ -233,7 +222,7 @@
     <string name="pref_dependencies">Libraries</string>
     <string name="pref_general">General</string>
     <string name="pref_general_autolog">AlwaysLogFailed</string>
-    <string name="pref_general_autolog_summary">Error reports will be immediately saved. Long press to view all logs</string>
+    <string name="pref_general_autolog_summary">Error reports will be immediately saved</string>
     <string name="pref_general_autolog_title">Always Log Failed Downloads</string>
     <string name="pref_general_bitrate">DefaultBitrate</string>
     <string name="pref_general_bitrate_title">Bitrate</string>
@@ -251,7 +240,7 @@
     <string name="pref_general_overwrite">DefaultOverwrite</string>
     <string name="pref_general_overwrite_title">Overwrite</string>
     <string name="pref_general_query">QueryAmount</string>
-    <string name="pref_general_query_prefix">The number of videos shown when searching is</string>
+    <string name="pref_general_query_prefix">The number of videos shown when searching is %d</string>
     <string name="pref_general_query_title">Query Amount</string>
     <string name="pref_general_speed">DefaultProcessSpeed</string>
     <string name="pref_general_speed_summary">Processing can be sped up at the cost of quality per file size</string>

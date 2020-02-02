@@ -208,7 +208,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
                 }
                 //endregion
             } catch (ClassCastException e) {
-                Log.e(TAG, "Class cast exception > " + e.getMessage());
+                Log.v(TAG, "Class cast exception > " + e.getMessage());
                 recycler.post(() -> notifyItemChanged(holder.getAdapterPosition(), null));
             }
         }

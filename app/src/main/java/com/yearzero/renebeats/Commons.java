@@ -2,12 +2,16 @@ package com.yearzero.renebeats;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.Context;
+import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Looper;
 import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -40,6 +44,7 @@ import java.util.TimeZone;
 
 import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
 
+@Keep
 public class Commons extends Application {
 
     public static final int PERM_REQUEST = 0x24D1;
@@ -142,6 +147,12 @@ public class Commons extends Application {
         // This ^^^^ will override all following downloads
     }
 
+    public static boolean isWifiConnected(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        return wifiManager.isWifiEnabled() && wifiManager.getConnectionInfo().getNetworkId() != -1;
+    }
+
     @Nullable
     public static NetworkType getDownloadNetworkType() {
         return globalNetworkType;
@@ -179,14 +190,22 @@ public class Commons extends Application {
         Directories.reinitialize(this);
 
         try {
-            YoutubeDL.getInstance().init(this);
+            YoutubeDL instance = YoutubeDL.getInstance();
+            instance.init(this);
+
+            // Auto update YoutubeDL
+            new UpdateYoutubeDLTask().execute(this);
         } catch (YoutubeDLException e) {
             Log.e(TAG, "Failed to initialize YouTubeDL", e);
         }
 
-        fetch = Fetch.Impl.getInstance(new FetchConfiguration.Builder(this)
-            .setDownloadConcurrentLimit(Preferences.getConcurrency())
-            .build());
+        try {
+            fetch = Fetch.Impl.getInstance(new FetchConfiguration.Builder(this)
+                    .setDownloadConcurrentLimit(Preferences.getConcurrency())
+                    .build());
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize Fetch", e);
+        }
 
         AndroidAudioConverter.load(this, new ILoadCallback() {
             @Override
@@ -236,4 +255,18 @@ public class Commons extends Application {
             androidDefaultUEH.uncaughtException(thread, ex);
         }
     };
+
+    private static class UpdateYoutubeDLTask extends AsyncTask<Application, Void, Void> {
+            @Override
+            protected Void doInBackground(Application... applications) {
+                if (applications != null && applications.length > 0 && applications[0] != null) {
+                    try {
+                        YoutubeDL.getInstance().updateYoutubeDL(applications[0]);
+                    } catch (YoutubeDLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+    }
 }

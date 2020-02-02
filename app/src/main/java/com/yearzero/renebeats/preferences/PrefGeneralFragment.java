@@ -126,11 +126,15 @@ public class PrefGeneralFragment extends PreferenceFragment {
         }
         Bitrate.setEntries(en);
         Bitrate.setEntryValues(keys);
-        DefaultListPrefRoutine(Bitrate, String.valueOf(Preferences.getBitrate()), Preferences.getBitrate() + ' ' + getString(R.string.kbps), key -> {
-            Preferences.setFormat(key.toLowerCase());
-            Preferences.save();
+        DefaultListPrefRoutine(Bitrate, String.valueOf(Preferences.getBitrate()), String.format(Commons.getLocale(), getString(R.string.kbps), Preferences.getBitrate()), key -> {
+            try {
+                Preferences.setBitrate(Short.valueOf(key));
+                Preferences.save();
+            } catch(NumberFormatException e) {
+                Log.w(TAG, "Invalid bitrate value");
+            }
 
-            return key.toUpperCase() + ' ' + getString(R.string.kbps);
+            return String.format(Commons.getLocale(), getString(R.string.kbps), Preferences.getBitrate());
         });
 
         String val2 = Preferences.getOverwrite().getValue();
@@ -145,7 +149,7 @@ public class PrefGeneralFragment extends PreferenceFragment {
 //            return entries[index == ArrayUtils.INDEX_NOT_FOUND ? ArrayUtils.indexOf(entryVal, OverwriteMode.getDefault().getValue()) : index];
         });
 
-        CharSequence[] seq = FileFormat.getEntries();
+//        CharSequence[] seq = FileFormat.getEntries();
         CharSequence[] seqV = FileFormat.getEntryValues();
         DefaultListPrefRoutine(FileFormat, (String) seqV[Preferences.getArtist_first() ? 0 : 1], Preferences.getArtist_first() ? getString(R.string.pref_general_first_artist) : getString(R.string.pref_general_first_titl), key -> {
             Preferences.setArtist_first(key.equals("artist first"));
@@ -191,7 +195,7 @@ public class PrefGeneralFragment extends PreferenceFragment {
     }
 
     private void UpdateQueryAmtSummary() {
-        QueryAmount.setSummary(getString(R.string.pref_general_query_prefix) + Preferences.getQuery_amount());
+        QueryAmount.setSummary(String.format(Commons.getLocale(), getString(R.string.pref_general_query_prefix), Preferences.getQuery_amount()));
     }
 
 }

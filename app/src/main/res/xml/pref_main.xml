@@ -26,12 +26,13 @@
 
         <androidx.preference.Preference
             android:key="@string/pref_data_logs"
+            android:icon="@drawable/ic_list_black_24dp"
             android:title="@string/pref_data_logs_title" />
 
         <de.mrapp.android.preference.activity.NavigationPreference
             android:fragment="com.yearzero.renebeats.AboutFragment"
             android:title="@string/pref_about"
-            android:icon="@drawable/ic_info_outline_black_24dp" />
+            android:icon="@drawable/ic_info_black_24dp" />
 
         <de.mrapp.android.preference.activity.NavigationPreference
             android:fragment="com.yearzero.renebeats.DependencyFragment"

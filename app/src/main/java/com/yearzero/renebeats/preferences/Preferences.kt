@@ -5,6 +5,7 @@ import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Build
 import android.text.format.DateFormat
+import androidx.annotation.Keep
 import com.yearzero.renebeats.BuildConfig
 import com.yearzero.renebeats.Directories
 import com.yearzero.renebeats.download.Query
@@ -69,7 +70,9 @@ object Preferences {
         load()
     }
 
-    @JvmStatic fun save() {
+    @Keep
+    @JvmStatic
+    fun save() {
         if (!::SharedPref.isInitialized) return
         val editor = SharedPref.edit()
         editor.putBoolean(loc_always_log_failed, always_log_failed)
@@ -81,7 +84,7 @@ object Preferences {
         editor.putBoolean(loc_mobile_data,       mobiledata)
         editor.putBoolean(loc_normalize,         normalize)
         editor.putString (loc_overwrite,         overwrite.value)
-        editor.putString (loc_process_speed,     overwrite.value)
+        editor.putString (loc_process_speed,     process_speed.value)
         editor.putInt    (loc_query_amount,      query_amount.toInt())
         editor.putBoolean(loc_restore,           restore)
         editor.putInt    (loc_timeout,           timeout)
@@ -99,6 +102,7 @@ object Preferences {
         editor.apply()
     }
 
+    @Keep
     @JvmStatic private fun load() {
         if (!::SharedPref.isInitialized) return
         restore = SharedPref.getBoolean(loc_restore, false)
@@ -113,12 +117,15 @@ object Preferences {
         bitrate           = SharedPref.getInt(loc_bitrate, bitrate.toInt()).toShort()
         concurrency       = SharedPref.getInt(loc_concurrency, concurrency.toInt()).toShort()
         format            = SharedPref.getString(loc_format, format) ?: format
+        guesser_mode      = GuesserMode.fromValue(SharedPref.getString(loc_guesser_mode, null))
         mobiledata        = SharedPref.getBoolean(loc_mobile_data, mobiledata)
         normalize         = SharedPref.getBoolean(loc_normalize, normalize)
         overwrite         = OverwriteMode.fromValue(SharedPref.getString(loc_overwrite, null))
+        process_speed     = ProcessSpeed.fromValue(SharedPref.getString(loc_process_speed, null))
         query_amount      = SharedPref.getInt(loc_query_amount, query_amount.toInt()).toShort()
         timeout           = SharedPref.getInt(loc_timeout, timeout)
 
+        // The editability of these following settings are disabled.
 //        queryImage      = Query.ThumbnailQuality.fromValue(SharedPref.getString(loc_IMG_query, null))
 //        queryImageLarge = Query.ThumbnailQuality.fromValue(SharedPref.getString(loc_IMG_queryLarge, null))
 //        downloadImage   = Query.ThumbnailQuality.fromValue(SharedPref.getString(loc_IMG_download, null))

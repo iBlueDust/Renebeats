@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -93,13 +94,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private static List<SearchResult> queries;
     private static String query;
+
+    // Update UI if the network profile has changed
     private BroadcastReceiver WifiListener = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-            if (!mWifi.isConnected() && !Preferences.getMobiledata() && Commons.getDownloadNetworkType() != NetworkType.ALL) {
+            if (!Commons.isWifiConnected(context) && !Preferences.getMobiledata() && Commons.getDownloadNetworkType() != NetworkType.ALL) {
                 ErrorCard.setVisibility(View.VISIBLE);
                 ErrorImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
                 ErrorTitle.setText(getString(R.string.no_wifi));
@@ -120,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             } else ErrorCard.setVisibility(View.GONE);
 
             queryAdapter.resetList(Collections.nCopies(Preferences.getQuery_amount(), null));
-            new YoutubeQueryTask(MainActivity.this, getPackageName())
+            if (query != null && !query.isEmpty())
+                new YoutubeQueryTask(MainActivity.this, getPackageName())
                     .setTimeout(Preferences.getTimeout())
                     .setSignature(getSignature(getPackageManager(), getPackageName()))
                     .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query);

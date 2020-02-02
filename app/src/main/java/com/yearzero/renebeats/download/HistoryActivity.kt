@@ -11,6 +11,7 @@ import android.util.SparseArray
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -230,7 +231,7 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
             val act = activity.get()
             if (act != null) {
                 act.findViewById<SwipeRefreshLayout>(R.id.swipe)?.isRefreshing = false
-                act.findViewById<View>(R.id.empty)?.visibility = View.GONE
+                act.findViewById<View>(R.id.empty)?.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
             }
             super.onPostExecute(result)
         }
@@ -302,17 +303,18 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 
             // Convert all groups into HistorySections
             val sections = ArrayList<HistorySection>()
-            val context = activity.get()
-            if (context != null) {
-                for (n in 0 until result.size()) {
+            for (n in 0 until result.size()) {
+                val context = activity.get()
+                if (context != null) {
                     result.valueAt(n).logs.sortWith(Comparator { a, b -> b.assigned.compareTo(a.assigned)})
                     sections.add(HistorySection(context, result.valueAt(n)))
                 }
-            } else return null
+            }
             return sections.reversed()
         }
 
         // Packed integer so that if sorted, the corresponding values will also be sorted by the group's collective date
+        @Keep
         private fun getCode(year: Int, month: Int = 0, day: Int = 0): Int = (year shl 9) + (month * 32) + day
     }
 

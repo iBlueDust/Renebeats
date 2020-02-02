@@ -50,7 +50,7 @@
             app:layout_constraintEnd_toStartOf="@+id/action1"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/ic_info_outline_black_24dp"
+            app:srcCompat="@drawable/ic_info_black_24dp"
             tools:ignore="VectorDrawableCompat" />
 
         <ImageButton

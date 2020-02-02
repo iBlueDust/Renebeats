@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -37,6 +39,7 @@ import com.yausername.youtubedl_android.YoutubeDL;
 import com.yausername.youtubedl_android.YoutubeDLException;
 import com.yausername.youtubedl_android.mapper.VideoFormat;
 import com.yausername.youtubedl_android.mapper.VideoInfo;
+import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.Directories;
 import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.R;
@@ -73,11 +76,13 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
     private static String loc_info = "renebeats/download_activity thumbnail";
 
+    private SparseArray<Short> bitrateViewIds = new SparseArray<>();
+
     private Query query;
-    private Integer start, end;
+    private Integer start, end; // Start and end times for trimming in seconds. Null means don't trim the start/end.
 
     private DownloadService service;
-    private VideoInfo videoInfo;
+    private VideoInfo videoInfo; // Video metadata
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,10 +229,15 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         Genres.setText(query.getGenres());
 
         Start.setOnClickListener(v -> {
+            if (videoInfo == null) {
+                Log.e(TAG, "videoInfo is null");
+                return;
+            }
             if (videoInfo.duration <= 0) {
                 Log.e(TAG, "Length is 0");
                 return;
             }
+
             DurationPicker dialog = new DurationPicker(DownloadActivity.this);
             dialog.setTitle(R.string.download_time_start);
 
@@ -257,6 +267,10 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         });
 
         End.setOnClickListener(v -> {
+            if (videoInfo == null) {
+                Log.e(TAG, "videoInfo is null");
+                return;
+            }
             if (videoInfo.duration <= 0) {
                 Log.e(TAG, "Length is 0");
                 return;
@@ -316,9 +330,13 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss()).show());
     }
 
+    //// Callback from extract video metadata from Youtube
     public void onExtractionComplete(VideoInfo videoInfo) {
-        this.videoInfo = videoInfo;
         retrieveDialog.dismiss();
+
+        if (videoInfo == null) return;
+
+        this.videoInfo = videoInfo;
 
         if (videoInfo.duration <= 0) {
             onBackPressed();
@@ -357,23 +375,29 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         for (int i = 0; i < Preferences.getBITRATES().length && Preferences.getBITRATES()[i] <= maxbit; i++) cnt++;
 
         Bitrates = new Chip[cnt];
-        String[] barr = getResources().getStringArray(R.array.bitrates);
-        for (int i = 0; i < barr.length; i++) barr[i] += ' ' + getString(R.string.kbps);
+        int lastChipId = -1;
 
         for (int i = 0; i < cnt; i++) {
+            short bitrate = Preferences.getBITRATES()[i];
+
             Chip chip = new Chip(DownloadActivity.this, null, R.style.Widget_MaterialComponents_Chip_Choice);
-            chip.setText(barr[i]);
+            chip.setText(String.format(Commons.getLocale(), getString(R.string.kbps), bitrate));
             chip.setCheckable(true);
             chip.setChipStrokeColorResource(R.color.Accent);
             chip.setChipStrokeWidth(1f);
             chip.setOnClickListener(v -> ((Chip) v).setChecked(true));
             Bitrates[i] = chip;
             BitrateGroup.addView(chip, i, new ChipGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            // Cache ids
+            bitrateViewIds.append(chip.getId(), bitrate);
+            lastChipId = chip.getId();
         }
-        BitrateGroup.check(Bitrates[Bitrates.length - 1].getId());
+        if (lastChipId != -1) BitrateGroup.check(lastChipId);
 
     }
 
+    //// Set fields to the metadata of the video according to GuesserMode
     private void UseGuesserMode() {
         switch (Preferences.getGuesser_mode()) {
             case TITLE_UPLOADER:
@@ -389,8 +413,9 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         }
     }
 
+    //// Constructs the download object from the UI
     public Download CreateDownload() {
-        if (query == null || query.getYoutubeID() == null) return null;
+        if (query == null || query.getYoutubeID() == null || videoInfo == null) return null;
 
         boolean invalid = false;
 
@@ -401,21 +426,16 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
         if (Artist.getText() != null)
             query.setArtist(Artist.getText().toString());
-        if (!(Album.getText() == null))
+        if (Album.getText() != null)
             query.setAlbum(Album.getText().toString());
 
+
+        // TODO: C'mon fix this
         short bitrate = Preferences.getBitrate();
 
         Chip chip = findViewById(BitrateGroup.getCheckedChipId());
-        if (chip != null) {
-            String s = chip.getText().toString();
-            try {
-                bitrate = Short.parseShort(s.substring(0, s.length() - 5));
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-                invalid = true;
-            }
-        }
+        if (chip != null)
+            bitrate = bitrateViewIds.get(chip.getId(), bitrate);
 
         if (!(Track.getText() == null || Track.getText().toString().trim().isEmpty())) {
             try {
@@ -470,7 +490,9 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             return download;
     }
 
+    //// Main method to start a download
     private void Download() {
+        // Construct the download from CreateDownload() and verify it
         Download args = CreateDownload();
         if (args == null) {
             Snackbar.make(findViewById(R.id.main), R.string.download_invalid, Snackbar.LENGTH_LONG)
@@ -479,8 +501,9 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             return;
         }
         String name = args.getFilenameWithExt();
-        args.setGenres(Genres.getText() == null ? "" : Genres.getText().toString()); //getChipAndTokenValues().toArray(new String[0]);
+        args.setGenres(Genres.getText() == null ? "" : Genres.getText().toString());
 
+        // Handle conflicting file names according to the user's preferences
         if (Preferences.getOverwrite() == OverwriteMode.PROMPT && new File(Directories.getMUSIC(), name).exists()) {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.download_conflict)
@@ -495,18 +518,22 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                         ServiceCheck(args);
                     })
                     .show();
-        } else {
+        } else { // Start the download if preference set to APPEND or OVERWRITE
             args.setOverwrite(false);
             ServiceCheck(args);
         }
     }
 
+    //// Check if the download is already running
     private void ServiceCheck(Download args) {
+        // Start the download if the service is not running
         if (service == null) {
             InitDownload(args);
             bindService(new Intent(this, DownloadService.class), this, 0);
             return;
         }
+
+        // Find the download in running and queueing downloads from service
         String name = args.getFilenameWithExt();
 
         ArrayList<Download> array = new ArrayList<>(service.getQueue());
@@ -520,6 +547,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             }
         }
 
+        // If it's already running, show a dialog
         if (match) {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.download_already)
@@ -531,9 +559,10 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                     .setNeutralButton(R.string.retry, (dialog, which) -> InitDownload(args))
                     .setNegativeButton(R.string.cancel, null)
                     .show();
-        } else InitDownload(args);
+        } else InitDownload(args); // Else, start the download
     }
 
+    //// Send the download to the service
     private void InitDownload(Download args) {
 //        if (Commons.downloadReceiver == null) {
 //            Commons.downloadReceiver = new DownloadReceiver(this, true);
@@ -554,6 +583,8 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     }
 
     // String[] format is [title, artist]
+    // Get the title and artist of a video from its metadata according to GuesserMode.
+    // This is GuesserMode's underlying algorithm
     private String[] extractTitleAndArtist(String title, String uploader) {
         if (title == null) return null;
 
@@ -568,6 +599,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         } else return new String[]{title, uploader == null ? "" : uploader.replace("VEVO", "")};
     }
 
+    // Get that thumbnail ing Picasso
     private void LoadThumbnail() {
         Picasso.get().load(query.getThumbnail(Preferences.getDownloadImage()))
                 .placeholder(R.color.SecondaryDark)
@@ -642,6 +674,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         service = null;
     }
 
+    @Keep
     private static class FetchVideoInfo extends AsyncTask<Void, Void, VideoInfo> {
         interface Callback {
             void onExtractionComplete(VideoInfo videoInfo);
