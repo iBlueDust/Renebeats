@@ -306,6 +306,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toStartOf="@+id/textInputLayout5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
@@ -314,9 +315,9 @@
                 android:id="@+id/year"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:selectAllOnFocus="true"
                 android:hint="@string/year"
                 android:inputType="number"
+                android:selectAllOnFocus="true"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -331,7 +332,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/textInputLayout4"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+            app:layout_constraintTop_toTopOf="@+id/textInputLayout4">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/track"
@@ -368,19 +369,20 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" >
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/genres"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/genres"
-            android:maxLines="3"
-            android:singleLine="false" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/genres"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/genres"
+                android:maxLines="3"
+                android:singleLine="false" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <CheckBox

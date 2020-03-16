@@ -67,7 +67,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
     private TextView Display;
     private Button Start, End, Swap, Youtube;
     private ChipGroup FormatGroup, BitrateGroup;
-    private Chip[] Bitrates, Formats;
+    private Chip[] Formats;
     private TextInputEditText Title, Artist, Album, Track, Year, Genres;
 //    private NachoTextView Genres;
     private CheckBox Normalize;
@@ -162,7 +162,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             onExtractionComplete(videoInfo);
         } else {
             FetchVideoInfo task = new FetchVideoInfo(query.getYoutubeID()).setCallback(this::onExtractionComplete);
-            task.execute();
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
             retrieveDialog = new Dialog(this);
             retrieveDialog.setTitle(getString(R.string.download_retrieve));
@@ -207,7 +207,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
                 break;
             }
         }
-        index = index < 0 ? 0 : index;
+        index = Math.max(0, index);
         Formats = new Chip[farr.length];
 
         for (int i = 0; i < farr.length; i++) {
@@ -374,7 +374,6 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
         int cnt = 0;
         for (int i = 0; i < Preferences.getBITRATES().length && Preferences.getBITRATES()[i] <= maxbit; i++) cnt++;
 
-        Bitrates = new Chip[cnt];
         int lastChipId = -1;
 
         for (int i = 0; i < cnt; i++) {
@@ -386,7 +385,6 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
             chip.setChipStrokeColorResource(R.color.Accent);
             chip.setChipStrokeWidth(1f);
             chip.setOnClickListener(v -> ((Chip) v).setChecked(true));
-            Bitrates[i] = chip;
             BitrateGroup.addView(chip, i, new ChipGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             // Cache ids

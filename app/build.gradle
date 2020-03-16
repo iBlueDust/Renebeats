@@ -10,26 +10,27 @@ android {
 	multiDexEnabled true
 	resConfigs "en"
 	targetSdkVersion 28
-	versionCode 10002
-	versionName "1.0.2"
+	versionCode 10003
+	versionName "1.0.3"
 	testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-	//    CODE | VERSION NAME
-	//       0 | Initial Version
-	//       1 | alpha0.1
-	//       2 | alpha0.2
-	//       3 | alpha0.3
-	//       4 | alpha0.4
-	//       5 | alpha0.5
-	//       6 | alpha0.6
-	//     601 | alpha0.6.1
-	//     700 | alpha0.7.0
-	//     701 | alpha0.7.1
-	//     702 | alpha0.7.2
-	//     703 | alpha0.7.3
+	  //  CODE | VERSION NAME
+	  //     0 | Initial Version
+	  //     1 | alpha0.1
+	  //     2 | alpha0.2
+	  //     3 | alpha0.3
+	  //     4 | alpha0.4
+	  //     5 | alpha0.5
+	  //     6 | alpha0.6
+	  //   601 | alpha0.6.1
+	  //   700 | alpha0.7.0
+	  //   701 | alpha0.7.1
+	  //   702 | alpha0.7.2
+	  //   703 | alpha0.7.3
 	  // 10000 | 1.0.0
 	  // 10001 | 1.0.1 Never properly released
 	  // 10002 | 1.0.2
+	  // 10003 | 1.0.3
   }
   buildTypes {
 	release {
@@ -66,15 +67,16 @@ android {
 //}
 
 dependencies {
-  compileOnly 'org.projectlombok:lombok:1.18.10'
-  annotationProcessor 'org.projectlombok:lombok:1.18.10'
-  implementation fileTree(include: ['*.jar'], dir: 'libs')
-  implementation 'androidx.appcompat:appcompat:1.1.0'
-  implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
-  implementation 'androidx.cardview:cardview:1.0.0'
-  implementation 'androidx.recyclerview:recyclerview:1.1.0'
-  implementation 'com.google.android.material:material:1.0.0'
-  implementation 'com.google.android.gms:play-services-auth:17.0.0'
+	//noinspection AnnotationProcessorOnCompilePath
+	compileOnly 'org.projectlombok:lombok:1.18.10'
+	annotationProcessor 'org.projectlombok:lombok:1.18.10'
+	implementation fileTree(include: ['*.jar'], dir: 'libs')
+	implementation 'androidx.appcompat:appcompat:1.1.0'
+	implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
+	implementation 'androidx.cardview:cardview:1.0.0'
+	implementation 'androidx.recyclerview:recyclerview:1.1.0'
+	implementation 'com.google.android.material:material:1.0.0'
+	implementation 'com.google.android.gms:play-services-auth:17.0.0'
 
 	implementation 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
 	implementation 'com.github.michael-rapp:android-preference-activity:7.0.3'
