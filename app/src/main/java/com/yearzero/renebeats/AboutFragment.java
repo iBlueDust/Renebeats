@@ -11,12 +11,12 @@ import androidx.fragment.app.Fragment;
 
 public class AboutFragment extends Fragment {
 
-    public AboutFragment() {
-    }
+	public AboutFragment() {
+	}
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_about, container, false);
-    }
+	@Override
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_about, container, false);
+	}
 
 }

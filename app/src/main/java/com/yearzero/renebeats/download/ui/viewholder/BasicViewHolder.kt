@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yearzero.renebeats.R
 
 open class BasicViewHolder(private val Main: View) : RecyclerView.ViewHolder(Main) {
-    protected val Title: TextView = Main.findViewById(R.id.title)
+	protected val Title: TextView = Main.findViewById(R.id.title)
 
-    open fun setTitle(text: String) { Title.text = text }
-    open fun getTitle(): CharSequence = Title.text
+	open fun setTitle(text: String) { Title.text = text }
+	open fun getTitle(): CharSequence = Title.text
 
-    open fun setOnClickListener(listener: View.OnClickListener) = Main.setOnClickListener(listener)
-    open fun setOnLongClickListener(listener: View.OnLongClickListener) = Main.setOnLongClickListener(listener)
+	open fun setOnClickListener(listener: View.OnClickListener) = Main.setOnClickListener(listener)
+	open fun setOnLongClickListener(listener: View.OnLongClickListener) = Main.setOnLongClickListener(listener)
 
-    companion object {
-        const val LocalID = 0
-    }
+	companion object {
+		const val LocalID = 0
+	}
 }

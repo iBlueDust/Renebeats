@@ -13,31 +13,31 @@ import com.yearzero.renebeats.errorlog.ErrorLogActivity;
 
 public class PreferenceActivity extends de.mrapp.android.preference.activity.PreferenceActivity {
 
-    private Preference ShowLogs;
+	private Preference ShowLogs;
 
-    @Override
-    protected void onCreateNavigation(@NonNull PreferenceFragmentCompat fragment) {
-        fragment.addPreferencesFromResource(R.xml.pref_main);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-//            actionBar.setTitle();
-        }
-        setToolbarElevation(0);
+	@Override
+	protected void onCreateNavigation(@NonNull PreferenceFragmentCompat fragment) {
+		fragment.addPreferencesFromResource(R.xml.pref_main);
+		ActionBar actionBar = getSupportActionBar();
+		if (actionBar != null) {
+			actionBar.setDisplayHomeAsUpEnabled(true);
+			//            actionBar.setTitle();
+		}
+		setToolbarElevation(0);
 
-        ShowLogs = fragment.findPreference(getString(R.string.pref_data_logs));
-        ShowLogs.setOnPreferenceClickListener(p -> {
-            startActivity(new Intent(PreferenceActivity.this, ErrorLogActivity.class));
-            return true;
-        });
-    }
+		ShowLogs = fragment.findPreference(getString(R.string.pref_data_logs));
+		ShowLogs.setOnPreferenceClickListener(p -> {
+			startActivity(new Intent(PreferenceActivity.this, ErrorLogActivity.class));
+			return true;
+		});
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if(item.getItemId() == android.R.id.home) {
+			onBackPressed();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 }

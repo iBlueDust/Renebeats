@@ -1,166 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
 
-    <!--<androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
-    <!--android:id="@+id/swipe"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--tools:context=".Activities.QueryActivity">-->
+	<!--<androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+	<!--android:id="@+id/swipe"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="match_parent"-->
+	<!--tools:context=".Activities.QueryActivity">-->
 
-    <!--<androidx.recyclerview.widget.RecyclerView-->
-    <!--android:id="@+id/list"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintTop_toTopOf="parent" />-->
+	<!--<androidx.recyclerview.widget.RecyclerView-->
+	<!--android:id="@+id/list"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="wrap_content"-->
+	<!--app:layout_constraintEnd_toEndOf="parent"-->
+	<!--app:layout_constraintStart_toStartOf="parent"-->
+	<!--app:layout_constraintTop_toTopOf="parent" />-->
 
-    <!--</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+	<!--</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
 
-    <ImageButton
-        android:id="@+id/dismiss"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_close_gray_24dp"
-        tools:ignore="VectorDrawableCompat"
-        android:contentDescription="@string/sym_x" />
+	<ImageButton
+		android:id="@+id/dismiss"
+		android:layout_width="36dp"
+		android:layout_height="36dp"
+		android:layout_marginStart="8dp"
+		android:layout_marginLeft="8dp"
+		android:layout_marginTop="8dp"
+		android:background="@android:color/transparent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:srcCompat="@drawable/ic_close_gray_24dp"
+		tools:ignore="VectorDrawableCompat"
+		android:contentDescription="@string/sym_x" />
 
-    <ImageButton
-        android:id="@+id/refresh"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_refresh_gray_24dp"
-        tools:ignore="VectorDrawableCompat"
-        android:contentDescription="@string/refresh" />
+	<ImageButton
+		android:id="@+id/refresh"
+		android:layout_width="36dp"
+		android:layout_height="36dp"
+		android:layout_marginTop="8dp"
+		android:layout_marginEnd="8dp"
+		android:layout_marginRight="8dp"
+		android:background="@android:color/transparent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:srcCompat="@drawable/ic_refresh_gray_24dp"
+		tools:ignore="VectorDrawableCompat"
+		android:contentDescription="@string/refresh" />
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
-        android:textAppearance="@style/Text.Header.Small"
-        android:maxLines="2"
-        android:ellipsize="end"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dismiss" />
+	<TextView
+		android:id="@+id/title"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_marginStart="32dp"
+		android:layout_marginLeft="32dp"
+		android:layout_marginTop="8dp"
+		android:layout_marginEnd="32dp"
+		android:layout_marginRight="32dp"
+		android:textAppearance="@style/Text.Header.Small"
+		android:maxLines="2"
+		android:ellipsize="end"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/dismiss" />
 
-    <!--<androidx.core.widget.NestedScrollView-->
-        <!--android:id="@+id/nest"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="16dp"-->
-        <!--android:layout_marginLeft="16dp"-->
-        <!--android:layout_marginTop="8dp"-->
-        <!--android:layout_marginEnd="16dp"-->
-        <!--android:layout_marginRight="16dp"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/title" >-->
+	<!--<androidx.core.widget.NestedScrollView-->
+	<!--android:id="@+id/nest"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="wrap_content"-->
+	<!--android:layout_marginStart="16dp"-->
+	<!--android:layout_marginLeft="16dp"-->
+	<!--android:layout_marginTop="8dp"-->
+	<!--android:layout_marginEnd="16dp"-->
+	<!--android:layout_marginRight="16dp"-->
+	<!--app:layout_constraintBottom_toBottomOf="parent"-->
+	<!--app:layout_constraintEnd_toEndOf="parent"-->
+	<!--app:layout_constraintStart_toStartOf="parent"-->
+	<!--app:layout_constraintTop_toBottomOf="@+id/title" >-->
 
-    <!--<ProgressBar-->
-        <!--android:id="@+id/loading"-->
-        <!--style="?android:attr/progressBarStyle"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:layout_constraintBottom_toBottomOf="@+id/shimmer"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent" />-->
+	<!--<ProgressBar-->
+	<!--android:id="@+id/loading"-->
+	<!--style="?android:attr/progressBarStyle"-->
+	<!--android:layout_width="wrap_content"-->
+	<!--android:layout_height="wrap_content"-->
+	<!--app:layout_constraintBottom_toBottomOf="@+id/shimmer"-->
+	<!--app:layout_constraintEnd_toEndOf="parent"-->
+	<!--app:layout_constraintStart_toStartOf="parent"-->
+	<!--app:layout_constraintTop_toTopOf="parent" />-->
 
-<!--<com.facebook.shimmer.ShimmerFrameLayout-->
-    <!--android:id="@+id/shimmer"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginTop="8dp"-->
-    <!--app:shimmer_auto_start="false"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/title" >-->
-    <!--<androidx.recyclerview.widget.RecyclerView-->
-        <!--android:id="@+id/query_list"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" />-->
-<!--</com.facebook.shimmer.ShimmerFrameLayout>-->
+	<!--<com.facebook.shimmer.ShimmerFrameLayout-->
+	<!--android:id="@+id/shimmer"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="wrap_content"-->
+	<!--android:layout_marginTop="8dp"-->
+	<!--app:shimmer_auto_start="false"-->
+	<!--app:layout_constraintTop_toBottomOf="@+id/title" >-->
+	<!--<androidx.recyclerview.widget.RecyclerView-->
+	<!--android:id="@+id/query_list"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="match_parent" />-->
+	<!--</com.facebook.shimmer.ShimmerFrameLayout>-->
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/query_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/title"/>
+	<androidx.recyclerview.widget.RecyclerView
+		android:id="@+id/query_list"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="8dp"
+		app:layout_constraintTop_toBottomOf="@id/title"/>
 
-    <ImageView
-        android:id="@+id/offline_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
-        android:contentDescription="@string/no_internet"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/offline_msg"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/ic_no_wifi_black_96dp"
-        tools:ignore="VectorDrawableCompat" />
+	<ImageView
+		android:id="@+id/offline_img"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginStart="16dp"
+		android:layout_marginLeft="16dp"
+		android:layout_marginEnd="16dp"
+		android:layout_marginRight="16dp"
+		android:layout_marginBottom="8dp"
+		android:contentDescription="@string/no_internet"
+		android:visibility="visible"
+		app:layout_constraintBottom_toTopOf="@+id/offline_msg"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:layout_constraintVertical_bias="1.0"
+		app:srcCompat="@drawable/ic_no_wifi_black_96dp"
+		tools:ignore="VectorDrawableCompat" />
 
-    <TextView
-        android:id="@+id/offline_msg"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="128dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
-        android:text="@string/query_empty"
-        android:gravity="center"
-        android:textColor="@color/textGray"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+	<TextView
+		android:id="@+id/offline_msg"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_marginStart="32dp"
+		android:layout_marginLeft="32dp"
+		android:layout_marginTop="128dp"
+		android:layout_marginEnd="32dp"
+		android:layout_marginRight="32dp"
+		android:text="@string/query_empty"
+		android:gravity="center"
+		android:textColor="@color/textGray"
+		android:visibility="visible"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/offline_action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/retry"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/offline_msg"
-        app:layout_constraintVertical_bias="0.0" />
+	<Button
+		android:id="@+id/offline_action"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginStart="16dp"
+		android:layout_marginLeft="16dp"
+		android:layout_marginTop="8dp"
+		android:layout_marginEnd="16dp"
+		android:layout_marginRight="16dp"
+		android:layout_marginBottom="16dp"
+		android:text="@string/retry"
+		android:visibility="visible"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/offline_msg"
+		app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

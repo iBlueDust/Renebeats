@@ -7,12 +7,12 @@ import com.yearzero.renebeats.R
 
 class SuccessViewHolder(itemView: View) : IntermediateViewHolder(itemView) {
 
-    private var Date: TextView = itemView.findViewById(R.id.date)
+	private var Date: TextView = itemView.findViewById(R.id.date)
 
-    fun setDate(date: String) { Date.text = date }
-    fun setRetryListener(listener: View.OnClickListener) = setAction0(listener)
+	fun setDate(date: String) { Date.text = date }
+	fun setRetryListener(listener: View.OnClickListener) = setAction0(listener)
 
-    companion object {
-        const val LocalID = 0x0102
-    }
+	companion object {
+		const val LocalID = 0x0102
+	}
 }

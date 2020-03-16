@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.preference.ListPreference
-        android:key="@string/pref_data_using"
-        android:title="@string/pref_general_using_title" />
-    <!--android:entries="@array/data" />-->
+	<androidx.preference.ListPreference
+		android:key="@string/pref_data_using"
+		android:title="@string/pref_general_using_title" />
+	<!--android:entries="@array/data" />-->
 
-    <androidx.preference.ListPreference
-        android:key="@string/pref_general_speed"
-        android:title="@string/pref_general_speed_title"
-        android:summary="@string/pref_general_speed_summary"
-        android:entries="@array/process_speed"
-        android:entryValues="@array/process_speed_entries" />
+	<androidx.preference.ListPreference
+		android:key="@string/pref_general_speed"
+		android:title="@string/pref_general_speed_title"
+		android:summary="@string/pref_general_speed_summary"
+		android:entries="@array/process_speed"
+		android:entryValues="@array/process_speed_entries" />
 
-    <!--<androidx.preference.ListPreference-->
-        <!--android:key="@string/pref_defaults_concurrent"-->
-        <!--android:title="Concurrent Downloads" />-->
+	<!--<androidx.preference.ListPreference-->
+	<!--android:key="@string/pref_defaults_concurrent"-->
+	<!--android:title="Concurrent Downloads" />-->
 
-    <androidx.preference.CheckBoxPreference
-        android:key="@string/pref_general_autolog"
-        android:title="@string/pref_general_autolog_title"
-        android:checked="false"
-        android:summary="@string/pref_general_autolog_summary" />
+	<androidx.preference.CheckBoxPreference
+		android:key="@string/pref_general_autolog"
+		android:title="@string/pref_general_autolog_title"
+		android:checked="false"
+		android:summary="@string/pref_general_autolog_summary" />
 
-    <androidx.preference.ListPreference
-        android:key="@string/pref_guesser"
-        android:icon="@drawable/ic_prediction_black_24dp"
-        android:title="@string/pref_guesser_title"
-        android:entries="@array/guesser"
-        android:entryValues="@array/guesser_entries"/>
+	<androidx.preference.ListPreference
+		android:key="@string/pref_guesser"
+		android:icon="@drawable/ic_prediction_black_24dp"
+		android:title="@string/pref_guesser_title"
+		android:entries="@array/guesser"
+		android:entryValues="@array/guesser_entries"/>
 
-    <androidx.preference.ListPreference
-        android:key="@string/pref_general_query"
-        android:title="@string/pref_general_query_title"
-        android:entries="@array/query_amount"
-        android:entryValues="@array/query_amount" />
+	<androidx.preference.ListPreference
+		android:key="@string/pref_general_query"
+		android:title="@string/pref_general_query_title"
+		android:entries="@array/query_amount"
+		android:entryValues="@array/query_amount" />
 
-    <androidx.preference.PreferenceCategory
-        android:title="@string/pref_general_cat_defaults" >
+	<androidx.preference.PreferenceCategory
+		android:title="@string/pref_general_cat_defaults" >
 
-        <androidx.preference.ListPreference
-            android:key="@string/pref_general_format"
-            android:title="@string/pref_general_format_title"
-            android:entries="@array/formats"
-            android:entryValues="@array/formats" />
+		<androidx.preference.ListPreference
+			android:key="@string/pref_general_format"
+			android:title="@string/pref_general_format_title"
+			android:entries="@array/formats"
+			android:entryValues="@array/formats" />
 
-        <androidx.preference.ListPreference
-            android:key="@string/pref_general_bitrate"
-            android:title="@string/pref_general_bitrate_title" />
+		<androidx.preference.ListPreference
+			android:key="@string/pref_general_bitrate"
+			android:title="@string/pref_general_bitrate_title" />
 
-        <androidx.preference.ListPreference
-            android:key="@string/pref_general_overwrite"
-            android:title="@string/pref_general_overwrite_title"
-            android:entries="@array/overwrite"
-            android:entryValues="@array/overwrite_entries" />
+		<androidx.preference.ListPreference
+			android:key="@string/pref_general_overwrite"
+			android:title="@string/pref_general_overwrite_title"
+			android:entries="@array/overwrite"
+			android:entryValues="@array/overwrite_entries" />
 
-        <androidx.preference.CheckBoxPreference
-            android:key="@string/pref_general_normalize"
-            android:title="@string/pref_general_normalize_title"
-            android:summary="@string/pref_general_normalize_summary" />
+		<androidx.preference.CheckBoxPreference
+			android:key="@string/pref_general_normalize"
+			android:title="@string/pref_general_normalize_title"
+			android:summary="@string/pref_general_normalize_summary" />
 
-        <androidx.preference.ListPreference
-            android:key="@string/pref_general_first"
-            android:title="@string/pref_general_first_title"
-            android:entries="@array/file_name"
-            android:entryValues="@array/file_name_entries" />
+		<androidx.preference.ListPreference
+			android:key="@string/pref_general_first"
+			android:title="@string/pref_general_first_title"
+			android:entries="@array/file_name"
+			android:entryValues="@array/file_name_entries" />
 
-    </androidx.preference.PreferenceCategory>
+	</androidx.preference.PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

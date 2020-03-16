@@ -28,27 +28,25 @@ import kotlin.collections.ArrayList
 
 class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback, ServiceConnection {
 
-    //TODO: HistoryActivity now works when a download is running (TESTING NEEDED)
+	companion object {
+		@JvmStatic val TAG = "HistoryActivity"
+	}
 
-    companion object {
-        @JvmStatic val TAG = "HistoryActivity"
-    }
+	private lateinit var Title: TextView
+	//    private lateinit var Search: SearchView
+	private lateinit var List: RecyclerView
+	private lateinit var Swipe: SwipeRefreshLayout
+	private lateinit var Empty: TextView
 
-    private lateinit var Title: TextView
-//    private lateinit var Search: SearchView
-    private lateinit var List: RecyclerView
-    private lateinit var Swipe: SwipeRefreshLayout
-    private lateinit var Empty: TextView
+	private var service: DownloadService? = null
 
-    private var service: DownloadService? = null
-
-//    private var task = History.RetrieveNTask()
-    private val adapter = HistoryAdapter(this)
+	//    private var task = History.RetrieveNTask()
+	private val adapter = HistoryAdapter(this)
 //    private val focusSet: TransitionSet = TransitionSet()
 //    private val unfocusSet: TransitionSet = TransitionSet()
 
-    private var array: Array<out HistoryLog> = emptyArray()
-    private var locale: Locale = Locale.ENGLISH
+	private var array: Array<out HistoryLog> = emptyArray()
+	private var locale: Locale = Locale.ENGLISH
 
 //    enum class SectionType { Date , Month, Year }
 
@@ -67,18 +65,18 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 //
 //    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_history)
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setContentView(R.layout.activity_history)
 
-        locale = Preferences.getMainLocale(this)
-        findViewById<ImageButton>(R.id.home).setOnClickListener{ onBackPressed() }
+		locale = Preferences.getMainLocale(this)
+		findViewById<ImageButton>(R.id.home).setOnClickListener{ onBackPressed() }
 
-        Title = findViewById(R.id.title)
+		Title = findViewById(R.id.title)
 //        Search = findViewById(R.id.search)
-        List = findViewById(R.id.list)
-        Swipe = findViewById(R.id.swipe)
-        Empty = findViewById(R.id.empty)
+		List = findViewById(R.id.list)
+		Swipe = findViewById(R.id.swipe)
+		Empty = findViewById(R.id.empty)
 
 //        Search.setOnQueryTextFocusChangeListener { _, hasFocus ->
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && (Title.visibility == View.VISIBLE) == hasFocus) {
@@ -116,49 +114,48 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 //            }
 //        })
 
-        Swipe.setOnRefreshListener(this::refresh)
-        Swipe.setColorSchemeResources(R.color.Accent, R.color.Secondary)
+		Swipe.setOnRefreshListener(this::refresh)
+		Swipe.setColorSchemeResources(R.color.Accent, R.color.Secondary)
 
-        List.layoutManager = LinearLayoutManager(this)
-        List.adapter = adapter
-        ItemTouchHelper(HistorySwipeCallback(this, adapter)).attachToRecyclerView(List)
+		List.layoutManager = LinearLayoutManager(this)
+		List.adapter = adapter
+		ItemTouchHelper(HistorySwipeCallback(this, adapter)).attachToRecyclerView(List)
 
-        refresh()
-    }
+		refresh()
+	}
 
-    private var fetch: HistoryRepo.RetrieveNTask? = null
+	private var fetch: HistoryRepo.RetrieveNTask? = null
 
-    private fun refresh() {
-        if (fetch?.status == AsyncTask.Status.RUNNING)
-            fetch!!.cancel(true)
-        fetch = HistoryRepo.RetrieveNTask().setCallback(this)
-        fetch!!.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, 10)
+	private fun refresh() {
+		if (fetch?.status == AsyncTask.Status.RUNNING)
+			fetch!!.cancel(true)
+		fetch = HistoryRepo.RetrieveNTask().setCallback(this)
+		fetch!!.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, 10)
 
-        Swipe.isRefreshing = true
-    }
+		Swipe.isRefreshing = true
+	}
 
-    override fun onProgress(progress: Int, total: Int) {}
-    override fun onComplete(it: Array<out HistoryLog>?) {
-        Swipe.isRefreshing = true
-        //TODO: Headers and stuff
+	override fun onProgress(progress: Int, total: Int) {}
+	override fun onComplete(it: Array<out HistoryLog>?) {
+		Swipe.isRefreshing = true
 
-        array = it ?: emptyArray()
+		array = it ?: emptyArray()
 
-        // Segment the History logs if it is not empty
-        if (it!!.isNotEmpty()) {
-            if (service == null) SegmentDataTask(this, adapter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
-            else SegmentDataTask(this, adapter, listOf(service!!.queue, service!!.running).flatten()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
-        }
-        else {
-            Empty.visibility = View.VISIBLE
-            Swipe.isRefreshing = false
-        }
-    }
+		// Segment the History logs if it is not empty
+		if (it!!.isNotEmpty()) {
+			if (service == null) SegmentDataTask(this, adapter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
+			else SegmentDataTask(this, adapter, listOf(service!!.queue, service!!.running).flatten()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, *it)
+		}
+		else {
+			Empty.visibility = View.VISIBLE
+			Swipe.isRefreshing = false
+		}
+	}
 
-    override fun onTimeout() {
-        Snackbar.make(Swipe, getString(R.string.history_fetch_timeout), Snackbar.LENGTH_LONG).show()
-        Swipe.isRefreshing = false
-    }
+	override fun onTimeout() {
+		Snackbar.make(Swipe, getString(R.string.history_fetch_timeout), Snackbar.LENGTH_LONG).show()
+		Swipe.isRefreshing = false
+	}
 
 //    override fun onBackPressed() = if (Search.hasFocus())
 //            Search.let {
@@ -167,79 +164,79 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 //            }
 //        else super.onBackPressed()
 
-    override fun onResume() {
-        super.onResume()
-        bindService(Intent(this, DownloadService::class.java), this, 0)
-    }
+	override fun onResume() {
+		super.onResume()
+		bindService(Intent(this, DownloadService::class.java), this, 0)
+	}
 
-    override fun onPause() {
-        unbindService(this)
-        super.onPause()
-    }
+	override fun onPause() {
+		unbindService(this)
+		super.onPause()
+	}
 
-    override fun onDestroy() {
-        if (service != null) application.onTerminate()
-        super.onDestroy()
-    }
+	override fun onDestroy() {
+		if (service != null) application.onTerminate()
+		super.onDestroy()
+	}
 
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        this.service = (service as DownloadService.LocalBinder).service
-        refresh()
-    }
+	override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+		this.service = (service as DownloadService.LocalBinder).service
+		refresh()
+	}
 
-    override fun onServiceDisconnected(name: ComponentName?) {
-        service = null
-    }
+	override fun onServiceDisconnected(name: ComponentName?) {
+		service = null
+	}
 
-    private class SegmentDataTask private constructor(private val activity: WeakReference<HistoryActivity>, private val adapter: HistoryAdapter) :
-            AsyncTask<HistoryLog, Void, List<HistorySection>>() {
-        constructor(activity: HistoryActivity, adapter: HistoryAdapter) : this(WeakReference(activity), adapter)
-        constructor(activity: HistoryActivity, adapter: HistoryAdapter, serviceList: List<Download>) : this(WeakReference(activity), adapter) {
-            this.serviceList = serviceList
-        }
+	private class SegmentDataTask private constructor(private val activity: WeakReference<HistoryActivity>, private val adapter: HistoryAdapter) :
+			AsyncTask<HistoryLog, Void, List<HistorySection>>() {
+		constructor(activity: HistoryActivity, adapter: HistoryAdapter) : this(WeakReference(activity), adapter)
+		constructor(activity: HistoryActivity, adapter: HistoryAdapter, serviceList: List<Download>) : this(WeakReference(activity), adapter) {
+			this.serviceList = serviceList
+		}
 
-        private var serviceList = emptyList<Download>()
+		private var serviceList = emptyList<Download>()
 
 //        companion object {
 //            @JvmStatic val THRESHOLD = 10
 //        }
 
-        override fun onPreExecute() {
-            val act = activity.get()
-            act?.findViewById<SwipeRefreshLayout>(R.id.swipe)?.isRefreshing = false
-            object : CountDownTimer(Preferences.timeout.toLong(), Preferences.timeout.toLong()) {
-                override fun onTick(l: Long) {}
+		override fun onPreExecute() {
+			val act = activity.get()
+			act?.findViewById<SwipeRefreshLayout>(R.id.swipe)?.isRefreshing = false
+			object : CountDownTimer(Preferences.timeout.toLong(), Preferences.timeout.toLong()) {
+				override fun onTick(l: Long) {}
 
-                override fun onFinish() {
-                    if (status == Status.RUNNING) {
-                        cancel()
-                        val swipe = act?.findViewById<SwipeRefreshLayout>(R.id.swipe)
-                        if (swipe != null) {
-                            swipe.isRefreshing = false
-                            Snackbar.make(swipe, act.getString(R.string.history_segment_timeout), Snackbar.LENGTH_LONG).show()
-                        }
-                    }
-                }
-            }.start()
-            super.onPreExecute()
-        }
+				override fun onFinish() {
+					if (status == Status.RUNNING) {
+						cancel()
+						val swipe = act?.findViewById<SwipeRefreshLayout>(R.id.swipe)
+						if (swipe != null) {
+							swipe.isRefreshing = false
+							Snackbar.make(swipe, act.getString(R.string.history_segment_timeout), Snackbar.LENGTH_LONG).show()
+						}
+					}
+				}
+			}.start()
+			super.onPreExecute()
+		}
 
-        override fun onPostExecute(result: List<HistorySection>) {
-            adapter.clearAll()
-            adapter.addSection(*result.toTypedArray())
+		override fun onPostExecute(result: List<HistorySection>) {
+			adapter.clearAll()
+			adapter.addSection(*result.toTypedArray())
 
-            val act = activity.get()
-            if (act != null) {
-                act.findViewById<SwipeRefreshLayout>(R.id.swipe)?.isRefreshing = false
-                act.findViewById<View>(R.id.empty)?.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
-            }
-            super.onPostExecute(result)
-        }
+			val act = activity.get()
+			if (act != null) {
+				act.findViewById<SwipeRefreshLayout>(R.id.swipe)?.isRefreshing = false
+				act.findViewById<View>(R.id.empty)?.visibility = if (result.isEmpty()) View.VISIBLE else View.GONE
+			}
+			super.onPostExecute(result)
+		}
 
-        override fun doInBackground(vararg params: HistoryLog): List<HistorySection>? {
-            val result = SparseArray<Node>()
+		override fun doInBackground(vararg params: HistoryLog): List<HistorySection>? {
+			val result = SparseArray<Node>()
 
-            // Split data into year groups
+			// Split data into year groups
 //            for (log in params) {
 //                val calendar = Calendar.getInstance()
 //                calendar.time = log.date
@@ -284,67 +281,67 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 //                }
 //            }
 
-            // Split to day groups immediately
-            mainLoop@ for (log in params) {
-                for (running in serviceList)
-                    if (running == log)
-                        break@mainLoop
+			// Split to day groups immediately
+			mainLoop@ for (log in params) {
+				for (running in serviceList)
+					if (running == log)
+						break@mainLoop
 
-                val calendar = Calendar.getInstance()
-                calendar.time = log.date
-                val year = calendar.get(Calendar.YEAR)
-                val month = calendar.get(Calendar.MONTH)
-                val date = calendar.get(Calendar.DATE)
-                val yearCode = getCode(year, month, date)
-                val node = result.get(yearCode, null)
-                if (node == null) result.append(yearCode, Node(ArrayList(listOf(log)), /*SectionType.Date,*/ year= year, month= month, date= date))
-                else node.logs.add(log)
-            }
+				val calendar = Calendar.getInstance()
+				calendar.time = log.date
+				val year = calendar.get(Calendar.YEAR)
+				val month = calendar.get(Calendar.MONTH)
+				val date = calendar.get(Calendar.DATE)
+				val yearCode = getCode(year, month, date)
+				val node = result.get(yearCode, null)
+				if (node == null) result.append(yearCode, Node(ArrayList(listOf(log)), /*SectionType.Date,*/ year= year, month= month, date= date))
+				else node.logs.add(log)
+			}
 
-            // Convert all groups into HistorySections
-            val sections = ArrayList<HistorySection>()
-            for (n in 0 until result.size()) {
-                val context = activity.get()
-                if (context != null) {
-                    result.valueAt(n).logs.sortWith(Comparator { a, b -> b.assigned.compareTo(a.assigned)})
-                    sections.add(HistorySection(context, result.valueAt(n)))
-                }
-            }
-            return sections.reversed()
-        }
+			// Convert all groups into HistorySections
+			val sections = ArrayList<HistorySection>()
+			for (n in 0 until result.size()) {
+				val context = activity.get()
+				if (context != null) {
+					result.valueAt(n).logs.sortWith(Comparator { a, b -> b.assigned.compareTo(a.assigned)})
+					sections.add(HistorySection(context, result.valueAt(n)))
+				}
+			}
+			return sections.reversed()
+		}
 
-        // Packed integer so that if sorted, the corresponding values will also be sorted by the group's collective date
-        @Keep
-        private fun getCode(year: Int, month: Int = 0, day: Int = 0): Int = (year shl 9) + (month * 32) + day
-    }
+		// Packed integer so that if sorted, the corresponding values will also be sorted by the group's collective date
+		@Keep
+		private fun getCode(year: Int, month: Int = 0, day: Int = 0): Int = (year shl 9) + (month * 32) + day
+	}
 
-    // Those 'groups'
-    open class Node(val logs: ArrayList<HistoryLog>, /*val type: SectionType = SectionType.Date,*/ val year: Int = 0, val month: Int = 0, val date: Int = 0)
+	// Those 'groups'
+	open class Node(val logs: ArrayList<HistoryLog>, /*val type: SectionType = SectionType.Date,*/ val year: Int = 0, val month: Int = 0, val date: Int = 0)
 
-    internal class HistorySwipeCallback(private val activity: HistoryActivity, private val adapter: HistoryAdapter) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+	internal class HistorySwipeCallback(private val activity: HistoryActivity, private val adapter: HistoryAdapter) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-            return false
-        }
+		override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+			return false
+		}
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            if (viewHolder is BasicViewHolder) {
-                val item = adapter.getItemAt(viewHolder.adapterPosition)
-                HistoryRepo.deleteRecord(item)
-                activity.refresh()
-                val title = if (viewHolder.getTitle().toString().trim { it <= ' ' }.isNotEmpty()) viewHolder.getTitle().toString() else activity.getString(R.string.one_download)
+		override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+			if (viewHolder is BasicViewHolder) {
+				val item = adapter.getItemAt(viewHolder.adapterPosition)
+				HistoryRepo.deleteRecord(item)
+				activity.refresh()
+				val title = if (viewHolder.getTitle().toString().trim { it <= ' ' }.isNotEmpty()) viewHolder.getTitle().toString() else activity.getString(R.string.one_download)
 
-                Snackbar.make(activity.window.decorView.rootView, String.format(Locale.ENGLISH, activity.getString(R.string.history_hid), title), Snackbar.LENGTH_LONG)
-                        .setAction(activity.getString(R.string.undo)) {
-                            HistoryRepo.record(item)
-                            activity.refresh()
-                            Snackbar.make(activity.window.decorView.rootView, String.format(Locale.ENGLISH, activity.getString(R.string.history_unhid), title), Snackbar.LENGTH_LONG).show()
-                        }.show()
-            }
-        }
+				Snackbar.make(activity.window.decorView.rootView, String.format(Locale.ENGLISH, activity.getString(R.string.history_hid), title), Snackbar.LENGTH_LONG)
+						.setAction(activity.getString(R.string.undo)) {
+							HistoryRepo.record(item)
+							activity.refresh()
+							Snackbar.make(activity.window.decorView.rootView, String.format(Locale.ENGLISH, activity.getString(R.string.history_unhid), title), Snackbar.LENGTH_LONG).show()
+						}.show()
+			}
+		}
 
-        override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-            return if (viewHolder.adapterPosition < 0 || adapter.isItemHeader(viewHolder.adapterPosition)) 0 else ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        }
-    }
+		override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+			return if (viewHolder.adapterPosition < 0 || adapter.isItemHeader(viewHolder.adapterPosition)) 0 else ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+		}
+	}
 }

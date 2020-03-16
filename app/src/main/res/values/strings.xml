@@ -1,334 +1,334 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="about_msg">Renebeats was made by Peter Raozen (iBlueDust) under the company name Year Zero.  The project is under no official license and was intended for a limited audience and for private use only. The creator has full rights to the modification, extermination, and publishing of this application.  Development started in 20 September 2018 and is still under alpha or initial development. Only one developer is continuing this project in his spare time.</string>
-    <string name="adapter_download_autolog_failed">Failed to autolog download error</string>
-    <string name="adapter_download_converting">%s converted</string>
-    <string name="adapter_download_downloaded">Download Completed, waiting for conversion</string>
-    <string name="adapter_download_downloading">%s of %s downloaded</string>
-    <string name="adapter_download_elapsed">Took </string>
-    <string name="adapter_download_invalid">Invalid download parameters. Please try again.</string>
-    <string name="adapter_download_metadata">Applying metadata</string>
-    <string name="adapter_download_network">Waiting for download</string>
-    <string name="adapter_download_waiting">Waiting for network</string>
-    <string name="adapter_history_autolog_failed">Failed to autolog download error</string>
-    <string name="album">Album</string>
-    <string name="app_icon">App Icon</string>
-    <string name="app_name">Renebeats</string>
-    <string name="append_suffix">Append Suffix</string>
-    <string name="artist">Artist</string>
-    <string name="assigned_at">Assigned at</string>
-    <string name="available_format">Available Format</string>
-    <string name="back">Back</string>
-    <string name="bitrate">Bitrate</string>
-    <string name="cancel">Cancel</string>
-    <string name="cancelled">Cancelled</string>
-    <string name="clear_all">Clear All</string>
-    <string name="clipboard_copy">Copied to clipboard</string>
-    <string name="close">Close</string>
-    <string name="completed">Completed</string>
-    <string name="completed_at">Completed at</string>
-    <string name="conversion">Conversion</string>
-    <string name="copy">Copy</string>
-    <string-array name="data">
-        <item>Wifi Only</item>
-        <item>Wifi and Mobile Data</item>
-    </string-array>
-    <string name="delete">Delete</string>
-    <string-array name="dependencies">
-        <item>AndroidAudioConverter 0.0.8 by Adriel "adrielcafe" Café on GitHub (was modified to add normalize and preset functionality)</item>
-        <!--<item>Android-DirectoryChooser 3.2 by Pascal‏‏ Harti‏g on GitHub</item>-->
-        <item>AndroidPreferenceActivity 7.0.3 by Michael "michael-rapp" Rapp on GitHub</item>
-        <item>Android Sliding Up Panel 3.4.0 by Umano on GitHub</item>
-        /<item>CircleImageView 3.0.1 by Henning "hdodenhof" Dodenhof on GitHub</item>
-        <item>Commons Text 1.6 by Apache Software Foundation</item>
-        <item>Commons IO 1.3.2 by Apache Software Foundation</item>
-        /<item>EasyPermissions 0.3.0 by Google Samples on GitHub</item>
-        <item>Fetch2 3.1.1 by Tonyo Francis on GitHub</item>
-        <item>Gson 2.8.6 by Google</item>
-        <!--<item>InfiniteScroll 0.0.2 by Piotr \"pwittchen\" Wittchen on GitHub</item>-->
-<!--        <item>Kryo 5.0.0-RC1 by Esoteric Software on GitHub</item>-->
-        <!--<item>MaterialSearchView 1.4.0 by Miguel Catalan Bañuls on GitHub</item>-->
-        <item>MyID3 for Android</item>
-        <!--<item>Nachos 1.1.1 by Hootsuite on GitHub</item>-->
-        <item>PanView 0.1.0 by Tyler Filla on GitHub</item>
-        /<item>Picasso 2.71828 by Square on GitHub</item>
-        /<item>picasso-transformations 2.2.1 by Daichi "wasabeef" Furiya on GitHub</item>
-        <item>Shimmer 0.5.0 by Facebook on GitHub</item>
-        <item>Storage Chooser 2.0.4.4 by Ashish "codekidX" Shekar on GitHub</item>
-        <item>youtubedl-android 0.7.0 by yausername on GitHub</item>
-        <!--<item>Transitions Everywhere by Andrey "andkulikulov" Kulikulov on GitHub</item>-->
-    </string-array>
-    <string name="dependencies_title">Libraries Used</string>
-    <string name="dialog_download_url">Tap to Reveal</string>
-    <string name="dialog_duration">Pick a Time</string>
-    <string name="dialog_errorlog_exception_unknown">Unknown exception</string>
-    <string name="dialog_errorlog_save">Successfully logged error</string>
-    <string name="dialog_errorlog_save_failed">Failed to save log</string>
-    <string name="dialog_retrieving_msg">Please wait, video parameters are being retrieved.</string>
-    <string name="download">Download</string>
-    <string name="download_already">Already Running</string>
-    <string name="download_already_msg">Another instance of this download is already running</string>
-    <string name="download_already_positive">Cancel and Run This One</string>
-    <string name="download_conflict">Conflicting File Names</string>
-    <string name="download_conflict_msg">There is already a file called %s in the Music folder. A suffix such as \'(1)\' can be appended to the file name to avoid conflicts.</string>
-    <string name="download_id">Download ID</string>
-    <string name="download_invalid">Invalid Download Arguments</string>
-    <string name="download_invalid_title">There must be a title</string>
-    <string name="download_invalid_track">Invalid Track Number</string>
-    <string name="download_invalid_year">Invalid Year Number</string>
-    <string name="download_invalid_youtube_id">Invalid video ID</string>
-    <string name="download_normalize_msg">Some audio/videos may have a quieter audio than other audios. This is because sometimes an audio/video file does not use the full volume range available and thus resulting in its audio being very quiet. Normalization will increase the audio\'s volume in such that it will utilize the whole available volume range though it may take more time.</string>
-    <string name="download_retrieve">Retrieving…</string>
-    <string name="download_start">Download started</string>
-    <string name="download_time_end">Set an end time</string>
-    <string name="download_time_end_length">End time cannot exceed the video\'s size</string>
-    <string name="download_time_end_start">End time cannot be equal or be less than the start time</string>
-    <string name="download_time_start">Set a start time</string>
-    <string name="download_time_start_end">Start time cannot be equal or exceed the end time</string>
-    <string name="end">End</string>
-    <string name="error_icon">Error icon</string>
-    <string name="error_logs">Error Logs</string>
-    <string name="error_wifi">No Wifi</string>
-    <string name="error_wifi_action">Resume Anyway</string>
-    <string name="error_wifi_msg">Connect to a wifi network to resume downloads.</string>
-    <string name="errorlog_empty">There are no logs! I feel accomplished :P</string>
-    <string name="exception">Exception</string>
-    <string name="failed">Failed</string>
-    <string name="fals">False</string>
-    <string-array name="file_name">
-        <item>Artist then Title</item>
-        <item>Title then Artist</item>
-    </string-array>
-    <string-array name="file_name_entries">
-        <item>artist first</item>
-        <item>title first</item>
-    </string-array>
-    <string name="final_metadata">Final (MTDT)</string>
-    <string name="format">Format</string>
-    <string-array name="formats">
-        <item>aac</item>
-        <item>flac</item>
-        <item>m4a</item>
-        <item>mp3</item>
-        <item>wav</item>
-        <item>wma</item>
-    </string-array>
-    <string name="genres">Genres</string>
-    <string name="go">Go</string>
-    <string-array name="guesser">
-        <item>Off</item>
-        <item>Use video title as song title</item>
-        <item>Just use video title and uploader</item>
-        <item>Guess the title and artist from the video title</item>
-    </string-array>
-    <string-array name="guesser_entries">
-        <item>off</item>
-        <item>title</item>
-        <item>simple</item>
-        <item>predict</item>
-    </string-array>
-    <string name="history">History</string>
-    <string name="history_delete">Delete History Log</string>
-    <string name="history_delete_msg">History log will be permanently gone once deleted</string>
-    <string name="history_delete_positive">Delete</string>
-    <string name="history_deleted">Deleted \'%s\'</string>
-    <string name="history_empty">Uhh… you haven\'t downloaded anything. Do try :)</string>
-    <string name="history_fetch_timeout">Data Fetch Timeout</string>
-    <string name="history_hid">Deleted %s</string>
-    <string name="history_segment_timeout">Data Segmentation Parsing Timeout</string>
-    <string name="history_unhid">Restored %s</string>
-    <string name="illegal_argument_exception">IllegalArgumentException</string>
-    <string name="kbps">%d kbps</string>
-    <string name="last_month">Last Month</string>
-    <string name="last_year">Last Year</string>
-    <string name="main_empty">No downloads are currently running</string>
-    <string name="main_error_connection_msg">It seems that we can\'t connect to YouTube. Please check your connection and try again later.</string>
-    <string name="main_error_empty">Your search didn\'t come out with any results</string>
-    <string name="main_error_quota">Uh oh! Sorry but it seems like we\'re having problems searching Youtube for you. Please try sharing Youtube videos from the Youtube app to Renebeats for the time being.</string>
-    <string name="main_error_quota_action">Open Youtube</string>
-    <string name="main_error_timeout">Request timed out</string>
-    <string name="main_header_are">s are</string>
-    <string name="main_header_completed">%d download%s completed</string>
-    <string name="main_header_empty">No downloads are currently running</string>
-    <string name="main_header_has"> </string>
-    <string name="main_header_have">s have</string>
-    <string name="main_header_is"> is</string>
-    <string name="main_header_queued">%d download%s queued</string>
-    <string name="main_header_running">%d download%s running</string>
-    <string name="main_header_runningwaiting">%d running, %d waiting for network</string>
-    <string name="main_header_waiting">%d download%s waiting for network</string>
-    <string name="main_search">Search or Paste a URL</string>
-    <string name="master_error">An error has occurred. Logging error…</string>
-    <string name="metadata">Metadata</string>
-    <string name="no_internet">No Internet</string>
-    <string name="no_wifi">No Wifi</string>
-    <string name="normalize">Normalize</string>
-    <string name="notif_desc">All downloads are displayed here</string>
-    <string name="off">Off</string>
-    <string name="ok">OK</string>
-    <string name="on">On</string>
-    <string name="one_download">a download</string>
-    <string name="overwrite">Overwrite</string>
-    <string-array name="overwrite">
-        <item>Ask me every time</item>
-        <item>Append \'(1)\' to file name</item>
-        <item>Overwrite Demon</item>
-    </string-array>
-    <string-array name="overwrite_entries">
-        <item>prompt</item>
-        <item>append</item>
-        <item>overwrite</item>
-    </string-array>
-    <string name="paths">Paths</string>
-    <string name="permission_rationale">This app requires the following permissions. Without them, some functionality will be lost</string>
-    <string name="pref_about">About</string>
-    <string name="pref_cat_misc">Miscellaneous</string>
-    <string name="pref_data"><![CDATA[Data & Storage]]></string>
-    <string name="pref_data_cat_delete">Delete</string>
-    <string name="pref_data_clear_history_summary">Download history will be cleared permanently</string>
-    <string name="pref_data_clearcache">ClearCache</string>
-    <string name="pref_data_clearcache_dialog">Clear Cache</string>
-    <string name="pref_data_clearcache_dialog_msg">Cache can only be cleared if there are no downloads running. Doing so while a download is running will most likely result in failure. Cache is %s</string>
-    <string name="pref_data_clearcache_failed">Failed to clear cache</string>
-    <string name="pref_data_clearcache_success">Cache has been cleared</string>
-    <string name="pref_data_clearcache_summary">No downloads must be performing to clear cache</string>
-    <string name="pref_data_clearcache_title">Clear Cache</string>
-    <string name="pref_data_clearhistory">DeleteHistory</string>
-    <string name="pref_data_clearhistory_dialog">Delete Download History</string>
-    <string name="pref_data_clearhistory_dialog_msg">Download History will be permanently deleted. There is no way to recover the data. History is %s</string>
-    <string name="pref_data_clearhistory_failed">Failed to clear history</string>
-    <string name="pref_data_clearhistory_success">History has been cleared</string>
-    <string name="pref_data_clearhistory_title">Delete History</string>
-    <string name="pref_data_clearlogs">ClearLogs</string>
-    <string name="pref_data_clearlogs_dialog">Clear All Error Logs?</string>
-    <string name="pref_data_clearlogs_dialog_msg">Logs are currently taking up %s</string>
-    <string name="pref_data_clearlogs_failed">Failed to clear logs</string>
-    <string name="pref_data_clearlogs_success">Cleared all logs</string>
-    <string name="pref_data_clearlogs_summary">Clear all error logs</string>
-    <string name="pref_data_clearlogs_title">Clear Logs</string>
-    <string name="pref_data_clearpaused">ClearPaused</string>
-    <string name="pref_data_logs">ShowLogs</string>
-    <string name="pref_data_logs_title">Show All Error Logs</string>
-    <string name="pref_data_output">OutputDirectory</string>
-    <string name="pref_data_output_dialog">All downloads will be saved in…</string>
-    <string name="pref_data_output_success">Output Folder has been changed</string>
-    <string name="pref_data_output_title">Output Location</string>
-    <string name="pref_data_restore">RestoreSettings</string>
-    <string name="pref_data_restore_active">Settings will be restored after the app is restarted. Tap to cancel.</string>
-    <string name="pref_data_restore_inactive">All preferences will be reverted to their initial state</string>
-    <string name="pref_data_restore_summary">All preferences will be reverted to their initial state</string>
-    <string name="pref_data_restore_title">Restore All Preferences</string>
-    <string name="pref_data_using">DownloadUsing</string>
-    <string name="pref_dependencies">Libraries</string>
-    <string name="pref_general">General</string>
-    <string name="pref_general_autolog">AlwaysLogFailed</string>
-    <string name="pref_general_autolog_summary">Error reports will be immediately saved</string>
-    <string name="pref_general_autolog_title">Always Log Failed Downloads</string>
-    <string name="pref_general_bitrate">DefaultBitrate</string>
-    <string name="pref_general_bitrate_title">Bitrate</string>
-    <string name="pref_general_cat_defaults">Defaults</string>
-    <string name="pref_general_concurrent">ConcurrentDownloads</string>
-    <string name="pref_general_first">DefaultFileName</string>
-    <string name="pref_general_first_artist">Artist then Title</string>
-    <string name="pref_general_first_titl">Title then Artist</string>
-    <string name="pref_general_first_title">File Name Format</string>
-    <string name="pref_general_format">DefaultFormat</string>
-    <string name="pref_general_format_title">Format</string>
-    <string name="pref_general_normalize">DefaultNormalize</string>
-    <string name="pref_general_normalize_summary">This helps fix overly quiet audio</string>
-    <string name="pref_general_normalize_title">Normalize</string>
-    <string name="pref_general_overwrite">DefaultOverwrite</string>
-    <string name="pref_general_overwrite_title">Overwrite</string>
-    <string name="pref_general_query">QueryAmount</string>
-    <string name="pref_general_query_prefix">The number of videos shown when searching is %d</string>
-    <string name="pref_general_query_title">Query Amount</string>
-    <string name="pref_general_speed">DefaultProcessSpeed</string>
-    <string name="pref_general_speed_summary">Processing can be sped up at the cost of quality per file size</string>
-    <string name="pref_general_speed_title">Processing Speed Preset</string>
-    <string name="pref_general_using_title">Download using</string>
-    <string name="pref_guesser">GuesserModes</string>
-    <string name="pref_guesser_title">Autofill Options</string>
-    <string name="pref_notification_completed">NotificationCompleted</string>
-    <string name="pref_notification_completed_summary">Show notifications of completed downloads</string>
-    <string name="pref_notification_completed_title">Completed</string>
-    <string name="pref_notification_master">NotificationMaster</string>
-    <string name="pref_notification_master_title">Notifications</string>
-    <string name="pref_notification_queue">NotificationQueue</string>
-    <string name="pref_notification_queue_summary">Show notifications of queued downloads</string>
-    <string name="pref_notification_queue_title">Queue</string>
-    <string name="pref_notification_running">NotificationRunning</string>
-    <string name="pref_notification_running_summary">Show notifications of running downloads</string>
-    <string name="pref_notification_running_title">Running</string>
-    <string name="pref_notifications">Notifications</string>
-    <string-array name="process_speed">
-        <item>Very Slow (Best Quality)</item>
-        <item>Slower</item>
-        <item>Slow</item>
-        <item>Medium (Default)</item>
-        <item>Fast</item>
-        <item>Faster</item>
-        <item>Very Fast</item>
-        <item>Super Fast</item>
-        <item>Ultra Fast (Worst Quality)</item>
-    </string-array>
-    <string-array name="process_speed_entries">
-        <item>veryslow</item>
-        <item>slower</item>
-        <item>slow</item>
-        <item>medium</item>
-        <item>fast</item>
-        <item>faster</item>
-        <item>veryfast</item>
-        <item>superfast</item>
-        <item>ultrafast</item>
-    </string-array>
-    <string name="progress">Progress</string>
-    <string-array name="query_amount">
-        <item>5</item>
-        <item>10</item>
-        <item>15</item>
-        <item>25</item>
-        <item>40</item>
-    </string-array>
-    <string name="query_empty">It seems that we can\'t connect to YouTube. Please check your connection and try again later.</string>
-    <string name="receiver_succeed_prefix">Succeeded after </string>
-    <string name="refresh">Refresh</string>
-    <string name="restore_cancelled">Restore Cancelled</string>
-    <string name="retry">Retry</string>
-    <string name="save">Save</string>
-    <string name="save_log">Save Log</string>
-    <string name="search">Search</string>
-    <string name="settings">Settings</string>
-    <string name="share">Share</string>
-    <string name="start">Start</string>
-    <string name="status">Status</string>
-    <string name="success">Success</string>
-    <string name="super_secret">Super Secret</string>
-    <string name="swap">Swap</string>
-    <string name="sym_down_arrow">&#129139;</string>
-    <string name="sym_empty">-</string>
-    <string name="sym_eq">=</string>
-    <string name="sym_greater"><![CDATA[>]]></string>
-    <string name="sym_hour">h</string>
-    <string name="sym_i">i</string>
-    <string name="sym_minute">m</string>
-    <string name="sym_question">\?</string>
-    <string name="sym_question_mark">\?</string>
-    <string name="sym_seconds">s</string>
-    <string name="sym_separator">-</string>
-    <string name="sym_x">x</string>
-    <string name="this_month">This Month</string>
-    <string name="this_year">This Year</string>
-    <string name="thumbnail">Thumbnail</string>
-    <string name="title">Title</string>
-    <string name="today">Today</string>
-    <string name="track_no">Track #</string>
-    <string name="tru">True</string>
-    <string name="undo">Undo</string>
-    <string name="unknown_exception">Unknown Exception</string>
-    <string name="url">URL</string>
-    <string name="year">Year</string>
-    <string name="yesterday">Yesterday</string>
-    <string name="youtube">YouTube</string>
-    <string name="youtube_id">YouTube ID</string>
+	<string name="about_msg">Renebeats was made by Peter Raozen (iBlueDust) under the company name Year Zero.  The project is under no official license and was intended for a limited audience and for private use only. The creator has full rights to the modification, extermination, and publishing of this application.  Development started in 20 September 2018 and is still under alpha or initial development. Only one developer is continuing this project in his spare time.</string>
+	<string name="adapter_download_autolog_failed">Failed to autolog download error</string>
+	<string name="adapter_download_converting">%s converted</string>
+	<string name="adapter_download_downloaded">Download Completed, waiting for conversion</string>
+	<string name="adapter_download_downloading">%s of %s downloaded</string>
+	<string name="adapter_download_elapsed">Took </string>
+	<string name="adapter_download_invalid">Invalid download parameters. Please try again.</string>
+	<string name="adapter_download_metadata">Applying metadata</string>
+	<string name="adapter_download_network">Waiting for download</string>
+	<string name="adapter_download_waiting">Waiting for network</string>
+	<string name="adapter_history_autolog_failed">Failed to autolog download error</string>
+	<string name="album">Album</string>
+	<string name="app_icon">App Icon</string>
+	<string name="app_name">Renebeats</string>
+	<string name="append_suffix">Append Suffix</string>
+	<string name="artist">Artist</string>
+	<string name="assigned_at">Assigned at</string>
+	<string name="available_format">Available Format</string>
+	<string name="back">Back</string>
+	<string name="bitrate">Bitrate</string>
+	<string name="cancel">Cancel</string>
+	<string name="cancelled">Cancelled</string>
+	<string name="clear_all">Clear All</string>
+	<string name="clipboard_copy">Copied to clipboard</string>
+	<string name="close">Close</string>
+	<string name="completed">Completed</string>
+	<string name="completed_at">Completed at</string>
+	<string name="conversion">Conversion</string>
+	<string name="copy">Copy</string>
+	<string-array name="data">
+		<item>Wifi Only</item>
+		<item>Wifi and Mobile Data</item>
+	</string-array>
+	<string name="delete">Delete</string>
+	<string-array name="dependencies">
+		<item>AndroidAudioConverter 0.0.8 by Adriel "adrielcafe" Café on GitHub (was modified to add normalize and preset functionality)</item>
+		<!--<item>Android-DirectoryChooser 3.2 by Pascal‏‏ Harti‏g on GitHub</item>-->
+		<item>AndroidPreferenceActivity 7.0.3 by Michael "michael-rapp" Rapp on GitHub</item>
+		<item>Android Sliding Up Panel 3.4.0 by Umano on GitHub</item>
+		/<item>CircleImageView 3.0.1 by Henning "hdodenhof" Dodenhof on GitHub</item>
+		<item>Commons Text 1.6 by Apache Software Foundation</item>
+		<item>Commons IO 1.3.2 by Apache Software Foundation</item>
+		/<item>EasyPermissions 0.3.0 by Google Samples on GitHub</item>
+		<item>Fetch2 3.1.1 by Tonyo Francis on GitHub</item>
+		<item>Gson 2.8.6 by Google</item>
+		<!--<item>InfiniteScroll 0.0.2 by Piotr \"pwittchen\" Wittchen on GitHub</item>-->
+		<!--        <item>Kryo 5.0.0-RC1 by Esoteric Software on GitHub</item>-->
+		<!--<item>MaterialSearchView 1.4.0 by Miguel Catalan Bañuls on GitHub</item>-->
+		<item>MyID3 for Android</item>
+		<!--<item>Nachos 1.1.1 by Hootsuite on GitHub</item>-->
+		<item>PanView 0.1.0 by Tyler Filla on GitHub</item>
+		/<item>Picasso 2.71828 by Square on GitHub</item>
+		/<item>picasso-transformations 2.2.1 by Daichi "wasabeef" Furiya on GitHub</item>
+		<item>Shimmer 0.5.0 by Facebook on GitHub</item>
+		<item>Storage Chooser 2.0.4.4 by Ashish "codekidX" Shekar on GitHub</item>
+		<item>youtubedl-android 0.7.0 by yausername on GitHub</item>
+		<!--<item>Transitions Everywhere by Andrey "andkulikulov" Kulikulov on GitHub</item>-->
+	</string-array>
+	<string name="dependencies_title">Libraries Used</string>
+	<string name="dialog_download_url">Tap to Reveal</string>
+	<string name="dialog_duration">Pick a Time</string>
+	<string name="dialog_errorlog_exception_unknown">Unknown exception</string>
+	<string name="dialog_errorlog_save">Successfully logged error</string>
+	<string name="dialog_errorlog_save_failed">Failed to save log</string>
+	<string name="dialog_retrieving_msg">Please wait, video parameters are being retrieved.</string>
+	<string name="download">Download</string>
+	<string name="download_already">Already Running</string>
+	<string name="download_already_msg">Another instance of this download is already running</string>
+	<string name="download_already_positive">Cancel and Run This One</string>
+	<string name="download_conflict">Conflicting File Names</string>
+	<string name="download_conflict_msg">There is already a file called %s in the Music folder. A suffix such as \'(1)\' can be appended to the file name to avoid conflicts.</string>
+	<string name="download_id">Download ID</string>
+	<string name="download_invalid">Invalid Download Arguments</string>
+	<string name="download_invalid_title">There must be a title</string>
+	<string name="download_invalid_track">Invalid Track Number</string>
+	<string name="download_invalid_year">Invalid Year Number</string>
+	<string name="download_invalid_youtube_id">Invalid video ID</string>
+	<string name="download_normalize_msg">Some audio/videos may have a quieter audio than other audios. This is because sometimes an audio/video file does not use the full volume range available and thus resulting in its audio being very quiet. Normalization will increase the audio\'s volume in such that it will utilize the whole available volume range though it may take more time.</string>
+	<string name="download_retrieve">Retrieving…</string>
+	<string name="download_start">Download started</string>
+	<string name="download_time_end">Set an end time</string>
+	<string name="download_time_end_length">End time cannot exceed the video\'s size</string>
+	<string name="download_time_end_start">End time cannot be equal or be less than the start time</string>
+	<string name="download_time_start">Set a start time</string>
+	<string name="download_time_start_end">Start time cannot be equal or exceed the end time</string>
+	<string name="end">End</string>
+	<string name="error_icon">Error icon</string>
+	<string name="error_logs">Error Logs</string>
+	<string name="error_wifi">No Wifi</string>
+	<string name="error_wifi_action">Resume Anyway</string>
+	<string name="error_wifi_msg">Connect to a wifi network to resume downloads.</string>
+	<string name="errorlog_empty">There are no logs! I feel accomplished :P</string>
+	<string name="exception">Exception</string>
+	<string name="failed">Failed</string>
+	<string name="fals">False</string>
+	<string-array name="file_name">
+		<item>Artist then Title</item>
+		<item>Title then Artist</item>
+	</string-array>
+	<string-array name="file_name_entries">
+		<item>artist first</item>
+		<item>title first</item>
+	</string-array>
+	<string name="final_metadata">Final (MTDT)</string>
+	<string name="format">Format</string>
+	<string-array name="formats">
+		<item>aac</item>
+		<item>flac</item>
+		<item>m4a</item>
+		<item>mp3</item>
+		<item>wav</item>
+		<item>wma</item>
+	</string-array>
+	<string name="genres">Genres</string>
+	<string name="go">Go</string>
+	<string-array name="guesser">
+		<item>Off</item>
+		<item>Use video title as song title</item>
+		<item>Just use video title and uploader</item>
+		<item>Guess the title and artist from the video title</item>
+	</string-array>
+	<string-array name="guesser_entries">
+		<item>off</item>
+		<item>title</item>
+		<item>simple</item>
+		<item>predict</item>
+	</string-array>
+	<string name="history">History</string>
+	<string name="history_delete">Delete History Log</string>
+	<string name="history_delete_msg">History log will be permanently gone once deleted</string>
+	<string name="history_delete_positive">Delete</string>
+	<string name="history_deleted">Deleted \'%s\'</string>
+	<string name="history_empty">Uhh… you haven\'t downloaded anything. Do try :)</string>
+	<string name="history_fetch_timeout">Data Fetch Timeout</string>
+	<string name="history_hid">Deleted %s</string>
+	<string name="history_segment_timeout">Data Segmentation Parsing Timeout</string>
+	<string name="history_unhid">Restored %s</string>
+	<string name="illegal_argument_exception">IllegalArgumentException</string>
+	<string name="kbps">%d kbps</string>
+	<string name="last_month">Last Month</string>
+	<string name="last_year">Last Year</string>
+	<string name="main_empty">No downloads are currently running</string>
+	<string name="main_error_connection_msg">It seems that we can\'t connect to YouTube. Please check your connection and try again later.</string>
+	<string name="main_error_empty">Your search didn\'t come out with any results</string>
+	<string name="main_error_quota">Uh oh! Sorry but it seems like we\'re having problems searching Youtube for you. Please try sharing Youtube videos from the Youtube app to Renebeats for the time being.</string>
+	<string name="main_error_quota_action">Open Youtube</string>
+	<string name="main_error_timeout">Request timed out</string>
+	<string name="main_header_are">s are</string>
+	<string name="main_header_completed">%d download%s completed</string>
+	<string name="main_header_empty">No downloads are currently running</string>
+	<string name="main_header_has"> </string>
+	<string name="main_header_have">s have</string>
+	<string name="main_header_is"> is</string>
+	<string name="main_header_queued">%d download%s queued</string>
+	<string name="main_header_running">%d download%s running</string>
+	<string name="main_header_runningwaiting">%d running, %d waiting for network</string>
+	<string name="main_header_waiting">%d download%s waiting for network</string>
+	<string name="main_search">Search or Paste a URL</string>
+	<string name="master_error">An error has occurred. Logging error…</string>
+	<string name="metadata">Metadata</string>
+	<string name="no_internet">No Internet</string>
+	<string name="no_wifi">No Wifi</string>
+	<string name="normalize">Normalize</string>
+	<string name="notif_desc">All downloads are displayed here</string>
+	<string name="off">Off</string>
+	<string name="ok">OK</string>
+	<string name="on">On</string>
+	<string name="one_download">a download</string>
+	<string name="overwrite">Overwrite</string>
+	<string-array name="overwrite">
+		<item>Ask me every time</item>
+		<item>Append \'(1)\' to file name</item>
+		<item>Overwrite Demon</item>
+	</string-array>
+	<string-array name="overwrite_entries">
+		<item>prompt</item>
+		<item>append</item>
+		<item>overwrite</item>
+	</string-array>
+	<string name="paths">Paths</string>
+	<string name="permission_rationale">This app requires the following permissions. Without them, some functionality will be lost</string>
+	<string name="pref_about">About</string>
+	<string name="pref_cat_misc">Miscellaneous</string>
+	<string name="pref_data"><![CDATA[Data & Storage]]></string>
+	<string name="pref_data_cat_delete">Delete</string>
+	<string name="pref_data_clear_history_summary">Download history will be cleared permanently</string>
+	<string name="pref_data_clearcache">ClearCache</string>
+	<string name="pref_data_clearcache_dialog">Clear Cache</string>
+	<string name="pref_data_clearcache_dialog_msg">Cache can only be cleared if there are no downloads running. Doing so while a download is running will most likely result in failure. Cache is %s</string>
+	<string name="pref_data_clearcache_failed">Failed to clear cache</string>
+	<string name="pref_data_clearcache_success">Cache has been cleared</string>
+	<string name="pref_data_clearcache_summary">No downloads must be performing to clear cache</string>
+	<string name="pref_data_clearcache_title">Clear Cache</string>
+	<string name="pref_data_clearhistory">DeleteHistory</string>
+	<string name="pref_data_clearhistory_dialog">Delete Download History</string>
+	<string name="pref_data_clearhistory_dialog_msg">Download History will be permanently deleted. There is no way to recover the data. History is %s</string>
+	<string name="pref_data_clearhistory_failed">Failed to clear history</string>
+	<string name="pref_data_clearhistory_success">History has been cleared</string>
+	<string name="pref_data_clearhistory_title">Delete History</string>
+	<string name="pref_data_clearlogs">ClearLogs</string>
+	<string name="pref_data_clearlogs_dialog">Clear All Error Logs?</string>
+	<string name="pref_data_clearlogs_dialog_msg">Logs are currently taking up %s</string>
+	<string name="pref_data_clearlogs_failed">Failed to clear logs</string>
+	<string name="pref_data_clearlogs_success">Cleared all logs</string>
+	<string name="pref_data_clearlogs_summary">Clear all error logs</string>
+	<string name="pref_data_clearlogs_title">Clear Logs</string>
+	<string name="pref_data_clearpaused">ClearPaused</string>
+	<string name="pref_data_logs">ShowLogs</string>
+	<string name="pref_data_logs_title">Show All Error Logs</string>
+	<string name="pref_data_output">OutputDirectory</string>
+	<string name="pref_data_output_dialog">All downloads will be saved in…</string>
+	<string name="pref_data_output_success">Output Folder has been changed</string>
+	<string name="pref_data_output_title">Output Location</string>
+	<string name="pref_data_restore">RestoreSettings</string>
+	<string name="pref_data_restore_active">Settings will be restored after the app is restarted. Tap to cancel.</string>
+	<string name="pref_data_restore_inactive">All preferences will be reverted to their initial state</string>
+	<string name="pref_data_restore_summary">All preferences will be reverted to their initial state</string>
+	<string name="pref_data_restore_title">Restore All Preferences</string>
+	<string name="pref_data_using">DownloadUsing</string>
+	<string name="pref_dependencies">Libraries</string>
+	<string name="pref_general">General</string>
+	<string name="pref_general_autolog">AlwaysLogFailed</string>
+	<string name="pref_general_autolog_summary">Error reports will be immediately saved</string>
+	<string name="pref_general_autolog_title">Always Log Failed Downloads</string>
+	<string name="pref_general_bitrate">DefaultBitrate</string>
+	<string name="pref_general_bitrate_title">Bitrate</string>
+	<string name="pref_general_cat_defaults">Defaults</string>
+	<string name="pref_general_concurrent">ConcurrentDownloads</string>
+	<string name="pref_general_first">DefaultFileName</string>
+	<string name="pref_general_first_artist">Artist then Title</string>
+	<string name="pref_general_first_titl">Title then Artist</string>
+	<string name="pref_general_first_title">File Name Format</string>
+	<string name="pref_general_format">DefaultFormat</string>
+	<string name="pref_general_format_title">Format</string>
+	<string name="pref_general_normalize">DefaultNormalize</string>
+	<string name="pref_general_normalize_summary">This helps fix overly quiet audio</string>
+	<string name="pref_general_normalize_title">Normalize</string>
+	<string name="pref_general_overwrite">DefaultOverwrite</string>
+	<string name="pref_general_overwrite_title">Overwrite</string>
+	<string name="pref_general_query">QueryAmount</string>
+	<string name="pref_general_query_prefix">The number of videos shown when searching is %d</string>
+	<string name="pref_general_query_title">Query Amount</string>
+	<string name="pref_general_speed">DefaultProcessSpeed</string>
+	<string name="pref_general_speed_summary">Processing can be sped up at the cost of quality per file size</string>
+	<string name="pref_general_speed_title">Processing Speed Preset</string>
+	<string name="pref_general_using_title">Download using</string>
+	<string name="pref_guesser">GuesserModes</string>
+	<string name="pref_guesser_title">Autofill Options</string>
+	<string name="pref_notification_completed">NotificationCompleted</string>
+	<string name="pref_notification_completed_summary">Show notifications of completed downloads</string>
+	<string name="pref_notification_completed_title">Completed</string>
+	<string name="pref_notification_master">NotificationMaster</string>
+	<string name="pref_notification_master_title">Notifications</string>
+	<string name="pref_notification_queue">NotificationQueue</string>
+	<string name="pref_notification_queue_summary">Show notifications of queued downloads</string>
+	<string name="pref_notification_queue_title">Queue</string>
+	<string name="pref_notification_running">NotificationRunning</string>
+	<string name="pref_notification_running_summary">Show notifications of running downloads</string>
+	<string name="pref_notification_running_title">Running</string>
+	<string name="pref_notifications">Notifications</string>
+	<string-array name="process_speed">
+		<item>Very Slow (Best Quality)</item>
+		<item>Slower</item>
+		<item>Slow</item>
+		<item>Medium (Default)</item>
+		<item>Fast</item>
+		<item>Faster</item>
+		<item>Very Fast</item>
+		<item>Super Fast</item>
+		<item>Ultra Fast (Worst Quality)</item>
+	</string-array>
+	<string-array name="process_speed_entries">
+		<item>veryslow</item>
+		<item>slower</item>
+		<item>slow</item>
+		<item>medium</item>
+		<item>fast</item>
+		<item>faster</item>
+		<item>veryfast</item>
+		<item>superfast</item>
+		<item>ultrafast</item>
+	</string-array>
+	<string name="progress">Progress</string>
+	<string-array name="query_amount">
+		<item>5</item>
+		<item>10</item>
+		<item>15</item>
+		<item>25</item>
+		<item>40</item>
+	</string-array>
+	<string name="query_empty">It seems that we can\'t connect to YouTube. Please check your connection and try again later.</string>
+	<string name="receiver_succeed_prefix">Succeeded after </string>
+	<string name="refresh">Refresh</string>
+	<string name="restore_cancelled">Restore Cancelled</string>
+	<string name="retry">Retry</string>
+	<string name="save">Save</string>
+	<string name="save_log">Save Log</string>
+	<string name="search">Search</string>
+	<string name="settings">Settings</string>
+	<string name="share">Share</string>
+	<string name="start">Start</string>
+	<string name="status">Status</string>
+	<string name="success">Success</string>
+	<string name="super_secret">Super Secret</string>
+	<string name="swap">Swap</string>
+	<string name="sym_down_arrow">&#129139;</string>
+	<string name="sym_empty">-</string>
+	<string name="sym_eq">=</string>
+	<string name="sym_greater"><![CDATA[>]]></string>
+	<string name="sym_hour">h</string>
+	<string name="sym_i">i</string>
+	<string name="sym_minute">m</string>
+	<string name="sym_question">\?</string>
+	<string name="sym_question_mark">\?</string>
+	<string name="sym_seconds">s</string>
+	<string name="sym_separator">-</string>
+	<string name="sym_x">x</string>
+	<string name="this_month">This Month</string>
+	<string name="this_year">This Year</string>
+	<string name="thumbnail">Thumbnail</string>
+	<string name="title">Title</string>
+	<string name="today">Today</string>
+	<string name="track_no">Track #</string>
+	<string name="tru">True</string>
+	<string name="undo">Undo</string>
+	<string name="unknown_exception">Unknown Exception</string>
+	<string name="url">URL</string>
+	<string name="year">Year</string>
+	<string name="yesterday">Yesterday</string>
+	<string name="youtube">YouTube</string>
+	<string name="youtube_id">YouTube ID</string>
 </resources>

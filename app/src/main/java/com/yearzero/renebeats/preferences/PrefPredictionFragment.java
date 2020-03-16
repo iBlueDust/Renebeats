@@ -15,15 +15,15 @@ import de.mrapp.android.preference.activity.PreferenceFragment;
  */
 public class PrefPredictionFragment extends PreferenceFragment {
 
-    private ListPreference Guesser;
+	private ListPreference Guesser;
 
-    public PrefPredictionFragment() { }
+	public PrefPredictionFragment() { }
 
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.pref_prediction);
+	@Override
+	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+		addPreferencesFromResource(R.xml.pref_prediction);
 
-        Guesser = (ListPreference) findPreference(getString(R.string.pref_guesser));
-    }
+		Guesser = (ListPreference) findPreference(getString(R.string.pref_guesser));
+	}
 
 }

@@ -14,61 +14,61 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class DependencyFragment extends Fragment {
 
-    private View view;
-    private RecyclerView List;
+	private View view;
+	private RecyclerView List;
 
-    public DependencyFragment() { }
+	public DependencyFragment() { }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_dependency, container, false);
+	@Override
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		view = inflater.inflate(R.layout.fragment_dependency, container, false);
 
-        List = view.findViewById(R.id.list);
+		List = view.findViewById(R.id.list);
 
-        List.setLayoutManager(new LinearLayoutManager(getContext()));
-        List.setAdapter(new Adapter(getContext(), getResources().getStringArray(R.array.dependencies)));
+		List.setLayoutManager(new LinearLayoutManager(getContext()));
+		List.setAdapter(new Adapter(getContext(), getResources().getStringArray(R.array.dependencies)));
 
-        return view;
-    }
+		return view;
+	}
 
-    private class Adapter extends RecyclerView.Adapter<ViewHolder> {
+	private static class Adapter extends RecyclerView.Adapter<ViewHolder> {
 
-        private Context context;
-        private String[] array;
+		private Context context;
+		private String[] array;
 
-        Adapter(Context context, String[] array) {
-            this.context = context;
-            this.array = array;
-        }
+		Adapter(Context context, String[] array) {
+			this.context = context;
+			this.array = array;
+		}
 
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_dependencies, parent, false));
-        }
+		@NonNull
+		@Override
+		public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+			return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_dependencies, parent, false));
+		}
 
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.setText(array[position]);
-        }
+		@Override
+		public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+			holder.setText(array[position]);
+		}
 
-        @Override
-        public int getItemCount() {
-            return array.length;
-        }
-    }
+		@Override
+		public int getItemCount() {
+			return array.length;
+		}
+	}
 
-    private static class ViewHolder extends RecyclerView.ViewHolder {
+	private static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView text;
+		private TextView text;
 
-        ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            text = itemView.findViewById(R.id.text);
-        }
+		ViewHolder(@NonNull View itemView) {
+			super(itemView);
+			text = itemView.findViewById(R.id.text);
+		}
 
-        void setText(String text) {
-            this.text.setText(text);
-        }
-    }
+		void setText(String text) {
+			this.text.setText(text);
+		}
+	}
 }

@@ -12,9 +12,9 @@ import com.yearzero.renebeats.R
 import java.util.*
 
 class ErrorLogAdapter private constructor(private val context: Context, private val manager: FragmentManager, private val items: ArrayList<String> = ArrayList()) : RecyclerView.Adapter<ErrorLogAdapter.ViewHolder>() {
-    companion object {
-        @JvmStatic private val TAG: String = "ErrorLogAdapter"
-    }
+	companion object {
+		@JvmStatic private val TAG: String = "ErrorLogAdapter"
+	}
 
 //    lateinit var items: ArrayList<Pair<String, String?>>
 
@@ -25,19 +25,19 @@ class ErrorLogAdapter private constructor(private val context: Context, private 
 //        for (i in items) this.items.add(Pair(i, null))
 //    }
 
-//    constructor(context: Context, manager: FragmentManager, items: List<String>) : this(context, manager, ArrayList<String>(items))
-    constructor(context: Context, manager: FragmentManager, items: Array<String>) : this(context, manager, ArrayList<String>(items.toList()))
+	//    constructor(context: Context, manager: FragmentManager, items: List<String>) : this(context, manager, ArrayList<String>(items))
+	constructor(context: Context, manager: FragmentManager, items: Array<String>) : this(context, manager, ArrayList<String>(items.toList()))
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_errorlog, parent, false))
-    override fun getItemCount(): Int = items.size
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_errorlog, parent, false))
+	override fun getItemCount(): Int = items.size
+	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 //        val first = items[position].first
 //        holder.setTitle(first.dropLast(4))
-        holder.setTitle(items[position].dropLast(4) + " UTC")
-        holder.setOnClickListener(View.OnClickListener{
-            ErrorLogDialog(Directories.readLog(items[holder.adapterPosition]), null)
-                    .show(manager, TAG)
-        })
+		holder.setTitle(items[position].dropLast(4) + " UTC")
+		holder.setOnClickListener(View.OnClickListener{
+			ErrorLogDialog(Directories.readLog(items[holder.adapterPosition]), null)
+					.show(manager, TAG)
+		})
 //        holder.setExpandOnceListener(View.OnClickListener{
 //            val text: String? = Directories.readLog(first)
 //            items[holder.adapterPosition] = Pair(first, text)
@@ -60,17 +60,17 @@ class ErrorLogAdapter private constructor(private val context: Context, private 
 //                Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
 //            }
 //        })
-    }
+	}
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+	class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val Title: TextView = itemView.findViewById(R.id.title)
+		private val Title: TextView = itemView.findViewById(R.id.title)
 //        private val Arrow: ImageView = itemView.findViewById(R.id.arrow)
 //        private val Collapsible: ViewGroup = itemView.findViewById(R.id.collapsible)
 //        private val Payload: TextView = itemView.findViewById(R.id.payload)
 //        private val Copy: ImageButton = itemView.findViewById(R.id.copy)
 //        private val Share: ImageButton = itemView.findViewById(R.id.share)
-        
+
 //        private var collapsed = true
 //            set(value) {
 //                var v = View.VISIBLE
@@ -87,13 +87,13 @@ class ErrorLogAdapter private constructor(private val context: Context, private 
 //                field = value
 //            }
 
-        fun setTitle(title: String) { Title.text = title }
+		fun setTitle(title: String) { Title.text = title }
 //        fun setPayload(payload: String) { Payload.text = payload }
 //        fun setCopyListener(listener: View.OnClickListener) = Copy.setOnClickListener(listener)
 //        fun setShareListener(listener: View.OnClickListener) = Share.setOnClickListener(listener)
 
-        fun setOnClickListener(listener: View.OnClickListener) = itemView.setOnClickListener(listener)
-        
+		fun setOnClickListener(listener: View.OnClickListener) = itemView.setOnClickListener(listener)
+
 //        fun setExpandOnceListener(listener: View.OnClickListener) {
 //            val l: View.OnClickListener = View.OnClickListener {
 //                listener.onClick(it)
@@ -102,5 +102,5 @@ class ErrorLogAdapter private constructor(private val context: Context, private 
 //            Arrow.setOnClickListener(l)
 //            Title.setOnClickListener(l)
 //        }
-    }
+	}
 }

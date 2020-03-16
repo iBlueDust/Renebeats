@@ -1,861 +1,861 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="296dp">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:textAppearance="@style/Text.Header.Small"
-            app:layout_constraintEnd_toStartOf="@+id/dismiss"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/dismiss"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/close"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_close_gray_24dp"
-            tools:ignore="VectorDrawableCompat" />
-
-        <TableLayout
-            android:id="@+id/mainly"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:orientation="vertical"
-            android:shrinkColumns="1"
-            android:stretchColumns="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title">
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/artist"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/author"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/album"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/album"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/genres"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/genres"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/year"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/year"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/track_no"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/track"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <!--<TableRow-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content">-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginEnd="8dp"-->
-                    <!--android:layout_marginRight="8dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="Duration"-->
-                    <!--android:textAppearance="@style/Text.BoldAccent" />-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/duration"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_gravity="end"-->
-                    <!--android:layout_weight="2"-->
-                    <!--android:ellipsize="end"-->
-                    <!--android:maxLines="2"-->
-                    <!--android:textAlignment="textEnd"-->
-                    <!--android:textAppearance="@style/Text.SemiLight" />-->
-            <!--</TableRow>-->
-        </TableLayout>
-
-        <View
-            android:id="@+id/view2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/ClearGray"
-            app:layout_constraintBottom_toBottomOf="@id/layout_format"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mainly" />
-
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:text="@string/format"
-            android:textAppearance="@style/Text.Section"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/view2" />
-
-        <TableLayout
-            android:id="@+id/layout_format"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:orientation="vertical"
-            android:shrinkColumns="1"
-            android:stretchColumns="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5">
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/format"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/format"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/bitrate"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/bitrate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/normalize"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/normalize"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:textAllCaps="true"
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/start"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/start"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/end"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/end"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/overwrite"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/overwrite"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-        </TableLayout>
-
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/status"
-            android:textAppearance="@style/Text.Section"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_format" />
-
-        <TableLayout
-            android:id="@+id/layout_status"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:orientation="vertical"
-            android:shrinkColumns="1"
-            android:stretchColumns="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView6">
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/download"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/download"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:textAllCaps="true"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/conversion"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/conversion"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:textAllCaps="true"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/metadata"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/metadata"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/assigned_at"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/assigned"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/completed_at"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/completed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-        </TableLayout>
-
-        <View
-            android:id="@+id/secret_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/ClearGray"
-            app:layout_constraintBottom_toBottomOf="@id/secret_main"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_status" />
-
-        <TextView
-            android:id="@+id/secret_lbl"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:text="@string/super_secret"
-            android:textAppearance="@style/Text.Section"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/secret_view" />
-
-        <TableLayout
-            android:id="@+id/secret_main"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:shrinkColumns="1"
-            android:stretchColumns="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/secret_lbl">
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/youtube_id"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/ytid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/download_id"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/downloadid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/url"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/url"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/available_format"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/availformat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp" >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/exception"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/exception"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/progress_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/progress"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/progress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-            </TableRow>
-        </TableLayout>
-
-        <TextView
-            android:id="@+id/secret_paths"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:text="@string/paths"
-            android:textAppearance="@style/Text.Section"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/secret_view" />
-
-        <TableLayout
-            android:id="@+id/secret_second"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:shrinkColumns="1"
-            android:stretchColumns="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/secret_paths">
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/download"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/path_download"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="3"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/status_download"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:src="@color/SecondaryDark" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/conversion"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/path_conversion"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/status_conversion"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:src="@color/SecondaryDark" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/final_metadata"
-                    android:textAppearance="@style/Text.BoldAccent" />
-
-                <TextView
-                    android:id="@+id/path_metadata"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_weight="2"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAlignment="textEnd"
-                    android:textAppearance="@style/Text.SemiLight" />
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/status_metadata"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:src="@color/SecondaryDark" />
-            </TableRow>
-
-        </TableLayout>
-
-        <Button
-            android:id="@+id/save"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@android:color/transparent"
-            android:text="@string/close"
-            android:textColor="@color/Accent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/secret_second" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:minWidth="296dp">
+
+		<TextView
+			android:id="@+id/title"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginLeft="16dp"
+			android:layout_marginTop="16dp"
+			android:layout_marginEnd="16dp"
+			android:layout_marginRight="16dp"
+			android:textAppearance="@style/Text.Header.Small"
+			app:layout_constraintEnd_toStartOf="@+id/dismiss"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
+
+		<ImageButton
+			android:id="@+id/dismiss"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
+			android:layout_marginEnd="16dp"
+			android:layout_marginRight="16dp"
+			android:background="@android:color/transparent"
+			android:contentDescription="@string/close"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			app:srcCompat="@drawable/ic_close_gray_24dp"
+			tools:ignore="VectorDrawableCompat" />
+
+		<TableLayout
+			android:id="@+id/mainly"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="32dp"
+			android:layout_marginLeft="32dp"
+			android:layout_marginTop="8dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginRight="32dp"
+			android:orientation="vertical"
+			android:shrinkColumns="1"
+			android:stretchColumns="1"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/title">
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/artist"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/author"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/album"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/album"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/genres"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/genres"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/year"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/year"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/track_no"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/track"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<!--<TableRow-->
+			<!--android:layout_width="wrap_content"-->
+			<!--android:layout_height="wrap_content">-->
+
+			<!--<TextView-->
+			<!--android:layout_width="wrap_content"-->
+			<!--android:layout_height="wrap_content"-->
+			<!--android:layout_marginEnd="8dp"-->
+			<!--android:layout_marginRight="8dp"-->
+			<!--android:layout_weight="1"-->
+			<!--android:text="Duration"-->
+			<!--android:textAppearance="@style/Text.BoldAccent" />-->
+
+			<!--<TextView-->
+			<!--android:id="@+id/duration"-->
+			<!--android:layout_width="wrap_content"-->
+			<!--android:layout_height="wrap_content"-->
+			<!--android:layout_gravity="end"-->
+			<!--android:layout_weight="2"-->
+			<!--android:ellipsize="end"-->
+			<!--android:maxLines="2"-->
+			<!--android:textAlignment="textEnd"-->
+			<!--android:textAppearance="@style/Text.SemiLight" />-->
+			<!--</TableRow>-->
+		</TableLayout>
+
+		<View
+			android:id="@+id/view2"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
+			android:layout_marginTop="16dp"
+			android:background="@color/ClearGray"
+			app:layout_constraintBottom_toBottomOf="@id/layout_format"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/mainly" />
+
+		<TextView
+			android:id="@+id/textView5"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginLeft="16dp"
+			android:layout_marginTop="8dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginRight="32dp"
+			android:text="@string/format"
+			android:textAppearance="@style/Text.Section"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="@+id/view2" />
+
+		<TableLayout
+			android:id="@+id/layout_format"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_marginStart="32dp"
+			android:layout_marginLeft="32dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginRight="32dp"
+			android:orientation="vertical"
+			android:shrinkColumns="1"
+			android:stretchColumns="1"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/textView5">
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/format"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/format"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/bitrate"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/bitrate"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/normalize"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/normalize"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:textAllCaps="true"
+					android:maxLines="2"
+					android:ellipsize="end"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/start"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/start"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/end"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/end"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow android:layout_marginBottom="8dp">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/overwrite"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/overwrite"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+		</TableLayout>
+
+		<TextView
+			android:id="@+id/textView6"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginLeft="16dp"
+			android:layout_marginTop="16dp"
+			android:text="@string/status"
+			android:textAppearance="@style/Text.Section"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/layout_format" />
+
+		<TableLayout
+			android:id="@+id/layout_status"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="32dp"
+			android:layout_marginLeft="32dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginRight="32dp"
+			android:orientation="vertical"
+			android:shrinkColumns="1"
+			android:stretchColumns="1"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/textView6">
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/download"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/download"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:textAllCaps="true"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/conversion"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/conversion"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:textAllCaps="true"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow android:layout_marginBottom="8dp">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/metadata"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/metadata"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/assigned_at"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/assigned"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/completed_at"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/completed"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+		</TableLayout>
+
+		<View
+			android:id="@+id/secret_view"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
+			android:layout_marginTop="16dp"
+			android:background="@color/ClearGray"
+			app:layout_constraintBottom_toBottomOf="@id/secret_main"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/layout_status" />
+
+		<TextView
+			android:id="@+id/secret_lbl"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginLeft="16dp"
+			android:layout_marginTop="8dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginRight="32dp"
+			android:text="@string/super_secret"
+			android:textAppearance="@style/Text.Section"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="@+id/secret_view" />
+
+		<TableLayout
+			android:id="@+id/secret_main"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="32dp"
+			android:layout_marginLeft="32dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginRight="32dp"
+			android:shrinkColumns="1"
+			android:stretchColumns="1"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/secret_lbl">
+
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/youtube_id"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/ytid"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/download_id"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/downloadid"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/url"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/url"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/available_format"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/availformat"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="8dp" >
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/exception"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/exception"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+
+			<TableRow
+				android:id="@+id/progress_row"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="8dp">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/progress"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/progress"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+			</TableRow>
+		</TableLayout>
+
+		<TextView
+			android:id="@+id/secret_paths"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginLeft="16dp"
+			android:layout_marginTop="16dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginRight="32dp"
+			android:text="@string/paths"
+			android:textAppearance="@style/Text.Section"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/secret_view" />
+
+		<TableLayout
+			android:id="@+id/secret_second"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="32dp"
+			android:layout_marginLeft="32dp"
+			android:layout_marginEnd="16dp"
+			android:layout_marginRight="16dp"
+			android:shrinkColumns="1"
+			android:stretchColumns="1"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/secret_paths">
+
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/download"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/path_download"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="3"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+
+				<de.hdodenhof.circleimageview.CircleImageView
+					android:id="@+id/status_download"
+					android:layout_width="16dp"
+					android:layout_height="16dp"
+					android:layout_marginStart="8dp"
+					android:layout_marginLeft="8dp"
+					android:src="@color/SecondaryDark" />
+			</TableRow>
+
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/conversion"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/path_conversion"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+
+				<de.hdodenhof.circleimageview.CircleImageView
+					android:id="@+id/status_conversion"
+					android:layout_width="16dp"
+					android:layout_height="16dp"
+					android:layout_marginStart="8dp"
+					android:layout_marginLeft="8dp"
+					android:src="@color/SecondaryDark" />
+			</TableRow>
+
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="8dp"
+					android:layout_marginRight="8dp"
+					android:layout_weight="1"
+					android:text="@string/final_metadata"
+					android:textAppearance="@style/Text.BoldAccent" />
+
+				<TextView
+					android:id="@+id/path_metadata"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end"
+					android:layout_weight="2"
+					android:ellipsize="end"
+					android:maxLines="2"
+					android:textAlignment="textEnd"
+					android:textAppearance="@style/Text.SemiLight" />
+
+				<de.hdodenhof.circleimageview.CircleImageView
+					android:id="@+id/status_metadata"
+					android:layout_width="16dp"
+					android:layout_height="16dp"
+					android:layout_marginStart="8dp"
+					android:layout_marginLeft="8dp"
+					android:src="@color/SecondaryDark" />
+			</TableRow>
+
+		</TableLayout>
+
+		<Button
+			android:id="@+id/save"
+			style="@style/Widget.MaterialComponents.Button.TextButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="8dp"
+			android:layout_marginEnd="8dp"
+			android:layout_marginRight="8dp"
+			android:layout_marginBottom="8dp"
+			android:background="@android:color/transparent"
+			android:text="@string/close"
+			android:textColor="@color/Accent"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/secret_second" />
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
