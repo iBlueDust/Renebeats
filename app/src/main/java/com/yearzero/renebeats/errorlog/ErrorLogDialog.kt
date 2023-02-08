@@ -82,7 +82,7 @@ class ErrorLogDialog() : DialogFragment() {
 
 		Copy.setOnClickListener {
 			val manager: ClipboardManager = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-			manager.primaryClip = ClipData.newPlainText("error log", Payload.text)
+			manager.setPrimaryClip(ClipData.newPlainText("error log", Payload.text))
 			Toast.makeText(context, getString(R.string.clipboard_copy), Toast.LENGTH_SHORT).show()
 		}
 		Share.setOnClickListener {
