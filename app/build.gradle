@@ -78,7 +78,11 @@ dependencies {
 	implementation 'com.google.android.material:material:1.0.0'
 	implementation 'com.google.android.gms:play-services-auth:17.0.0'
 
-	implementation 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
+//	implementation 'com.github.writingminds:ffmpeg-android-java'
+	compile 'com.writingminds:FFmpegAndroid:0.3.2'
+	implementation ('com.github.adrielcafe:AndroidAudioConverter:0.0.8') {
+		exclude group: 'com.github.adrielcafe', module: 'ffmpeg-android-java'
+	}
 	implementation 'com.github.michael-rapp:android-preference-activity:7.0.3'
 	implementation 'com.sothree.slidinguppanel:library:3.4.0'
 	implementation 'de.hdodenhof:circleimageview:3.0.1'
