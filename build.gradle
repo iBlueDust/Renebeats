@@ -33,3 +33,8 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+def secretPropertiesFile = rootProject.file("secret.properties")
+def secretProperties = new Properties()
+secretProperties.load(new FileInputStream(secretPropertiesFile))
+ext.secretProperties = secretProperties

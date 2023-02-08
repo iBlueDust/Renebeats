@@ -77,7 +77,7 @@ public class YoutubeQueryTask extends AsyncTask<String, Void, List<SearchResult>
 					.build();
 
 			YouTube.Search.List search = youtube.search().list("id,snippet");
-			search.setKey(BuildConfig.YT_API_KEY);
+			search.setKey(BuildConfig.YouTubeAPIKey);
 			search.setQ(query[0]);
 
 			search.setType("video");

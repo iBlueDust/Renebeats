@@ -11,6 +11,9 @@ keystores.txt
 /captures
 /app/src/main/vector
 
+secret.properties
+secrets.properties
+
 # Built application files
 *.apk
 *.aar
@@ -97,4 +100,3 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
-*.apk

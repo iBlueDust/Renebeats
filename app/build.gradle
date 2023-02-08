@@ -3,13 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-  compileSdkVersion 28
+  compileSdkVersion 33
   defaultConfig {
 	applicationId "com.yearzero.renebeats"
 	minSdkVersion 16
 	multiDexEnabled true
 	resConfigs "en"
-	targetSdkVersion 28
+	targetSdkVersion 33
 	versionCode 10003
 	versionName "1.0.3"
 	testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -33,16 +33,19 @@ android {
 	  // 10003 | 1.0.3
   }
   buildTypes {
+	debug {
+	  buildConfigField 'String', 'YouTubeAPIKey', secretProperties.getProperty("YouTubeAPIKey_Debug")
+	}
+
 	release {
 	  minifyEnabled false
 //	  shrinkResources true
-//      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 	  proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+	  buildConfigField 'String', 'YouTubeAPIKey', secretProperties.getProperty("YouTubeAPIKey_Release")
 	}
 
 	buildTypes.all {
-	  buildConfigField 'String', 'YT_API_KEY', YouTubeAPIKey
-
 	  buildConfigField 'String', 'Notif_Downloading', Notif_Downloading
 	  buildConfigField 'String', 'Notif_ChannelID', Notif_ChannelID
 	  buildConfigField 'Integer', 'Notif_BaseID', Notif_BaseID
@@ -79,7 +82,7 @@ dependencies {
 	implementation 'com.google.android.gms:play-services-auth:17.0.0'
 
 //	implementation 'com.github.writingminds:ffmpeg-android-java'
-	compile 'com.writingminds:FFmpegAndroid:0.3.2'
+	implementation 'com.writingminds:FFmpegAndroid:0.3.2'
 	implementation ('com.github.adrielcafe:AndroidAudioConverter:0.0.8') {
 		exclude group: 'com.github.adrielcafe', module: 'ffmpeg-android-java'
 	}
