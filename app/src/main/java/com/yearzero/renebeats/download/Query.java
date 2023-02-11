@@ -95,6 +95,7 @@ public class Query implements Serializable {
 			else
 				result = title.trim() + " - " + artist.trim();
 		}
+		// Sanitize invalid characters before returning
 		return result.replaceAll("(?:\\||\\\\|\\?|\\*|<|\"|:|>|\\+|\\[|]|/')", "_");
 	}
 

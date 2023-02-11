@@ -466,7 +466,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 			high_bit = videoFormat.getAbr();
 			url = videoFormat.getUrl();
 			availableFormat = videoFormat.getExt();
-			convert = !(format.toLowerCase().equals(videoFormat.getExt().toLowerCase()) && high_bit == bitrate);
+			convert = !(format.equalsIgnoreCase(videoFormat.getExt()) && high_bit == bitrate);
 		}
 		// endregion
 
@@ -559,10 +559,6 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
 	//// Send the download to the service
 	private void InitDownload(Download args) {
-		//        if (Commons.downloadReceiver == null) {
-		//            Commons.downloadReceiver = new DownloadReceiver(this, true);
-		//            LocalBroadcastManager.getInstance(this).registerReceiver(Commons.downloadReceiver, new IntentFilter(DownloadService.TAG));
-		//        }
 		LocalBroadcastManager.getInstance(this).registerReceiver(new DownloadReceiver(this), new IntentFilter(DownloadService.TAG));
 
 		Intent service = new Intent(this, DownloadService.class);

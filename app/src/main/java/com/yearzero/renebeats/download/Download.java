@@ -66,15 +66,6 @@ public class Download extends Query implements Serializable {
 		this.size = size;
 	}
 
-	//    Download(@NonNull Query query, short bitrate, @NonNull String format, @Nullable SparseArray<YouTubeExtractor.YtFile> sparseArray, Integer start, Integer end, boolean normalize, long size) {
-	//        this(query, bitrate, format, (YouTubeExtractor.YtFile[]) null, start, end, normalize, size);
-	//        if (sparseArray != null) {
-	//            this.sparseArray = new YouTubeExtractor.YtFile[sparseArray.size()];
-	//            for (int i = 0; i < this.sparseArray.length; i++)
-	//                this.sparseArray[i] = sparseArray.valueAt(i);
-	//        }
-	//    }
-
 	String getFilenameWithExt() {
 		return getFilename() + '.' + getFormat();
 	}
@@ -116,40 +107,4 @@ public class Download extends Query implements Serializable {
 		else if (o instanceof HistoryLog) return ((HistoryLog) o).getId() == id;
 		else return false;
 	}
-
-	//    @Override
-	//    public boolean equals(Object o) {
-	//        if (this == o) return true;
-	//        if (!(o instanceof Download)) return false;
-	//        if (!super.equals(o)) return false;
-	//        Download download = (Download) o;
-	//        return bitrate == download.bitrate &&
-	//                indeterminate == download.indeterminate &&
-	//                normalize == download.normalize &&
-	//                convert == download.convert &&
-	//                current == download.current &&
-	//                total == download.total &&
-	//                size == download.size &&
-	//                downloadId == download.downloadId &&
-	//                equals(start, download.start) &&
-	//                equals(end, download.end) &&
-	//                equals(exception, download.exception) &&
-	//                format.equals(download.format) &&
-	//                equals(url, download.url) &&
-	//                equals(down, download.down) &&
-	//                equals(availableFormat, download.availableFormat) &&
-	//                equals(conv, download.conv) &&
-	//                equals(mtdt, download.mtdt) &&
-	//                equals(overwrite, download.overwrite) &&
-	//                status.equals(download.status) &&
-	//                equals(assigned, download.assigned) &&
-	//                equals(completeDate, download.completeDate) &&
-	//                Arrays.equals(sparseArray, download.sparseArray);
-	//    }
-	//
-	//    private boolean equals(Object a, Object b) {
-	//        if (a == b) return true;
-	//        if (a == null || b == null) return false;
-	//        return a.equals(b);
-	//    }
 }
