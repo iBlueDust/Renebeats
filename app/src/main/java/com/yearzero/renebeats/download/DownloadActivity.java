@@ -230,7 +230,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 				Log.e(TAG, "videoInfo is null");
 				return;
 			}
-			if (videoInfo.duration <= 0) {
+			if (videoInfo.getDuration() <= 0) {
 				Log.e(TAG, "Length is 0");
 				return;
 			}
@@ -238,18 +238,18 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 			DurationPicker dialog = new DurationPicker(DownloadActivity.this);
 			dialog.setTitle(R.string.download_time_start);
 
-			if (videoInfo.duration > 3600)
+			if (videoInfo.getDuration() > 3600)
 				dialog.setEnabled(DurationPicker.Mode.Hour);
-			else if (videoInfo.duration > 60)
+			else if (videoInfo.getDuration() > 60)
 				dialog.setEnabled(DurationPicker.Mode.Minute);
 			else dialog.setEnabled(DurationPicker.Mode.Second);
 
 			dialog.setTime(start == null ? 0 : start);
-			dialog.setMaxTime(videoInfo.duration);
+			dialog.setMaxTime(videoInfo.getDuration());
 			dialog.setCallbacks(new DurationPicker.Callbacks() {
 				@Override
 				public String Validate(int time) {
-					if (time >= (end == null ? videoInfo.duration : end))
+					if (time >= (end == null ? videoInfo.getDuration() : end))
 						return getString(R.string.download_time_start_end);
 					return null;
 				}
@@ -268,7 +268,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 				Log.e(TAG, "videoInfo is null");
 				return;
 			}
-			if (videoInfo.duration <= 0) {
+			if (videoInfo.getDuration() <= 0) {
 				Log.e(TAG, "Length is 0");
 				return;
 			}
@@ -276,20 +276,20 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 			dialog.setTitle(R.string.download_time_end);
 			dialog.setTime(end == null ? 0 : end);
 
-			if (videoInfo.duration > 3600)
+			if (videoInfo.getDuration() > 3600)
 				dialog.setEnabled(DurationPicker.Mode.Hour);
-			else if (videoInfo.duration > 60)
+			else if (videoInfo.getDuration() > 60)
 				dialog.setEnabled(DurationPicker.Mode.Minute);
 			else dialog.setEnabled(DurationPicker.Mode.Second);
 
-			dialog.setTime(end == null ? videoInfo.duration : end);
-			dialog.setMaxTime(videoInfo.duration);
+			dialog.setTime(end == null ? videoInfo.getDuration() : end);
+			dialog.setMaxTime(videoInfo.getDuration());
 			dialog.setCallbacks(new DurationPicker.Callbacks() {
 				@Override
 				public String Validate(int time) {
 					if (start != null && time <= start)
 						return getString(R.string.download_time_end_start);
-					if (end != null && end > videoInfo.duration)
+					if (end != null && end > videoInfo.getDuration())
 						return getString(R.string.download_time_end_length);
 					return null;
 				}
@@ -335,28 +335,28 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
 		this.videoInfo = videoInfo;
 
-		if (videoInfo.duration <= 0) {
+		if (videoInfo.getDuration() <= 0) {
 			onBackPressed();
 			Toast.makeText(DownloadActivity.this, R.string.download_invalid_youtube_id, Toast.LENGTH_LONG).show();
 			return;
 		}
 
 		if (query.getTitle().isEmpty()) {
-			query.setTitle(videoInfo.title);
+			query.setTitle(videoInfo.getTitle());
 			Display.setText(query.getTitle());
 
 			UseGuesserMode();
 		} else if (query.getArtist().isEmpty()) {
-			query.setArtist(videoInfo.uploader);
+			query.setArtist(videoInfo.getUploader());
 			Artist.setText(query.getArtist());
 		}
 
 		// Fill missing thumbnails (I don't think this is necessary honestly
-		if (query.getThumbMax() == null) query.setThumbMax(videoInfo.thumbnail);
-		if (query.getThumbHigh() == null) query.setThumbHigh(videoInfo.thumbnail);
-		if (query.getThumbMedium() == null) query.setThumbMedium(videoInfo.thumbnail);
-		if (query.getThumbDefault() == null) query.setThumbDefault(videoInfo.thumbnail);
-		if (query.getThumbStandard() == null) query.setThumbStandard(videoInfo.thumbnail);
+		if (query.getThumbMax() == null) query.setThumbMax(videoInfo.getThumbnail());
+		if (query.getThumbHigh() == null) query.setThumbHigh(videoInfo.getThumbnail());
+		if (query.getThumbMedium() == null) query.setThumbMedium(videoInfo.getThumbnail());
+		if (query.getThumbDefault() == null) query.setThumbDefault(videoInfo.getThumbnail());
+		if (query.getThumbStandard() == null) query.setThumbStandard(videoInfo.getThumbnail());
 		LoadThumbnail();
 
 		int maxbit = Integer.MIN_VALUE;
@@ -365,8 +365,8 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 
 		RefreshTimeRange();
 
-		for (VideoFormat format : videoInfo.formats)
-			maxbit = Math.max(format.abr, maxbit);
+		for (VideoFormat format : videoInfo.getFormats())
+			maxbit = Math.max(format.getAbr(), maxbit);
 
 		int cnt = 0;
 		for (int i = 0; i < Preferences.getBITRATES().length && Preferences.getBITRATES()[i] <= maxbit; i++) cnt++;
@@ -460,13 +460,13 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 		// region Extract URL
 		int high_bit = -1;
 
-		for (VideoFormat videoFormat : videoInfo.formats) {
-			if (videoFormat == null || videoFormat.abr <= high_bit || high_bit >= bitrate)
+		for (VideoFormat videoFormat : videoInfo.getFormats()) {
+			if (videoFormat == null || videoFormat.getAbr() <= high_bit || high_bit >= bitrate)
 				continue;
-			high_bit = videoFormat.abr;
-			url = videoFormat.url;
-			availableFormat = videoFormat.ext;
-			convert = !(format.toLowerCase().equals(videoFormat.ext.toLowerCase()) && high_bit == bitrate);
+			high_bit = videoFormat.getAbr();
+			url = videoFormat.getUrl();
+			availableFormat = videoFormat.getExt();
+			convert = !(format.toLowerCase().equals(videoFormat.getExt().toLowerCase()) && high_bit == bitrate);
 		}
 		// endregion
 
@@ -476,9 +476,9 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 				format,
 				url,
 				start,
-				end != null && end == Math.floor(videoInfo.duration) ? null : end,
+				end != null && end == Math.floor(videoInfo.getDuration()) ? null : end,
 				Normalize.isChecked(),
-				videoInfo.duration
+				videoInfo.getDuration()
 		);
 		download.setAvailableFormat(availableFormat);
 		download.setConvert(convert);
@@ -613,9 +613,9 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 		short sm = this.start == null ? 0 : (short) (Math.floor(this.start / 60f) % 60);
 		short ss = this.start == null ? 0 : (short) (this.start % 60);
 
-		short eh = (short) Math.floor((this.end == null ? videoInfo.duration : this.end) / 3600f);
-		short em = (short) (Math.floor((this.end == null ? videoInfo.duration : this.end) / 60f) % 60);
-		short es = (short) ((this.end == null ? videoInfo.duration : this.end) % 60);
+		short eh = (short) Math.floor((this.end == null ? videoInfo.getDuration() : this.end) / 3600f);
+		short em = (short) (Math.floor((this.end == null ? videoInfo.getDuration() : this.end) / 60f) % 60);
+		short es = (short) ((this.end == null ? videoInfo.getDuration() : this.end) % 60);
 
 		if (eh > 0) {
 			start.append(sh).append(':');

@@ -18,6 +18,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         android:fullBackupContent="@xml/backup_descriptor"
+        android:extractNativeLibs="true"
+        android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute" >
 
         <service
@@ -28,16 +30,17 @@
 
         <activity
             android:name=".download.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".download.DownloadActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".download.MainActivity" />
