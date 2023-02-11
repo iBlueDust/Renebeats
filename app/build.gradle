@@ -3,8 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-  compileSdkVersion 33
-  defaultConfig {
+	compileSdkVersion 33
+  	defaultConfig {
 	applicationId "com.yearzero.renebeats"
 	minSdkVersion 24
 	multiDexEnabled true
@@ -14,64 +14,63 @@ android {
 	versionName "1.0.3"
 	testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-	  //  CODE | VERSION NAME
-	  //     0 | Initial Version
-	  //     1 | alpha0.1
-	  //     2 | alpha0.2
-	  //     3 | alpha0.3
-	  //     4 | alpha0.4
-	  //     5 | alpha0.5
-	  //     6 | alpha0.6
-	  //   601 | alpha0.6.1
-	  //   700 | alpha0.7.0
-	  //   701 | alpha0.7.1
-	  //   702 | alpha0.7.2
-	  //   703 | alpha0.7.3
-	  // 10000 | 1.0.0
-	  // 10001 | 1.0.1 Never properly released
-	  // 10002 | 1.0.2
-	  // 10003 | 1.0.3
-  }
-  buildTypes {
-	debug {
-	  buildConfigField 'String', 'YouTubeAPIKey', secretProperties.getProperty("YouTubeAPIKey_Debug")
-	}
+	//  CODE | VERSION NAME
+	//     0 | Initial Version
+	//     1 | alpha0.1
+	//     2 | alpha0.2
+	//     3 | alpha0.3
+	//     4 | alpha0.4
+	//     5 | alpha0.5
+	//     6 | alpha0.6
+	//   601 | alpha0.6.1
+	//   700 | alpha0.7.0
+	//   701 | alpha0.7.1
+	//   702 | alpha0.7.2
+	//   703 | alpha0.7.3
+	// 10000 | 1.0.0
+	// 10001 | 1.0.1 Never properly released
+	// 10002 | 1.0.2
+	// 10003 | 1.0.3
+  	}
+  	buildTypes {
+		debug {
+		  buildConfigField 'String', 'YouTubeAPIKey', secretProperties.getProperty("YouTubeAPIKey_Debug")
+		}
 
-	release {
-	  minifyEnabled false
-//	  shrinkResources true
-	  proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+		release {
+		  minifyEnabled true
+		  shrinkResources true
+		  proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
-	  buildConfigField 'String', 'YouTubeAPIKey', secretProperties.getProperty("YouTubeAPIKey_Release")
-	}
+		  buildConfigField 'String', 'YouTubeAPIKey', secretProperties.getProperty("YouTubeAPIKey_Release")
+		}
 
-	buildTypes.all {
-	  buildConfigField 'String', 'Notif_Downloading', Notif_Downloading
-	  buildConfigField 'String', 'Notif_ChannelID', Notif_ChannelID
-	  buildConfigField 'Integer', 'Notif_BaseID', Notif_BaseID
+		buildTypes.all {
+		  buildConfigField 'String', 'Notif_Downloading', Notif_Downloading
+		  buildConfigField 'String', 'Notif_ChannelID', Notif_ChannelID
+		  buildConfigField 'Integer', 'Notif_BaseID', Notif_BaseID
 
-	  buildConfigField 'String', 'Dir_Permanent_ChildPath', Dir_Permanent_ChildPath
-	  buildConfigField 'String', 'Dir_BIN_ChildPath', Dir_BIN_ChildPath
-	  buildConfigField 'String', 'Dir_LOGS_ChildPath', Dir_LOGS_ChildPath
-	  buildConfigField 'String', 'Dir_History_ChildPath', Dir_History_ChildPath
-	  buildConfigField 'String', 'Dir_Downloads_File', Dir_Downloads_File
-	}
-  }
-  compileOptions {
-//    sourceCompatibility = '1.8'
-//    targetCompatibility = '1.8'
-	  sourceCompatibility JavaVersion.VERSION_1_8
-	  targetCompatibility JavaVersion.VERSION_1_8
-  }
+		  buildConfigField 'String', 'Dir_Permanent_ChildPath', Dir_Permanent_ChildPath
+		  buildConfigField 'String', 'Dir_BIN_ChildPath', Dir_BIN_ChildPath
+		  buildConfigField 'String', 'Dir_LOGS_ChildPath', Dir_LOGS_ChildPath
+		  buildConfigField 'String', 'Dir_History_ChildPath', Dir_History_ChildPath
+		  buildConfigField 'String', 'Dir_Downloads_File', Dir_Downloads_File
+		}
+  	}
+	compileOptions {
+	  	sourceCompatibility JavaVersion.VERSION_1_8
+	  	targetCompatibility JavaVersion.VERSION_1_8
+  	}
 }
 
 dependencies {
 	//noinspection AnnotationProcessorOnCompilePath
 	compileOnly 'org.projectlombok:lombok:1.18.10' // Do not modify. Do not delete.
 	annotationProcessor 'org.projectlombok:lombok:1.18.10'
+
 	implementation fileTree(include: ['*.jar'], dir: 'libs')
 	implementation 'androidx.appcompat:appcompat:1.1.0'
-	implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
+	implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 	implementation 'androidx.cardview:cardview:1.0.0'
 	implementation 'androidx.recyclerview:recyclerview:1.1.0'
 	implementation 'com.google.android.material:material:1.0.0'
@@ -93,18 +92,17 @@ dependencies {
 	implementation 'com.github.codekidX:storage-chooser:2.0.4.4'
 	implementation 'com.github.yausername.youtubedl-android:library:-SNAPSHOT'
 
-  implementation('com.google.api-client:google-api-client-android:1.30.7') {
-	exclude group: 'org.apache.httpcomponents'
-  }
-  implementation('com.google.apis:google-api-services-youtube:v3-rev99-1.17.0-rc') {
-	exclude group: 'org.apache.httpcomponents'
-  }
+	implementation('com.google.api-client:google-api-client-android:1.30.7') {
+		exclude group: 'org.apache.httpcomponents'
+	}
+	implementation('com.google.apis:google-api-services-youtube:v3-rev99-1.17.0-rc') {
+		exclude group: 'org.apache.httpcomponents'
+	}
+	implementation('com.github.evgenyneu:js-evaluator-for-android:v5.0.0') {
+		exclude module: 'appcompat-v7'
+	}
 
-  testImplementation 'junit:junit:4.12'
-  androidTestImplementation 'androidx.test:runner:1.5.2'
-  androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-
-  implementation('com.github.evgenyneu:js-evaluator-for-android:v5.0.0') {
-	exclude module: 'appcompat-v7'
-  }
+	testImplementation 'junit:junit:4.12'
+	androidTestImplementation 'androidx.test:runner:1.2.0'
+	androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
