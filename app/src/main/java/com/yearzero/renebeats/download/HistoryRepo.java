@@ -134,66 +134,11 @@ public class HistoryRepo {
 		cal.setTime(assigned);
 		String encoded = Base64.encodeToString(ByteBuffer.allocate(4).putInt((int) (assigned.getTime() / 86400000)).array(), Base64.DEFAULT);
 		return new File(Directories.getHISTORY(), cal.get(Calendar.YEAR) + "/" + encoded.substring(0, encoded.length() - 1) + '.' + EXTENSION);
-		//        int date = cal.get(Calendar.DATE);
-		//        return new File(Directories.getHISTORY(), cal.get(Calendar.YEAR) + "/" + (date < 10 ? '0' + date : date) + '.' + EXTENSION);
 	}
-
-	//    private static int shortHistHash(HistoryLog data) {
-	//        int hash = 1369 + data.getTitle().hashCode();
-	//        hash = 37 * hash + data.getArtist().hashCode();
-	//        hash = 37 * hash + data.getFormat().hashCode();
-	//        hash = 37 * hash + data.getBitrate();
-	//        long ticks = data.getAssigned().getTime();
-	//        return 37 * hash + (int) (ticks ^ ticks >> 32);
-	//    }
-	//
-	//    private static int shortHistHash(Download data) {
-	//        int hash = 1369 + data.getTitle().hashCode();
-	//        hash = 37 * hash + data.getArtist().hashCode();
-	//        hash = 37 * hash + data.getFormat().hashCode();
-	//        hash = 37 * hash + data.getBitrate();
-	//        long ticks = data.getAssigned().getTime();
-	//        return 37 * hash + (int) (ticks ^ ticks >> 32);
-	//    }
 
 	static String getFilename(Download download) {
 		return Long.toHexString(download.getId());
 	}
-
-	//    public interface Callback<T, U> {
-	//        void onComplete(U data);
-	//        void onError(@Nullable T current, Exception e);
-	//    }
-
-	//    static int dateCodeNow(Date date) {
-	//        Calendar cal = Calendar.getInstance();
-	//        cal.setTime(date);
-	//        return cal.get(Calendar.YEAR) * 12 + cal.get(Calendar.MONTH);
-	//    }
-	//
-	//    static int dateCodeFromName(String filename) throws IllegalArgumentException {
-	//        short year = (short) Integer.parseInt(filename.substring(0, filename.indexOf('-')));
-	//        short month = Short.parseShort(filename.lastIndexOf('.') < 0 ? filename.substring(filename.indexOf('-')) : filename.substring(filename.indexOf('-') + 1, filename.lastIndexOf('.')));
-	//        if (month < 0 || month > 12) throw new IllegalArgumentException("month value is negative or more than 11");
-	//        return year * 12 + month;
-	//    }
-	//
-	//    public static int[] listHist() {
-	//        File[] raw = Directories.getHISTORY().listFiles((dir, name) -> name.endsWith('.' + EXTENSION));
-	//        int[] cooked = new int[raw.length];
-	//        for (int i = 0; i < raw.length; i++) {
-	//            try {
-	//                cooked[i] = dateCodeFromName(raw[i].getName());
-	//            } catch (IllegalArgumentException e) {
-	//                cooked[i] = -1;
-	//            }
-	//        }
-	//        return cooked;
-	//    }
-
-	//    static File getHistFile(int compressed) {
-	//        return getHistFile((short) (compressed >> 4), (byte) (compressed & 0xF));
-	//    }
 
 	private static File getHistFile(@Nonnegative short year, byte month) {
 		return new File(Directories.getHISTORY(), String.format(Locale.ENGLISH, "%d-%d.%s", year, month + 1, EXTENSION));

@@ -37,8 +37,8 @@ public class HistoryDialog extends DownloadDialog {
 	//    }
 
 	@Override
-	public void UpdatePartial(@NonNull Download download) {
+	public void UpdateStatus(@NonNull Download download) {
 		super.setDownload(download);
-		super.UpdatePartial();
+		super.UpdateStatus();
 	}
 }

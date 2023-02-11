@@ -25,16 +25,6 @@ class RunningViewHolder(Main: View) : IntermediateViewHolder(Main) {
 		}
 	}
 
-//    fun setPaused(value: Boolean) = if (value) {
-//        Constraint.setBackgroundResource(R.drawable.background_layout_paused)
-//        Status.text = "PAUSED"
-//        Action0.setImageResource(R.drawable.ic_play_black_24dp)
-//    } else {
-//        Constraint.setBackgroundResource(R.drawable.background_layout_running)
-//        Action0.setImageResource(R.drawable.ic_pause_black_24dp)
-//        updateAnimation()
-//    }
-
 	private fun updateAnimation() {
 		val draw = Constraint.background
 		if (draw is AnimationDrawable) {

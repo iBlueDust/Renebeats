@@ -241,7 +241,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 		int index = getServiceDownloads().indexOf(args);
 		if (index >= 0) UpdateAtPosition(index, args);
 		else Log.w(TAG, "onProgress indexOf returned -1");
-		if (dialog != null) dialog.UpdatePartial(args);
+		if (dialog != null) dialog.UpdateStatus(args);
 	}
 
 	@Override
@@ -250,7 +250,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 
 		if (index < 0) notifyDataSetChanged();
 		else notifyItemChanged(index);
-		if (dialog != null) dialog.UpdatePartial(args);
+		if (dialog != null) dialog.UpdateStatus(args);
 	}
 
 	@Override

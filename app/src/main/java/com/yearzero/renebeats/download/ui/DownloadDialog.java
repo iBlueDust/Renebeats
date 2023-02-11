@@ -1,5 +1,6 @@
 package com.yearzero.renebeats.download.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -126,9 +127,20 @@ public class DownloadDialog extends DialogFragment {
 	}
 
 	private void Update() {
-		if (isDownloadNull()) return;
-
 		String empty = getString(R.string.sym_empty);
+
+		if (download == null) {
+			Assigned.setText(empty);
+			Completed.setText(empty);
+			YouTubeID.setText(empty);
+			ID.setText(empty);
+			AvailFormat.setText(empty);
+			Exception.setText(empty);
+
+			Log.w(TAG, "download is null");
+			return;
+		}
+
 		Title.setText(download.getTitle());
 		Artist.setText(download.getArtist());
 		Album.setText(download.getAlbum());
@@ -146,53 +158,39 @@ public class DownloadDialog extends DialogFragment {
 		Conversion.setText(empty);
 		Metadata.setText(empty);
 
-		Assigned.setText(download == null || download.getAssigned() == null || getContext() == null ? empty : Preferences.formatDateLong(getContext(), download.getAssigned()));
-		Completed.setText(download == null || download.getCompleteDate() == null || getContext() == null ? empty : Preferences.formatDateLong(getContext(), download.getCompleteDate()));
+		Assigned.setText(download.getAssigned() == null || getContext() == null ? empty : Preferences.formatDateLong(getContext(), download.getAssigned()));
+		Completed.setText(download.getCompleteDate() == null || getContext() == null ? empty : Preferences.formatDateLong(getContext(), download.getCompleteDate()));
 
-		YouTubeID.setText(download == null ? empty : download.getYoutubeID());
-		ID.setText(download == null ? empty : Long.toHexString(download.getDownloadId()));
-		//        URL.setText(download == null || download.url == null ? empty : download.url);
-		AvailFormat.setText(download == null || download.getAvailableFormat() == null ? empty : download.getAvailableFormat().toUpperCase());
-		Exception.setText(download == null || download.getException() == null ? empty : download.getException().getMessage());
+		YouTubeID.setText(download.getYoutubeID());
+		ID.setText(Long.toHexString(download.getDownloadId()));
+		AvailFormat.setText(download.getAvailableFormat() == null ? empty : download.getAvailableFormat().toUpperCase());
+		Exception.setText(download.getException() == null ? empty : download.getException().getMessage());
 
 		if (download.getUrl() == null || download.getUrl().isEmpty())
 			URL.setText(empty);
 		else {
 			URL.setText(R.string.dialog_download_url);
 			URL.setOnClickListener(view -> {
-				if (getContext() != null)
-					new AlertDialog.Builder(getContext())
-							.setTitle(R.string.url)
-							.setMessage(download.getUrl())
-							.setPositiveButton(getString(R.string.go), (dialog, which) -> {
-								Intent intent = new Intent(Intent.ACTION_VIEW);
-								intent.setData(Uri.parse(download.getUrl()));
-								startActivity(intent);
-							})
-							.show();
+				Context context = getContext();
+				if (context != null)
+					showURLDialog(context, download.getUrl());
 			});
 		}
-		UpdatePartial();
+		UpdateStatus();
 	}
 
-	public void UpdatePartial(@NonNull Download download) {
+	public void UpdateStatus(@NonNull Download download) {
 		this.download = download;
-		UpdatePartial();
+		UpdateStatus();
 	}
 
-	void UpdatePartial() {
-		if (isDownloadNull()) return;
+	void UpdateStatus() {
+		if (download == null) {
+			Log.w(TAG, "download is null");
+			return;
+		}
 
-		if (download.getException() instanceof IllegalArgumentException)
-			Exception.setText(R.string.illegal_argument_exception);
-		else if (download.getException() instanceof DownloadService.ServiceException) {
-			//                if ((((DownloadService.ServiceException) download.exception).getDownload()) == null)
-			//                    DLText.setText("");
-			//                else UpdateStatus(download.status);
-			Exception payload = ((DownloadService.ServiceException) download.getException()).getPayload();
-			Exception.setText(payload == null ? download.getException().getMessage() : payload.getMessage());
-		} else if (download.getException() != null)
-			Exception.setText(download.getException().getMessage());
+		UpdateException(download.getException());
 
 		if (download.getSize() <= 0)
 			Progress.setText(String.format(Commons.getLocale(), "%d/%d", download.getCurrent(), download.getTotal()));
@@ -243,19 +241,26 @@ public class DownloadDialog extends DialogFragment {
 		else Metadata.setText(R.string.failed);
 	}
 
-	private boolean isDownloadNull() {
-		if (download == null) {
-			Log.w(TAG, "download == null");
-			return true;
-		} else return false;
+	private void UpdateException(@Nullable Exception exception) {
+		if (download.getException() instanceof IllegalArgumentException)
+			Exception.setText(R.string.illegal_argument_exception);
+		else if (download.getException() != null)
+			Exception.setText(download.getException().getMessage());
+		else
+			Exception.setText(R.string.sym_empty);
 	}
 
-	//    private String ArrayToString(String[] strings) {
-	//        if (strings.length <= 0) return "";
-	//        StringBuilder builder = new StringBuilder(strings[0]);
-	//        for (String string : strings) builder.append(',').append(string);
-	//        return builder.toString();
-	//    }
+	private void showURLDialog(Context context, String url) {
+		new AlertDialog.Builder(context)
+				.setTitle(R.string.url)
+				.setMessage(url)
+				.setPositiveButton(getString(R.string.go), (dialog, which) -> {
+					Intent intent = new Intent(Intent.ACTION_VIEW);
+					intent.setData(Uri.parse(url));
+					startActivity(intent);
+				})
+				.show();
+	}
 
 	private String IntToHMS(int i) {
 		StringBuilder str = new StringBuilder();
