@@ -42,8 +42,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
-
 @Keep
 public class Commons extends Application {
 
@@ -207,18 +205,6 @@ public class Commons extends Application {
 			Log.e(TAG, "Failed to initialize Fetch", e);
 		}
 
-		AndroidAudioConverter.load(this, new ILoadCallback() {
-			@Override
-			public void onSuccess() {
-				Log.i(TAG, "AndroidAudioConverter successfully loaded");
-			}
-
-			@Override
-			public void onFailure(Exception error) {
-				Log.e(TAG, "AndroidAudioConverter failed to load");
-			}
-		});
-
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
 			androidDefaultUEH = Thread.getDefaultUncaughtExceptionHandler();
 			Thread.setDefaultUncaughtExceptionHandler(handler);
@@ -237,7 +223,8 @@ public class Commons extends Application {
 		final String[] suffix = {"B", "KB", "MB", "GB"};
 		float len = (float) length;
 		int i = -1;
-		while (i++ < suffix.length && len >= 1000F) len /= 1000F;
+		while (i++ < suffix.length && len >= 1000F)
+			len /= 1000F;
 		return String.format(Locale.ENGLISH, "%.2f %s", len, suffix[i]);
 	}
 

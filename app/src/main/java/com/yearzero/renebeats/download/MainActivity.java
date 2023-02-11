@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -93,10 +94,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 	private static String query;
 
 	// Update UI if the network profile has changed
-	private BroadcastReceiver WifiListener = new BroadcastReceiver() {
+	private final BroadcastReceiver WifiListener = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (!Commons.isWifiConnected(context) && !Preferences.getMobiledata() && Commons.getDownloadNetworkType() != NetworkType.ALL) {
+			if (!Commons.isWifiConnected(context)
+					&& !Preferences.getMobiledata()
+					&& Commons.getDownloadNetworkType() != NetworkType.ALL) {
 				ErrorCard.setVisibility(View.VISIBLE);
 				ErrorImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
 				ErrorTitle.setText(getString(R.string.no_wifi));
@@ -107,13 +110,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 					ErrorCard.setVisibility(View.GONE);
 				});
 
-				//                OfflineAction.setText(R.string.retry);
-				//                OfflineImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
-				//                OfflineMsg.setText(R.string.no_internet);
-				//                OfflineAction.setVisibility(View.VISIBLE);
-				//                OfflineImg.setVisibility(View.VISIBLE);
-				//                OfflineMsg.setVisibility(View.VISIBLE);
-				//                OfflineAction.setOnClickListener(v -> Query());
 			} else ErrorCard.setVisibility(View.GONE);
 
 			queryAdapter.resetList(Collections.nCopies(Preferences.getQuery_amount(), null));
@@ -129,8 +125,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//        if (getIntent() != null && getIntent().getBooleanExtra(InternalArgs.EXIT, false)) finish();
-
 		setContentView(R.layout.activity_main);
 
 		SlideUp = findViewById(R.id.slide_up);
@@ -148,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
 		ScrollImg = findViewById(R.id.scroll_img);
 		InfoTitle = findViewById(R.id.info_title);
-		//        InfoAction = findViewById(R.id.info_action);
 
 		List = findViewById(R.id.list);
 
@@ -291,21 +284,22 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 	}
 
 	public void onError(Exception e) {
-		if (e instanceof GoogleJsonResponseException) {
-			OfflineImg.setImageResource(R.drawable.ic_error_gray_24dp);
-			OfflineMsg.setText(R.string.main_error_quota);
-			OfflineAction.setText(R.string.main_error_quota_action);
-			OfflineAction.setOnClickListener(v -> {
-				try {
-					// try starting the app if it is installed
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:")));
-				} catch (ActivityNotFoundException ex) {
-					// else, open the website instead
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com")));
-				}
-			});
-			OfflineSetVisibility(true);
-		}
+		if (!(e instanceof GoogleJsonResponseException))
+			return;
+
+		OfflineImg.setImageResource(R.drawable.ic_error_gray_24dp);
+		OfflineMsg.setText(R.string.main_error_quota);
+		OfflineAction.setText(R.string.main_error_quota_action);
+		OfflineAction.setOnClickListener(v -> {
+			try {
+				// try starting the app if it is installed
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:")));
+			} catch (ActivityNotFoundException ex) {
+				// else, open the website instead
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com")));
+			}
+		});
+		OfflineSetVisibility(true);
 	}
 
 	public void onTimeout() {
@@ -370,58 +364,45 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 		service = ((DownloadService.LocalBinder) iBinder).getService();
 		service.addCallbacks(this);
 		adapter = new DownloadAdapter(this, service, List, getSupportFragmentManager());
-		List.setLayoutManager(manager);
-		List.setAdapter(adapter);
-		ScrollImg.setVisibility(View.VISIBLE);
-		//        int index = getIntent().getIntExtra(InternalArgs.INDEX, -1);
-		//        if (index > 0 && manager.findFirstCompletelyVisibleItemPosition() <= index && manager.findLastCompletelyVisibleItemPosition() >= index) {
-		//            RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(this) {
-		//                @Override
-		//                protected int getVerticalSnapPreference() {
-		//                    return LinearSmoothScroller.SNAP_TO_START;
-		//                }
-		//            };
-		//            smoothScroller.setTargetPosition(index);
-		//            manager.startSmoothScroll(smoothScroller);
-		//        }
-
-
-		//        if (getIntent() != null) {
-		//            int scrollIndex = getIntent().getIntExtra(InternalArgs.INDEX, -1);
-		//            if (scrollIndex >= 0 && scrollIndex < adapter.getItemCount()) {
-		//                float y = List.getY() + List.getChildAt(scrollIndex).getY();
-		//                ((NestedScrollView) findViewById(R.id.main)).smoothScrollTo(0, (int) y);
-		////                manager.scrollToPositionWithOffset(scrollIndex, 20);
-		////                List.scrollToPosition(scrollIndex);
-		//            }
-		//        }
+		runOnUiThread(() -> {
+			List.setLayoutManager(manager);
+			List.setAdapter(adapter);
+			ScrollImg.setVisibility(View.VISIBLE);
+		});
 	}
 
 	@Override
 	public void onServiceDisconnected(ComponentName componentName) {
 		service.removeCallbacks(this);
 		service = null;
-		if (adapter.getItemCount() > 0) ScrollImg.setVisibility(View.VISIBLE);
+		if (adapter.getItemCount() > 0)
+			runOnUiThread(() -> ScrollImg.setVisibility(View.VISIBLE));
 		Log.w(TAG, "Service has been disconnected");
 	}
 
 	@Override
 	public void onProgress(Download args, long progress, long max, long size, boolean indeterminate) {
-		adapter.onProgress(args, progress, max, size, indeterminate);
-		UpdateInfo();
+		runOnUiThread(() -> {
+			adapter.onProgress(args, progress, max, size, indeterminate);
+			UpdateInfo();
+		});
 	}
 
 	@Override
 	public void onDone(Download args, boolean successful, Exception e) {
-		adapter.onDone(args, successful, e);
-		UpdateInfo();
+		runOnUiThread(() -> {
+			adapter.onDone(args, successful, e);
+			UpdateInfo();
+		});
 	}
 
 	@Override
 	public void onWarn(Download args, String type) {
-		adapter.onWarn(args, type);
 		Log.w(TAG, '\'' + args.getTitle() + '\'' + ": " + type);
-		Snackbar.make(findViewById(R.id.main), type, Snackbar.LENGTH_LONG).show();
+		runOnUiThread(() -> {
+			adapter.onWarn(args, type);
+			Snackbar.make(findViewById(R.id.main), type, Snackbar.LENGTH_LONG).show();
+		});
 	}
 
 	@Override
@@ -429,11 +410,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 		if(Search.getText() == null || Search.getText().toString().trim().isEmpty()) return;
 
 		InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-		View v = getCurrentFocus();
-		if (v == null) {
-			v = new View(this);
-		}
-		imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+		imm.hideSoftInputFromWindow(view.getWindowToken(), 0); // Hide keyboard
 
 		String url = "";
 		String query = Search.getText().toString();

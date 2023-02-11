@@ -19,6 +19,7 @@ import com.tonyodev.fetch2.Priority;
 import com.tonyodev.fetch2.Request;
 import com.tonyodev.fetch2core.DownloadBlock;
 import com.yearzero.renebeats.AndroidAudioConverter;
+import com.yearzero.renebeats.AudioFormat;
 import com.yearzero.renebeats.Commons;
 import com.yearzero.renebeats.Directories;
 import com.yearzero.renebeats.InternalArgs;
@@ -34,16 +35,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-
-import cafe.adriel.androidaudioconverter.model.AudioFormat;
 
 public class DownloadService extends Service {
 
@@ -207,7 +205,7 @@ public class DownloadService extends Service {
 
 			LocalBroadcastManager.getInstance(DownloadService.this).sendBroadcast(req);
 
-			if (CheckQueues()) stop();
+			if (isServiceIdling()) stop();
 			return START_STICKY;
 		}
 
@@ -217,14 +215,14 @@ public class DownloadService extends Service {
 			current = (Download) intent.getSerializableExtra(InternalArgs.DATA);
 		} catch (ClassCastException e) {
 			e.printStackTrace();
-			if (CheckQueues()) {
+			if (isServiceIdling()) {
 				stop();
 				return START_NOT_STICKY;
 			}
 		}
 
 		if (current == null) {
-			if (CheckQueues()) stop();
+			if (isServiceIdling()) stop();
 			return START_STICKY;
 		}
 
@@ -277,7 +275,10 @@ public class DownloadService extends Service {
 		if (!Commons.fetch.getListenerSet().contains(fetchListener))
 			Commons.fetch.addListener(fetchListener);
 
-		Request request = new Request(current.getUrl(), Directories.getBIN().getAbsolutePath() + '/' + current.getDown());
+		Request request = new Request(
+				current.getUrl(),
+				new File(Directories.getBIN(), current.getDown()).getAbsolutePath()
+		);
 		request.setNetworkType(Preferences.getMobiledata() ? NetworkType.ALL : NetworkType.WIFI_ONLY);
 		request.setPriority(Priority.HIGH);
 		request.setEnqueueAction(EnqueueAction.REPLACE_EXISTING);
@@ -291,158 +292,161 @@ public class DownloadService extends Service {
 		if (convertProgress != null) return;
 		final Download current = convertQueue.poll();
 		if (current == null) {
-			if (CheckQueues()) stop();
+			if (isServiceIdling()) stop();
 			return;
 		}
 
-		if (current.isConvert()) {
-			if (converter == null) converter = AndroidAudioConverter.with(getApplicationContext());
-			File conv = converter.setFile(new File(Directories.getBIN(), current.getDown()))
-					.setTrim(current.getStart(), current.getEnd())
-					.setNormalize(current.isNormalize())
-					.setFormat(AudioFormat.valueOf(current.getFormat().toUpperCase()))
-					.setBitrate(current.getBitrate())
-					.setCallback(new AndroidAudioConverter.IConvertCallback() {
-						@Override
-						public void onSuccess(File conv) {
-							convertProgress = null;
-							current.getStatus().setConvert(Status.Convert.COMPLETE);
-							current.setConv(conv.getName());
-							converter.killProcess();
-							if (convertQueue.size() > 0) Convert();
-							Metadata(current);
-						}
-
-						@Override
-						public void onProgress(long size, int c, int length) {
-							DownloadService.this.onProgress(c, length, size, length == 0, current);
-						}
-
-						@Override
-						public void onFailure(Exception e) {
-							converter.killProcess();
-							convertProgress = null;
-							current.getStatus().setConvert(Status.Convert.FAILED);
-
-							e.printStackTrace();
-							onFinish(current, new ServiceException("Failed to process download", e));
-						}
-					})
-					.convert();
-			current.getStatus().setConvert(Status.Convert.RUNNING);
-			current.getStatus().setMetadata(null);
-			if (conv != null) current.setConv(conv.getAbsolutePath());
-			convertProgress = current;
-		} else {
+		if (!current.isConvert()) {
 			current.setConv(current.getDown());
 			current.getStatus().setConvert(Status.Convert.SKIPPED);
 			current.getStatus().setMetadata(null);
 			Metadata(current);
 			if (convertProgress == null && convertQueue.size() > 0) Convert();
+
+			return;
 		}
 
+		if (converter == null)
+			converter = new AndroidAudioConverter(getApplicationContext());
+
+		File conv = converter.setFile(new File(Directories.getBIN(), current.getDown()))
+				.setTrim(current.getStart(), current.getEnd())
+				.setNormalize(current.isNormalize())
+				.setFormat(AudioFormat.valueOf(current.getFormat().toUpperCase()))
+				.setBitrate(current.getBitrate())
+				.setCallback(new AndroidAudioConverter.IConvertCallback() {
+					@Override
+					public void onSuccess(File conv) {
+						convertProgress = null;
+						current.getStatus().setConvert(Status.Convert.COMPLETE);
+						current.setConv(conv.getName());
+						converter.killProcess();
+						if (convertQueue.size() > 0) Convert();
+						Metadata(current);
+					}
+
+					@Override
+					public void onProgress(long size, int c, int length) {
+						DownloadService.this.onProgress(
+								c, length, size, length == 0, current
+						);
+					}
+
+					@Override
+					public void onFailure(Exception e) {
+						converter.killProcess();
+						convertProgress = null;
+						current.getStatus().setConvert(Status.Convert.FAILED);
+
+						e.printStackTrace();
+						onFinish(current, new ServiceException("Failed to process download", e));
+					}
+				})
+				.convert();
+
+		current.getStatus().setConvert(Status.Convert.RUNNING);
+		current.getStatus().setMetadata(null);
+		if (conv != null)
+			current.setConv(conv.getAbsolutePath());
+		convertProgress = current;
 	}
 
 	private void Metadata(Download current) {
-		if (current.getConv() == null) {
+		if (current.getConv() == null || current.getConv().isEmpty()) {
 			current.getStatus().setInvalid(true);
-			onFinish(current, false, new IllegalArgumentException("conv is null"));
-			return;
-		} else if (current.getConv().isEmpty()) {
-			current.getStatus().setInvalid(true);
-			onFinish(current, false, new IllegalArgumentException("conv is empty"));
+			Exception exception = new IllegalArgumentException("No converted file found.");
+			onFinish(current, false, exception);
 			return;
 		}
 
 		onProgress(0L, 0L, true, current);
 
-		MusicMetadataSet src_set = null;
-		try {
-			src_set = new MyID3().read(new File(current.getConv()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		if (current.getOverwrite()) current.setMtdt(current.getFilenameWithExt());
+		if (current.getOverwrite()) 
+			current.setMtdt(current.getFilenameWithExt());
 		else {
-			short w = 1;
-			String mtdt = current.getFilename();
-			String offset = mtdt;
-
-			while (new File(Directories.getBIN(), offset + '.' + current.getFormat()).exists()) offset = mtdt + " (" + w++ + ')';
-
-			current.setMtdt(offset + '.' + current.getFormat());
+			String filename = current.getFilename();
+			String metadataFilename = avoidFilenameConflict(current, filename);
+			current.setMtdt(metadataFilename);
 		}
 
-		if (src_set == null) {
-			Log.i(TAG, "No metadata in down");
-			try {
-				try (InputStream in = new FileInputStream(new File(Directories.getBIN(), current.getConv()))) {
-					try (OutputStream out = new FileOutputStream(new File(Directories.getMUSIC(), current.getMtdt()))) {
-						byte[] buf = new byte[1024];
-						int len;
-						while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				onFinish(current, new ServiceException("Error copying file from conv to mtdt since there is no metadata support", e));
-			}
-		} else {
-			MusicMetadata meta = new MusicMetadata("name");
-			if (!current.getTitle().isEmpty())
-				meta.setSongTitle(current.getTitle());
-			if (!current.getArtist().isEmpty())
-				meta.setArtist(current.getArtist());
-			if (!current.getAlbum().isEmpty()) meta.setAlbum(current.getAlbum());
-			if (current.getTrack() > 0) meta.setTrackNumber(current.getTrack());
-			if (current.getYear() > 0) meta.setYear(String.valueOf(current.getYear()));
+		if (writeMetadata(current)) {
+			current.setCompleteDate(new Date());
+			current.getStatus().setMetadata(true);
+			onFinish(current, true, null);
+			return;
+		}
 
-			//            if (current.genres != null && current.genres.length > 0) {
-			//                StringBuilder str = new StringBuilder();
-			//
-			//                for (int i = 0; i < current.genres.length - 1; i++)
-			//                    str.append(current.genres[i]).append(", ");
-			//
-			//                str.append(current.genres[current.genres.length - 1]);
-			//                meta.setGenre(str.toString());
-			//            }
-			if (!current.getGenres().isEmpty()) meta.setGenre(current.getGenres());
+		Log.w(TAG, "Failed to write metadata. Copying files instead...");
 
-			try {
-				new MyID3().write(
-						new File(current.getConv()),
-						new File(Directories.getMUSIC(), current.getMtdt()),
-						src_set,
-						meta
-				);
-			} catch (IOException | ID3WriteException e) {
-				e.printStackTrace();
-				current.setCompleteDate(new Date());
-				current.getStatus().setMetadata(true);
-				onFinish(current, new ServiceException("Metadata Failure", e));
-				return;
-			}
+		File convertedFile = new File(Directories.getBIN(), current.getConv());
+		File metadataFile = new File(Directories.getMUSIC(), current.getMtdt());
+		if (copyFile(convertedFile, metadataFile)) {
+			current.setCompleteDate(new Date());
+			current.getStatus().setMetadata(false);
+			onFinish(current, true, null);
+			return;
 		}
 
 		current.setCompleteDate(new Date());
 		current.getStatus().setMetadata(true);
-		onFinish(current, true, null);
+		onFinish(current, new ServiceException("Failed to copy file to output folder."));
+	}
+
+	private boolean writeMetadata(Download download) {
+		File convertedFile = new File(Directories.getBIN(), download.getConv());
+		File metadataFile = new File(Directories.getMUSIC(), download.getMtdt());
+
+		MusicMetadata metadata = new MusicMetadata("name");
+		metadata.setSongTitle(download.getTitle());
+		metadata.setArtist(download.getArtist());
+		metadata.setAlbum(download.getAlbum());
+		metadata.setTrackNumber(download.getTrack());
+		metadata.setYear(String.valueOf(download.getYear()));
+		metadata.setGenre(download.getGenres());
+
+		MyID3 metadataEngine = new MyID3();
+		try {
+			MusicMetadataSet metadataSet = metadataEngine.read(convertedFile);
+			metadataEngine.write(convertedFile, metadataFile, metadataSet, metadata);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	private boolean copyFile(File source, File destination) {
+		try (FileInputStream in = new FileInputStream(source);
+			 FileOutputStream out = new FileOutputStream(destination)) {
+			FileChannel inChannel = in.getChannel();
+			FileChannel outChannel = out.getChannel();
+			inChannel.transferTo(0, inChannel.size(), outChannel);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	private String avoidFilenameConflict(Download current, String filename) {
+		String nonConflictFilename = filename;
+		String extension = current.getFormat();
+		int i = 1;
+		while (new File(Directories.getBIN(), nonConflictFilename + '.' + extension).exists())
+			nonConflictFilename = filename + " (" + i++ + ')';
+		
+		return nonConflictFilename + '.' + extension;
 	}
 
 	//endregion
 
-	private boolean CheckQueues() {
+	private boolean isServiceIdling() {
 		return downloadMap.size() == 0 &&
 				convertQueue.size() == 0 &&
 				convertProgress == null;
 	}
 
 	private void onFinish(Download args, boolean successful, @Nullable Exception e) {
-		//        boolean failed = false;
-		//        for (File f : Directories.getBIN().listFiles()) {
-		//            if (!f.delete()) failed = true;
-		//        }
 		if (args.getDown() == null)
 			Log.w(TAG, "Download received does not have a down");
 		else if (args.getConv() == null)
@@ -469,7 +473,7 @@ public class DownloadService extends Service {
 		if (e != null) intent.putExtra(InternalArgs.EXCEPTION, e);
 		intent.putExtra(InternalArgs.RESULT, successful ? InternalArgs.SUCCESS : InternalArgs.FAILED);
 		intent.putExtra(InternalArgs.DATA, args);
-		intent.putExtra(InternalArgs.REMAINING, !CheckQueues());
+		intent.putExtra(InternalArgs.REMAINING, !isServiceIdling());
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 
@@ -513,83 +517,8 @@ public class DownloadService extends Service {
 
 		Commons.fetch.removeListener(fetchListener);
 
-		//        Commons.fetch.getDownloadsWithStatus(Status.COMPLETE, new Func<List<Download>>() {
-		//            @Override
-		//            public void call(@NotNull final List<Download> completed) {
-		//                Commons.fetch.getDownloadsWithStatus(Status.DOWN_QUEUE, new Func<List<Download>>() {
-		//                    @Override
-		//                    public void call(@NotNull List<Download> queue) {
-
-		//        Sanitize();
-		//        if (!Commons.saveQueue(queue.toArray(new Download[0]))) {
-		//            Log.e(TAG, "Failed to save queue");
-		//            Intent error = new Intent(TAG);
-		//            error.putExtra(InternalArgs.RESULT, InternalArgs.ERR_LOAD);
-		//            LocalBroadcastManager.getInstance(DownloadService.this).sendBroadcast(error);
-		//
-		//            if (callbacks != null) callbacks.onWarn(InternalArgs.ERR_LOAD);
-		//        }
-
 		DownloadService.super.onDestroy();
-		//                    }
-		//                });
-		//            }
-		//        });
-
 	}
-
-	//    public void pause(int downloadId) {
-	//        if (convertProgress != null && convertProgress.getDownloadId() == downloadId) {
-	//            converter.killProcess();
-	//            convertPause.add(convertProgress);
-	//            convertProgress.setPause(true);
-	//            convertProgress = null;
-	//            Convert();
-	//        } else {
-	//            Commons.fetch.pause(downloadId);
-	//            Download d = downloadMap.get(downloadId);
-	//            if (d != null) d.setPause(true);
-	//        }
-	//    }
-
-	//    public void pauseAll(boolean includeConvert) {
-	//        if (includeConvert) cpause = true;
-	//        pause = true;
-	//        Commons.fetch.pauseGroup(GROUP_ID);
-	//    }
-	//
-	//    public void resume(int downloadId) {
-	//        boolean not = true;
-	//        for (Download d : convertPause) {
-	//            if (d.getDownloadId() == downloadId) {
-	//                convertQueue.add(d);
-	//                d.setPause(false);
-	//                Convert();
-	//                not = false;
-	//                break;
-	//            }
-	//        }
-	//        if (not) {
-	//            Commons.fetch.resume(downloadId);
-	//            Download d = downloadMap.get(downloadId);
-	//            if (d != null) d.setPause(true);
-	//        }
-	//    }
-	//
-	//    public void resumeAll() {
-	//        cpause = false;
-	//        pause = false;
-	//        Convert();
-	//        Commons.fetch.resumeGroup(GROUP_ID);
-	//    }
-	//
-	//    public boolean isPaused() {
-	//        return cpause || pause;
-	//    }
-	//
-	//    public boolean isCpause() {
-	//        return cpause;
-	//    }
 
 	public void cancel(int id) {
 		Download current = null;
@@ -763,10 +692,6 @@ public class DownloadService extends Service {
 		}
 		return list;
 	}
-
-	//    public Download[] getConvertPaused() {
-	//        return convertPause.toArray(new Download[0]);
-	//    }
 
 	public List<Download> getRunning() {
 		ArrayList<Download> downloads = new ArrayList<>();

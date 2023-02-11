@@ -6,7 +6,7 @@ android {
   compileSdkVersion 33
   defaultConfig {
 	applicationId "com.yearzero.renebeats"
-	minSdkVersion 21
+	minSdkVersion 24
 	multiDexEnabled true
 	resConfigs "en"
 	targetSdkVersion 33
@@ -65,13 +65,9 @@ android {
   }
 }
 
-//configurations {
-//  all*.exclude group: 'com.google.guava', module: 'listenablefuture'
-//}
-
 dependencies {
 	//noinspection AnnotationProcessorOnCompilePath
-	compileOnly 'org.projectlombok:lombok:1.18.10'
+	compileOnly 'org.projectlombok:lombok:1.18.10' // Do not modify. Do not delete.
 	annotationProcessor 'org.projectlombok:lombok:1.18.10'
 	implementation fileTree(include: ['*.jar'], dir: 'libs')
 	implementation 'androidx.appcompat:appcompat:1.1.0'
@@ -81,18 +77,14 @@ dependencies {
 	implementation 'com.google.android.material:material:1.0.0'
 	implementation 'com.google.android.gms:play-services-auth:17.0.0'
 
-//	implementation 'com.github.writingminds:ffmpeg-android-java'
-	implementation 'com.writingminds:FFmpegAndroid:0.3.2'
-	implementation ('com.github.adrielcafe:AndroidAudioConverter:0.0.8') {
-		exclude group: 'com.github.adrielcafe', module: 'ffmpeg-android-java'
-	}
+	implementation 'com.arthenica:ffmpeg-kit-full:5.1'
 	implementation 'com.github.michael-rapp:android-preference-activity:7.0.3'
 	implementation 'com.sothree.slidinguppanel:library:3.4.0'
 	implementation 'de.hdodenhof:circleimageview:3.0.1'
 	implementation 'org.apache.commons:commons-text:1.8'
 	implementation 'commons-io:commons-io:2.6'
-	implementation 'pub.devrel:easypermissions:0.3.0'
-	implementation 'androidx.tonyodev.fetch2:xfetch2:3.1.1'
+	implementation 'pub.devrel:easypermissions:3.0.0'
+	implementation 'androidx.tonyodev.fetch2:xfetch2:3.1.6'
 	implementation 'com.google.code.gson:gson:2.8.6'
 	implementation 'com.github.tylerfilla:PanView:0.1.0'
 	implementation 'com.squareup.picasso:picasso:2.71828'
@@ -109,8 +101,8 @@ dependencies {
   }
 
   testImplementation 'junit:junit:4.12'
-  androidTestImplementation 'androidx.test:runner:1.2.0'
-  androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+  androidTestImplementation 'androidx.test:runner:1.5.2'
+  androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
   implementation('com.github.evgenyneu:js-evaluator-for-android:v5.0.0') {
 	exclude module: 'appcompat-v7'
