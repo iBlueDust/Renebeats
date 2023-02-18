@@ -745,6 +745,7 @@ public class DownloadService extends Service {
 
 		private ServiceException(String msg, @NonNull Exception exp) {
 			super(msg + " | " + exp.getMessage());
+			payload = exp;
 		}
 
 		public Exception getPayload() {
