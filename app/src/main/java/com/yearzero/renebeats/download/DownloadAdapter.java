@@ -44,7 +44,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 		this.service = service;
 		this.recycler = recycler;
 		this.manager = manager;
-		service.Sanitize();
+		service.sanitizeAllQueues();
 	}
 
 	@NonNull
