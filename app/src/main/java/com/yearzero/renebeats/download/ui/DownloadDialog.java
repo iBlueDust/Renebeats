@@ -149,7 +149,7 @@ public class DownloadDialog extends DialogFragment {
 		Track.setText(String.valueOf(download.getTrack()));
 		Format.setText(download.getFormat().toUpperCase());
 		Bitrate.setText(String.format(Locale.ENGLISH, getString(R.string.kbps), download.getBitrate()));
-		Normalize.setText(download.isNormalize() ? R.string.on : R.string.off);
+		Normalize.setText(download.getNormalize() ? R.string.on : R.string.off);
 		Start.setText(download.getStart() == null ? empty : IntToHMS(download.getStart()));
 		End.setText(download.getEnd() == null ? empty : IntToHMS(download.getEnd()));
 		Overwrite.setText(download.getOverwrite() ? R.string.tru : R.string.fals);

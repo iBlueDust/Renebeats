@@ -113,19 +113,23 @@ class HistorySection(
 		holder.setInfoListener(View.OnClickListener {
 			lateinit var dialog: ErrorLogDialog
 
-			if (historyLog.exception == null) {
+			// Declare as separate variable so Kotlin doesn't complain that by the time
+			// LogReturnException is called, historyLog.exception could have mutated.
+			val exception = historyLog.exception
+
+			if (exception == null) {
 				dialog = ErrorLogDialog(context.getString(R.string.unknown_exception), null)
 				dialog.show(context.supportFragmentManager, TAG)
 				return@OnClickListener
 			}
 
 			if (!Preferences.always_log_failed) {
-				dialog = ErrorLogDialog(null, historyLog.exception)
+				dialog = ErrorLogDialog(null, exception)
 				dialog.show(context.supportFragmentManager, TAG)
 				return@OnClickListener
 			}
 
-			val exceptionLog = Commons.LogExceptionReturn(historyLog, historyLog.exception)
+			val exceptionLog = Commons.LogExceptionReturn(historyLog, exception)
 
 			if (exceptionLog == null) {
 				Toast.makeText(
@@ -162,9 +166,9 @@ class HistorySection(
 	fun getItemViewType(position: Int): Int = array[position].let{
 		if (
 			Status(
-				Status.Download.fromValue(it.status_download),
-				Status.Convert.fromValue(it.status_convert),
-				it.status_meta
+				Status.Download.fromValue(it.statusDownload),
+				Status.Convert.fromValue(it.statusConvert),
+				it.statusMeta
 			).isSuccessful
 		)
 			SuccessViewHolder.LocalID

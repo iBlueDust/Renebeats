@@ -264,7 +264,7 @@ public class DownloadReceiver extends BroadcastReceiver {
 								break;
 							case PAUSED:
 								builder.setContentText("Download Paused");
-								builder.setProgress((int) data.getCurrent(), (int) data.getTotal(), data.isIndeterminate());
+								builder.setProgress((int) data.getCurrent(), (int) data.getTotal(), data.getIndeterminate());
 								builder.setAutoCancel(false);
 								builder.setOngoing(false);
 								break;

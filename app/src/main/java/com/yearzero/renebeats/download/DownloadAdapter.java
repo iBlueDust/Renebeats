@@ -134,7 +134,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 					case RUNNING:
 						RunningViewHolder i = (RunningViewHolder) holder;
 						i.setStatus(String.format(Locale.ENGLISH, context.getString(R.string.adapter_download_downloading), Commons.FormatBytes(args.getCurrent()), Commons.FormatBytes(args.getTotal())));
-						i.setProgress((int) args.getCurrent(), (int) args.getTotal(), args.isIndeterminate());
+						i.setProgress((int) args.getCurrent(), (int) args.getTotal(), args.getIndeterminate());
 						i.setCancelListener(v -> service.cancel(args.getDownloadId()));
 						break;
 					case COMPLETE:

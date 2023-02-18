@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class DownloadService extends Service {
 
@@ -275,6 +276,8 @@ public class DownloadService extends Service {
 		if (!Commons.fetch.getListenerSet().contains(fetchListener))
 			Commons.fetch.addListener(fetchListener);
 
+		Objects.requireNonNull(current.getUrl());
+		Objects.requireNonNull(current.getDown());
 		Request request = new Request(
 				current.getUrl(),
 				new File(Directories.getBIN(), current.getDown()).getAbsolutePath()
@@ -296,7 +299,7 @@ public class DownloadService extends Service {
 			return;
 		}
 
-		if (!current.isConvert()) {
+		if (!current.getConvert()) {
 			current.setConv(current.getDown());
 			current.getStatus().setConvert(Status.Convert.SKIPPED);
 			current.getStatus().setMetadata(null);
@@ -309,9 +312,16 @@ public class DownloadService extends Service {
 		if (converter == null)
 			converter = new AndroidAudioConverter(getApplicationContext());
 
+		if (current.getDown() == null) {
+			ServiceException exception = new ServiceException("Cannot convert audio file. Filename lost.");
+			Log.e(TAG, exception.getMessage());
+			onFinish(current, false, exception);
+			return;
+		}
+
 		File conv = converter.setFile(new File(Directories.getBIN(), current.getDown()))
 				.setTrim(current.getStart(), current.getEnd())
-				.setNormalize(current.isNormalize())
+				.setNormalize(current.getNormalize())
 				.setFormat(AudioFormat.valueOf(current.getFormat().toUpperCase()))
 				.setBitrate(current.getBitrate())
 				.setCallback(new AndroidAudioConverter.IConvertCallback() {
@@ -378,6 +388,7 @@ public class DownloadService extends Service {
 
 		Log.w(TAG, "Failed to write metadata. Copying files instead...");
 
+		Objects.requireNonNull(current.getMtdt());
 		File convertedFile = new File(Directories.getBIN(), current.getConv());
 		File metadataFile = new File(Directories.getMUSIC(), current.getMtdt());
 		if (copyFile(convertedFile, metadataFile)) {
@@ -393,6 +404,8 @@ public class DownloadService extends Service {
 	}
 
 	private boolean writeMetadata(Download download) {
+		Objects.requireNonNull(download.getConv());
+		Objects.requireNonNull(download.getMtdt());
 		File convertedFile = new File(Directories.getBIN(), download.getConv());
 		File metadataFile = new File(Directories.getMUSIC(), download.getMtdt());
 
