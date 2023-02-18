@@ -312,6 +312,7 @@
 	<string name="sym_hour">h</string>
 	<string name="sym_i">i</string>
 	<string name="sym_minute">m</string>
+	<string name="sym_not_available">N/A</string>
 	<string name="sym_question">\?</string>
 	<string name="sym_question_mark">\?</string>
 	<string name="sym_seconds">s</string>

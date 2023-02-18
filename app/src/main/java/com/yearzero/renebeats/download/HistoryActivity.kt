@@ -33,37 +33,16 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 	}
 
 	private lateinit var Title: TextView
-	//    private lateinit var Search: SearchView
 	private lateinit var List: RecyclerView
 	private lateinit var Swipe: SwipeRefreshLayout
 	private lateinit var Empty: TextView
 
 	private var service: DownloadService? = null
 
-	//    private var task = History.RetrieveNTask()
 	private val adapter = HistoryAdapter(this)
-//    private val focusSet: TransitionSet = TransitionSet()
-//    private val unfocusSet: TransitionSet = TransitionSet()
 
 	private var array: Array<out HistoryLog> = emptyArray()
 	private var locale: Locale = Locale.ENGLISH
-
-//    enum class SectionType { Date , Month, Year }
-
-//    init {
-//        focusSet.addTransition(ChangeBounds()
-//                .setDuration(100)
-//                .setStartDelay(50))
-//                .addTransition(Fade()
-//                        .setDuration(100))
-//
-//        unfocusSet.addTransition(ChangeBounds()
-//                .setDuration(100))
-//                .addTransition(Fade()
-//                        .setDuration(100)
-//                        .setStartDelay(50))
-//
-//    }
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -73,46 +52,9 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 		findViewById<ImageButton>(R.id.home).setOnClickListener{ onBackPressed() }
 
 		Title = findViewById(R.id.title)
-//        Search = findViewById(R.id.search)
 		List = findViewById(R.id.list)
 		Swipe = findViewById(R.id.swipe)
 		Empty = findViewById(R.id.empty)
-
-//        Search.setOnQueryTextFocusChangeListener { _, hasFocus ->
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && (Title.visibility == View.VISIBLE) == hasFocus) {
-//                if (hasFocus) {
-//                    TransitionManager.beginDelayedTransition(Swipe, focusSet)
-//                    Title.visibility = View.GONE
-//                } else {
-//                    TransitionManager.beginDelayedTransition(Swipe, unfocusSet)
-//                    Title.visibility = View.VISIBLE
-//                }
-//            } else Title.visibility = if (hasFocus) View.GONE else View.VISIBLE
-//        }
-//        Search.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-//            override fun onQueryTextSubmit(query: String?): Boolean { return false }
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                if (newText != null && newText.isNotBlank()) {
-//                    // Filter results by keyword in 'filter' field
-//                    val filter = newText.toString().trim().toLowerCase(locale)
-//                    array.filter{ log ->
-//                        log.getFilename(getString(R.string.sym_separator))?.toLowerCase(locale)?.contains(filter)
-//                                ?: getString(R.string.sym_empty).toLowerCase(locale).contains(filter)
-//                    }
-//                    onComplete(array)
-//                }
-//                return true
-//            }
-//        })
-
-//        Search.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//            }
-//
-//            override fun onQueryTextSubmit(query: String?): Boolean {
-//            }
-//        })
 
 		Swipe.setOnRefreshListener(this::refresh)
 		Swipe.setColorSchemeResources(R.color.Accent, R.color.Secondary)
@@ -157,13 +99,6 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 		Swipe.isRefreshing = false
 	}
 
-//    override fun onBackPressed() = if (Search.hasFocus())
-//            Search.let {
-//                it.clearFocus()
-//                it.isIconified = true
-//            }
-//        else super.onBackPressed()
-
 	override fun onResume() {
 		super.onResume()
 		bindService(Intent(this, DownloadService::class.java), this, 0)
@@ -196,10 +131,6 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 		}
 
 		private var serviceList = emptyList<Download>()
-
-//        companion object {
-//            @JvmStatic val THRESHOLD = 10
-//        }
 
 		override fun onPreExecute() {
 			val act = activity.get()
@@ -236,65 +167,24 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 		override fun doInBackground(vararg params: HistoryLog): List<HistorySection>? {
 			val result = SparseArray<Node>()
 
-			// Split data into year groups
-//            for (log in params) {
-//                val calendar = Calendar.getInstance()
-//                calendar.time = log.date
-//                val year = calendar.get(Calendar.YEAR)
-//                val yearCode = getCode(year)
-//                val node = result.get(yearCode, null)
-//                if (node == null) result.append(yearCode, Node(ArrayList(listOf(log)), SectionType.Year, year= year))
-//                else node.logs.add(log)
-//            }
-// // Check for any year groups exceeding the THRESHOLD, if so, split to month groups
-//            var i = 0
-//            while (i in 0 until result.size()) {
-//                val node = result.valueAt(i++)
-//                if (node.logs.size > THRESHOLD) {
-//                    result.removeAt(i--)
-//                    for (log in node.logs) {
-//                        val calendar = Calendar.getInstance()
-//                        calendar.time = log.date
-//                        val month = calendar.get(Calendar.MONTH)
-//                        val code = getCode(node.year, month)
-//                        val child = result.get(code, null)
-//                        if (child == null) result.append(code, Node(ArrayList(listOf(log)), SectionType.Month, year= node.year, month= month))
-//                        else child.logs.add(log)
-//                    }
-//                }
-//            }
-// // Check for any month groups exceeding THRESHOLD, if so, split to date groups
-//            var j = 0
-//            while (j in 0 until result.size()) {
-//                val node = result.valueAt(j++)
-//                if (node.logs.size > THRESHOLD) {
-//                    result.removeAt(j--)
-//                    for (log in node.logs) {
-//                        val calendar = Calendar.getInstance()
-//                        calendar.time = log.date
-//                        val date = calendar.get(Calendar.DATE)
-//                        val code = getCode(node.year, node.month, date)
-//                        val child = result.get(code, null)
-//                        if (child == null) result.append(code, Node(ArrayList(listOf(log)), SectionType.Date, year= node.year, month= node.month, date= date))
-//                        else child.logs.add(log)
-//                    }
-//                }
-//            }
-
 			// Split to day groups immediately
 			mainLoop@ for (log in params) {
 				for (running in serviceList)
-					if (running == log)
+					if (running.id == log.id)
 						break@mainLoop
 
 				val calendar = Calendar.getInstance()
-				calendar.time = log.date
+				calendar.time = log.assigned ?: Date()
 				val year = calendar.get(Calendar.YEAR)
 				val month = calendar.get(Calendar.MONTH)
 				val date = calendar.get(Calendar.DATE)
 				val yearCode = getCode(year, month, date)
 				val node = result.get(yearCode, null)
-				if (node == null) result.append(yearCode, Node(ArrayList(listOf(log)), /*SectionType.Date,*/ year= year, month= month, date= date))
+				if (node == null)
+					result.append(
+						yearCode,
+						Node(ArrayList(listOf(log)), year= year, month= month, date= date)
+					)
 				else node.logs.add(log)
 			}
 
@@ -303,14 +193,17 @@ class HistoryActivity : AppCompatActivity(), HistoryRepo.RetrieveNTask.Callback,
 			for (n in 0 until result.size()) {
 				val context = activity.get()
 				if (context != null) {
-					result.valueAt(n).logs.sortWith(Comparator { a, b -> b.assigned.compareTo(a.assigned)})
+					result.valueAt(n).logs.sortWith(
+						Comparator { a, b -> b.assigned?.compareTo(a.assigned) ?: 0}
+					)
 					sections.add(HistorySection(context, result.valueAt(n)))
 				}
 			}
 			return sections.reversed()
 		}
 
-		// Packed integer so that if sorted, the corresponding values will also be sorted by the group's collective date
+		// Packed integer so that if sorted, the corresponding values will also be sorted by the
+		// group's collective date
 		@Keep
 		private fun getCode(year: Int, month: Int = 0, day: Int = 0): Int = (year shl 9) + (month * 32) + day
 	}

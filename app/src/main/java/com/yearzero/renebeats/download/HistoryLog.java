@@ -14,7 +14,7 @@ import javax.annotation.ParametersAreNullableByDefault;
 @ParametersAreNullableByDefault
 public class HistoryLog implements Serializable {
 	// Appcode (EA50) - "Class" (ClA5) - Class ID (415C_1066)
-	private static long serialVersionUID = 0xEA50_C1A5_415C_1066L;
+	private static final long serialVersionUID = 0xEA50_C1A5_415C_1066L;
 
 	//TODO: Merge with Download and use custom Serializer or Annotations?
 
@@ -50,14 +50,19 @@ public class HistoryLog implements Serializable {
 	private Exception exception;
 
 	@Nullable
-	public String getFilename(String sym_separator) {
+	public String getFilename() {
 		if (artist != null && title != null)
 			return Preferences.getArtist_first() ?
-					artist + ' ' + sym_separator + ' ' + title :
-					title + ' ' + sym_separator + ' ' + artist;
-		else if (artist != null) return artist;
-		else if (title != null) return title;
-		else return null;
+					artist + " - " + title :
+					title + " - " + artist;
+
+		if (artist != null)
+			return artist;
+
+		if (title != null)
+			return title;
+
+		return null;
 	}
 
 	public Date getDate() {
@@ -157,23 +162,19 @@ public class HistoryLog implements Serializable {
 		else return false;
 	}
 
-	public String getVersion() {return this.version;}
+	// This class is accessed in some Kotlin files. Unfortunately, Kotlin does not cooperate well
+	// with Lombok, so some manual getters and setters have to be defined
+	// TODO: wait for better Kotlin and Lombok interoperability
 
-	public int getVersionCode() {return this.versionCode;}
+	public String getVersion() {return this.version;}
 
 	public boolean isConvert() {return this.convert;}
 
 	public boolean isNormalize() {return this.normalize;}
 
-	public boolean isOverwrite() {return this.overwrite;}
-
 	public short getBitrate() {return this.bitrate;}
 
-	public int getTrack() {return this.track;}
-
 	public int getYear() {return this.year;}
-
-	public int getDownloadId() {return this.downloadId;}
 
 	public long getId() {return this.id;}
 
@@ -181,27 +182,9 @@ public class HistoryLog implements Serializable {
 
 	public Integer getEnd() {return this.end;}
 
-	public String getAlbum() {return this.album;}
-
-	public String getArtist() {return this.artist;}
-
-	public String getAvailableFormat() {return this.availableFormat;}
-
-	public String getConv() {return this.conv;}
-
-	public String getDown() {return this.down;}
-
 	public String getFormat() {return this.format;}
 
-	public String getMtdt() {return this.mtdt;}
-
 	public String getTitle() {return this.title;}
-
-	public String getUrl() {return this.url;}
-
-	public String getYoutubeID() {return this.youtubeID;}
-
-	public String getGenres() {return this.genres;}
 
 	public Date getAssigned() {return this.assigned;}
 
@@ -213,67 +196,5 @@ public class HistoryLog implements Serializable {
 
 	public Boolean getStatus_meta() {return this.status_meta;}
 
-	public boolean isInvalid() {return this.invalid;}
-
 	public Exception getException() {return this.exception;}
-
-	void setVersion(String version) {this.version = version; }
-
-	void setVersionCode(int versionCode) {this.versionCode = versionCode; }
-
-	void setConvert(boolean convert) {this.convert = convert; }
-
-	void setNormalize(boolean normalize) {this.normalize = normalize; }
-
-	void setOverwrite(boolean overwrite) {this.overwrite = overwrite; }
-
-	void setBitrate(short bitrate) {this.bitrate = bitrate; }
-
-	void setTrack(int track) {this.track = track; }
-
-	void setYear(int year) {this.year = year; }
-
-	void setDownloadId(int downloadId) {this.downloadId = downloadId; }
-
-	void setId(long id) {this.id = id; }
-
-	void setStart(Integer start) {this.start = start; }
-
-	void setEnd(Integer end) {this.end = end; }
-
-	void setAlbum(String album) {this.album = album; }
-
-	void setArtist(String artist) {this.artist = artist; }
-
-	void setAvailableFormat(String availableFormat) {this.availableFormat = availableFormat; }
-
-	void setConv(String conv) {this.conv = conv; }
-
-	void setDown(String down) {this.down = down; }
-
-	void setFormat(String format) {this.format = format; }
-
-	void setMtdt(String mtdt) {this.mtdt = mtdt; }
-
-	void setTitle(String title) {this.title = title; }
-
-	void setUrl(String url) {this.url = url; }
-
-	void setYoutubeID(String youtubeID) {this.youtubeID = youtubeID; }
-
-	void setGenres(String genres) {this.genres = genres; }
-
-	void setAssigned(Date assigned) {this.assigned = assigned; }
-
-	void setCompleted(Date completed) {this.completed = completed; }
-
-	void setStatus_download(String status_download) {this.status_download = status_download; }
-
-	void setStatus_convert(String status_convert) {this.status_convert = status_convert; }
-
-	void setStatus_meta(Boolean status_meta) {this.status_meta = status_meta; }
-
-	void setInvalid(boolean invalid) {this.invalid = invalid; }
-
-	void setException(Exception exception) {this.exception = exception; }
 }

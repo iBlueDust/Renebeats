@@ -16,6 +16,18 @@ buildscript {
     }
 }
 
+/*
+ * Doesn't work right now because of a frustrating NoClassDefFoundError
+ */
+//plugins {
+//    id 'org.jetbrains.kotlin.plugin.lombok' version '1.8.10'
+//    id 'io.freefair.lombok' version '5.3.0'
+//}
+//
+//kotlinLombok {
+//    lombokConfigurationFile file("lombok.config")
+//}
+
 allprojects {
     repositories {
         google()
