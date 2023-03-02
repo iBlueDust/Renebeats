@@ -48,22 +48,27 @@ public class HistoryRepo {
 
 	static Exception record(HistoryLog log) {
 		File file = getSessionFile(log.getAssigned());
-		HistoryLog[] written = readSession(file);
-		return writeSession(file, written == null ? new HistoryLog[] {log} : ArrayUtils.add(written, log));
+		HistoryLog[] recordedLogs = readSession(file);
+		HistoryLog[] allLogs =
+				recordedLogs == null ? new HistoryLog[] {log} : ArrayUtils.add(recordedLogs, log);
+		return writeSession(file, allLogs);
 	}
 
 	static Exception completeRecord(HistoryLog log) {
 		File file = getSessionFile(log.getAssigned());
-		HistoryLog[] read = readSession(file);
+		HistoryLog[] readLogs = readSession(file);
 
-		if (read == null) return new LogNotFoundException();
-		for (int i = 0; i < read.length; i++) {
-			if (read[i].equals(log)) {
-				read[i] = log;
-				return writeSession(file, read);
-			}
+		if (readLogs == null)
+			return writeSession(file, log);
+
+		for (int i = 0; i < readLogs.length; i++) {
+			if (readLogs[i].getId() != log.getId())
+				continue;
+
+			readLogs[i] = log;
+			return writeSession(file, readLogs);
 		}
-		return new LogNotFoundException();
+		return writeSession(file, log);
 	}
 
 	private static HistoryLog[] readSession(File file) {
@@ -132,8 +137,12 @@ public class HistoryRepo {
 	private static File getSessionFile(Date assigned) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(assigned);
-		String encoded = Base64.encodeToString(ByteBuffer.allocate(4).putInt((int) (assigned.getTime() / 86400000)).array(), Base64.DEFAULT);
-		return new File(Directories.getHISTORY(), cal.get(Calendar.YEAR) + "/" + encoded.substring(0, encoded.length() - 1) + '.' + EXTENSION);
+		long dayNumber = assigned.getTime() / 86400000;
+		byte[] dayNumberInBytes = ByteBuffer.allocate(4).putInt((int) dayNumber).array();
+		String encodedDate = Base64.encodeToString(dayNumberInBytes, Base64.DEFAULT);
+		encodedDate = encodedDate.substring(0, encodedDate.length() - 1);
+		String filename = cal.get(Calendar.YEAR) + "/" + encodedDate + '.' + EXTENSION;
+		return new File(Directories.getHISTORY(), filename);
 	}
 
 	static String getFilename(Download download) {
@@ -141,7 +150,9 @@ public class HistoryRepo {
 	}
 
 	private static File getHistFile(@Nonnegative short year, byte month) {
-		return new File(Directories.getHISTORY(), String.format(Locale.ENGLISH, "%d-%d.%s", year, month + 1, EXTENSION));
+		String filename =
+				String.format(Locale.ENGLISH, "%d-%d.%s", year, month + 1, EXTENSION);
+		return new File(Directories.getHISTORY(), filename);
 	}
 
 	private static class LogNotFoundException extends Exception {}
