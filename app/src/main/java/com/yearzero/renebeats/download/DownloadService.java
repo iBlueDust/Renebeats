@@ -188,6 +188,13 @@ public class DownloadService extends Service {
 	//region Main
 
 	@Override
+	public void onCreate() {
+		downloadEngine = new DownloadEngine(this);
+		conversionEngine = new ConversionEngine(this);
+		metadataEngine = new MetadataEngine();
+	}
+
+	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent == null)
 			return START_STICKY;
@@ -529,8 +536,8 @@ public class DownloadService extends Service {
 		download.setIndeterminate(indeterminate);
 
 		for (int i = 0; i < callbacks.size(); i++) {
-			ClientCallbacks c = callbacks.get(i);
-			c.onProgress(download, current, total, size, indeterminate);
+			ClientCallbacks callbacks = this.callbacks.get(i);
+			callbacks.onProgress(download, current, total, size, indeterminate);
 		}
 
 		Intent intent = new Intent(TAG);
@@ -731,7 +738,8 @@ public class DownloadService extends Service {
 
 		boolean bad = false;
 		for (File file : files) {
-			if (!file.delete()) bad = true;
+			if (!file.delete())
+				bad = true;
 		}
 
 		if (bad) Log.w(TAG, "Failed to empty BIN");
@@ -742,10 +750,12 @@ public class DownloadService extends Service {
 	 */
 	public List<Download> getAll() {
 		ArrayList<Download> downloads = new ArrayList<>();
-		for (int i = 0; i < downloadQueue.size(); i++) downloads.add(downloadQueue.valueAt(i));
+		for (int i = 0; i < downloadQueue.size(); i++)
+			downloads.add(downloadQueue.valueAt(i));
 		downloads.addAll(convertQueue);
 		downloads.addAll(completed);
-		if (runningConversion != null) downloads.add(runningConversion);
+		if (runningConversion != null)
+			downloads.add(runningConversion);
 		return downloads;
 	}
 
@@ -757,7 +767,8 @@ public class DownloadService extends Service {
 		for (int i = 0; i < downloadQueue.size(); i++) {
 			Download d = downloadQueue.valueAt(i);
 			Status.Download sd = d.getStatus().getDownload();
-			if (sd == Status.Download.NETWORK_PENDING || sd == Status.Download.QUEUED) list.add(d);
+			if (sd == Status.Download.NETWORK_PENDING || sd == Status.Download.QUEUED)
+				list.add(d);
 		}
 		return list;
 	}
@@ -769,11 +780,13 @@ public class DownloadService extends Service {
 		ArrayList<Download> downloads = new ArrayList<>();
 		for (int i = 0; i < downloadQueue.size(); i++) {
 			Download d = downloadQueue.valueAt(i);
-			if (d.getStatus().getDownload() == Status.Download.RUNNING || d.getStatus().getDownload() == Status.Download.PAUSED)
+			if (d.getStatus().getDownload() == Status.Download.RUNNING
+					|| d.getStatus().getDownload() == Status.Download.PAUSED)
 				downloads.add(downloadQueue.valueAt(i));
 		}
 		downloads.addAll(convertQueue);
-		if (runningConversion != null) downloads.add(runningConversion);
+		if (runningConversion != null)
+			downloads.add(runningConversion);
 		return downloads;
 	}
 
@@ -817,9 +830,9 @@ public class DownloadService extends Service {
 
 	// TODO: Separate business logic into three engines that communicate through DownloadService
 
-	private final DownloadEngine downloadEngine = new DownloadEngine(this);
-	private final ConversionEngine conversionEngine = new ConversionEngine(this);
-	private final MetadataEngine metadataEngine = new MetadataEngine();
+	private DownloadEngine downloadEngine;
+	private ConversionEngine conversionEngine;
+	private MetadataEngine metadataEngine;
 
 	private void deploy(@NonNull Download request) {
 		request.getStatus().reset();
@@ -852,10 +865,11 @@ public class DownloadService extends Service {
 		private final SparseArray<Task> tasks = new SparseArray<>();
 
 		protected DownloadEngine(Context context) {
-			fetch = Fetch.Impl.getInstance(new FetchConfiguration.Builder(context)
+			FetchConfiguration config = new FetchConfiguration.Builder(context)
 					.setDownloadConcurrentLimit(Preferences.getConcurrency())
-					.build());
+					.build();
 
+			fetch = Fetch.Impl.getInstance(config);
 			fetch.addListener(this);
 		}
 
