@@ -1,6 +1,7 @@
 package com.yearzero.renebeats.download;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -13,6 +14,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.tonyodev.fetch2.EnqueueAction;
 import com.tonyodev.fetch2.Error;
+import com.tonyodev.fetch2.Fetch;
+import com.tonyodev.fetch2.FetchConfiguration;
 import com.tonyodev.fetch2.FetchListener;
 import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2.Priority;
@@ -25,6 +28,7 @@ import com.yearzero.renebeats.Directories;
 import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.preferences.Preferences;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.cmc.music.metadata.MusicMetadata;
 import org.cmc.music.metadata.MusicMetadataSet;
 import org.cmc.music.myid3.MyID3;
@@ -35,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -42,6 +47,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class DownloadService extends Service {
 
@@ -464,16 +471,12 @@ public class DownloadService extends Service {
 	}
 
 	private void onFinish(Download args, boolean successful, @Nullable Exception e) {
-		if (args.getDown() == null)
-			Log.w(TAG, "Download received does not have a down");
-		else if (args.getConv() == null)
-			Log.w(TAG, "Download received does not have a conv");
-		else if (!(new File(Directories.getBIN(), args.getDown()).delete() && new File(Directories.getBIN(), args.getConv()).delete()))
-			Log.w(TAG, "Failed to delete cache from BIN");
+		deleteCachedDownload(args);
 
-		if (args.getCompleteDate() == null) args.setCompleteDate(new Date());
+		args.setCompleteDate(new Date());
 		args.setException(successful ? null : e);
-		if (!completed.contains(args)) completed.add(args);
+		if (!completed.contains(args))
+			completed.add(args);
 
 		Exception f = HistoryRepo.completeRecord(HistoryLog.generate(args));
 		if (f != null) {
@@ -494,6 +497,21 @@ public class DownloadService extends Service {
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 
+	private void deleteCachedDownload(Download args) {
+		if (args.getDown() == null) {
+			Log.w(TAG, "Download received does not have a down");
+			return;
+		}
+		if (args.getConv() == null) {
+			Log.w(TAG, "Download received does not have a conv");
+			return;
+		}
+
+		if (!new File(Directories.getBIN(), args.getDown()).delete()
+				|| !new File(Directories.getBIN(), args.getConv()).delete())
+			Log.w(TAG, "Failed to delete cache from BIN");
+	}
+
 	private void onFinish(@NonNull Download args, @NonNull ServiceException e) {
 		onFinish(args, false, e);//.setStatus(args.status));
 	}
@@ -502,7 +520,11 @@ public class DownloadService extends Service {
 		onProgress(current, total, 0L, indeterminate, download);
 	}
 
-	private void onProgress(long current, long total, long size, boolean indeterminate, Download download) {
+	private void onProgress(long current,
+							long total,
+							long size,
+							boolean indeterminate,
+							Download download) {
 		download.setCurrent(current);
 		download.setTotal(total);
 		download.setSize(size);
@@ -797,48 +819,245 @@ public class DownloadService extends Service {
 
 	// TODO: Separate business logic into three engines that communicate through DownloadService
 
-//	private final DownloadEngine downloadEngine = new DownloadEngine();
-//	private final ConversionEngine conversionEngine = new ConversionEngine();
-//	private final MetadataEngine metadataEngine = new MetadataEngine();
-//
-//	private void deploy(@NonNull Download download) {
-//		download.getStatus().reset();
-//		downloadEngine.queue(download);
-//	}
-//
-//	protected class DownloadEngine {
-//
-//		private Fetch fetch;
-//		// Though the type is called a SparseArray, it is, in fact, a Map<int, ... >
-//		private SparseArray<Download> map = new SparseArray<>();
-//
-//		protected DownloadEngine() {
-//			fetch = Fetch.Impl.getInstance(new FetchConfiguration.Builder(this)
-//					.setDownloadConcurrentLimit(Preferences.getConcurrency())
-//					.build());
-//		}
-//
-//		protected Future<Void> queue(@NonNull Download download) {
-//			CompletableFuture<Void> future = new CompletableFuture<>();
-//			// Send to fetch2
-//			if (!Directories.getBIN().exists() && !Directories.getBIN().mkdirs()) {
-//				future.completeExceptionally(new RuntimeException("Failed to create BIN folder"));
-//				return future;
-//			}
-//
-//			download.setDown(makeTemporaryFilename(download));
-//
-//			if (!Commons.fetch)
-//		}
-//
-//		private String makeTemporaryFilename(@NonNull Download download) {
-//			return Long.toHexString(download.getId()) + '.' + download.getAvailableFormat();
-//		}
-//	}
-//	protected class ConversionEngine {
-//
-//	}
-//	protected class MetadataEngine {
-//
-//	}
+	private final DownloadEngine downloadEngine = new DownloadEngine(this);
+	private final ConversionEngine conversionEngine = new ConversionEngine();
+	private final MetadataEngine metadataEngine = new MetadataEngine();
+
+	private void deploy(@NonNull Download requested) {
+		requested.getStatus().reset();
+		downloadEngine.download(requested)
+				.thenCompose(conversionEngine::convert)
+				.thenCompose(metadataEngine::process);
+	}
+
+	protected class DownloadEngine implements FetchListener {
+
+		private static final int GROUP_ID = 0xC560_6A11;
+
+		private final Fetch fetch;
+
+		private class Task {
+			@NonNull Download download;
+			@NonNull CompletableFuture<Download> future; // to call once download finishes
+
+			Task(@NonNull Download download, @NonNull CompletableFuture<Download> future) {
+				this.download = download;
+				this.future = future;
+			}
+		}
+
+		// Though the type is called a SparseArray, it is, in fact, a Map<int, ... >
+		private final SparseArray<Task> tasks = new SparseArray<>();
+
+		protected DownloadEngine(Context context) {
+			fetch = Fetch.Impl.getInstance(new FetchConfiguration.Builder(context)
+					.setDownloadConcurrentLimit(Preferences.getConcurrency())
+					.build());
+
+			fetch.addListener(this);
+		}
+
+		protected CompletableFuture<Download> download(@NonNull Download download) {
+			CompletableFuture<Download> future = new CompletableFuture<>();
+			// Send to fetch2
+			if (!Directories.getBIN().exists() && !Directories.getBIN().mkdirs()) {
+				future.completeExceptionally(new RuntimeException("Failed to create BIN folder"));
+				return future;
+			}
+
+			if (download.getUrl() == null) {
+				future.completeExceptionally(new InvalidParameterException("Cannot find download URL"));
+				return future;
+			}
+
+			String filename = makeTemporaryFilename(download);
+			download.setDown(filename);
+
+			Request request = new Request(
+					download.getUrl(),
+					new File(Directories.getBIN(), filename).getAbsolutePath()
+			);
+			boolean useMobileData = Preferences.getMobiledata();
+			request.setNetworkType(useMobileData ? NetworkType.ALL : NetworkType.WIFI_ONLY);
+			request.setPriority(Priority.NORMAL);
+			request.setEnqueueAction(EnqueueAction.REPLACE_EXISTING);
+			request.setGroupId(GROUP_ID);
+			download.setDownloadId(request.getId());
+
+			Task task = new Task(download, future); // bundle with future
+			tasks.put(request.getId(), task);
+			fetch.enqueue(request, null, null);
+			return future;
+		}
+
+		private String makeTemporaryFilename(@NonNull Download download) {
+			return Long.toHexString(download.getId()) + '.' + download.getAvailableFormat();
+		}
+
+		private void updateDownloadStatus(@NonNull com.tonyodev.fetch2.Download fetchDownload,
+										  Status.Download status) {
+			int id = fetchDownload.getRequest().getId();
+			Task task = tasks.get(id);
+			if (task == null) {
+				logUnknownDownloadId(id, status);
+				return;
+			}
+
+			Download download = task.download;
+			download.getStatus().setDownload(status);
+			reportProgress(download, fetchDownload);
+		}
+
+		private void resolveDownload(@NonNull com.tonyodev.fetch2.Download fetchDownload,
+									 @NonNull Status.Download status) {
+			int id = fetchDownload.getRequest().getId();
+			Task task = tasks.get(id);
+			if (task == null) {
+				logUnknownDownloadId(id, status);
+				return;
+			}
+
+			Download download = task.download;
+			download.getStatus().setDownload(status);
+			DownloadService.this.onProgress(1L, 1L, false, download);
+			task.future.complete(download);
+			tasks.remove(id);
+		}
+
+		private void rejectDownload(@NonNull com.tonyodev.fetch2.Download fetchDownload,
+									@NonNull Status.Download status,
+									@NonNull Exception error) {
+			int id = fetchDownload.getRequest().getId();
+			Task task = tasks.get(id);
+			if (task == null) {
+				logUnknownDownloadId(id, status);
+				return;
+			}
+
+			Download download = task.download;
+			download.getStatus().setDownload(status);
+			DownloadService.this.onFinish(download, false, error);
+			task.future.completeExceptionally(error);
+			tasks.remove(id);
+		}
+
+		private void reportProgress(@NonNull Download download,
+									@NonNull com.tonyodev.fetch2.Download fetchDownload) {
+			DownloadService.this.onProgress(
+					fetchDownload.getDownloaded(),
+					fetchDownload.getTotal(),
+					fetchDownload.getTotal(),
+					false,
+					download
+			);
+		}
+
+		private void logUnknownDownloadId(int id, @NonNull Status.Download status) {
+			Log.w(
+					TAG,
+					"A mysterious download appeared that is "
+							+ status.getValue()
+							+ " that Fetch processed (id: "
+							+ id
+							+ ")"
+			);
+		}
+
+		@Override
+		public void onAdded(@NonNull com.tonyodev.fetch2.Download fetchDownload) {
+			updateDownloadStatus(fetchDownload, Status.Download.QUEUED);
+		}
+
+		@Override
+		public void onCancelled(@NonNull com.tonyodev.fetch2.Download fetchDownload) {
+			rejectDownload(fetchDownload,
+					Status.Download.CANCELLED,
+					new InterruptedException("Download cancelled"));
+		}
+
+		@Override
+		public void onCompleted(@NonNull com.tonyodev.fetch2.Download fetchDownload) {
+			resolveDownload(fetchDownload, Status.Download.COMPLETE);
+		}
+
+		@Override
+		public void onDeleted(@NonNull com.tonyodev.fetch2.Download fetchDownload) {
+			rejectDownload(fetchDownload,
+					Status.Download.CANCELLED,
+					new InterruptedException("Download deleted"));
+		}
+
+		@Override
+		public void onDownloadBlockUpdated(
+				@NonNull com.tonyodev.fetch2.Download download,
+				@NonNull DownloadBlock downloadBlock,
+				int i
+		) {}
+
+		@Override
+		public void onError(
+				@NonNull com.tonyodev.fetch2.Download fetchDownload,
+				@NonNull Error error,
+				@Nullable Throwable throwable
+		) {
+			rejectDownload(fetchDownload,
+					Status.Download.FAILED,
+					new ServiceException(error.toString()));
+		}
+
+		@Override
+		public void onPaused(@NonNull com.tonyodev.fetch2.Download fetchDownload) {
+			updateDownloadStatus(fetchDownload, Status.Download.PAUSED);
+		}
+
+		@Override
+		public void onProgress(
+				@NonNull com.tonyodev.fetch2.Download fetchDownload,
+				long etaMilliseconds,
+				long bitsPerSecond
+		) {
+			// TODO: Use etaMilliseconds and bitsPerSecond
+			updateDownloadStatus(fetchDownload, Status.Download.RUNNING);
+		}
+
+		@Override
+		public void onQueued(@NonNull com.tonyodev.fetch2.Download fetchDownload, boolean b) {
+			updateDownloadStatus(fetchDownload, Status.Download.QUEUED);
+		}
+
+		@Override
+		public void onRemoved(@NonNull com.tonyodev.fetch2.Download fetchDownload) {
+			rejectDownload(fetchDownload,
+					Status.Download.CANCELLED,
+					new InterruptedException("Download removed from queue"));
+
+		}
+
+		@Override
+		public void onResumed(@NonNull com.tonyodev.fetch2.Download fetchDownload) {
+			updateDownloadStatus(fetchDownload, Status.Download.RUNNING);
+		}
+
+		@Override
+		public void onStarted(@NonNull com.tonyodev.fetch2.Download fetchDownload,
+							  @NonNull List<? extends DownloadBlock> blocks,
+							  int i) {
+			updateDownloadStatus(fetchDownload, Status.Download.RUNNING);
+		}
+
+		@Override
+		public void onWaitingNetwork(@NonNull com.tonyodev.fetch2.Download fetchDownload) {
+			updateDownloadStatus(fetchDownload, Status.Download.NETWORK_PENDING);
+		}
+	}
+	protected class ConversionEngine {
+		public CompletableFuture<Download> convert(@NonNull Download download) {
+			throw new NotImplementedException("Not implemented yet.");
+		}
+	}
+	protected class MetadataEngine {
+		public CompletableFuture<Download> process(@NonNull Download download) {
+			throw new NotImplementedException("Not implemented yet.");
+		}
+	}
 }
