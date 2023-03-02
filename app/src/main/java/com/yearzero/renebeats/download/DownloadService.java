@@ -28,7 +28,6 @@ import com.yearzero.renebeats.Directories;
 import com.yearzero.renebeats.InternalArgs;
 import com.yearzero.renebeats.preferences.Preferences;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.cmc.music.metadata.MusicMetadata;
 import org.cmc.music.metadata.MusicMetadataSet;
 import org.cmc.music.myid3.MyID3;
@@ -48,7 +47,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 public class DownloadService extends Service {
 
@@ -439,19 +437,6 @@ public class DownloadService extends Service {
 		}
 	}
 
-	private boolean copyFile(File source, File destination) {
-		try (FileInputStream in = new FileInputStream(source);
-			 FileOutputStream out = new FileOutputStream(destination)) {
-			FileChannel inChannel = in.getChannel();
-			FileChannel outChannel = out.getChannel();
-			inChannel.transferTo(0, inChannel.size(), outChannel);
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
 	private String avoidFilenameConflict(Download current, String filename) {
 		String nonConflictFilename = filename;
 		String extension = current.getFormat();
@@ -510,6 +495,19 @@ public class DownloadService extends Service {
 		if (!new File(Directories.getBIN(), args.getDown()).delete()
 				|| !new File(Directories.getBIN(), args.getConv()).delete())
 			Log.w(TAG, "Failed to delete cache from BIN");
+	}
+
+	private boolean copyFile(File source, File destination) {
+		try (FileInputStream in = new FileInputStream(source);
+			 FileOutputStream out = new FileOutputStream(destination)) {
+			FileChannel inChannel = in.getChannel();
+			FileChannel outChannel = out.getChannel();
+			inChannel.transferTo(0, inChannel.size(), outChannel);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	private void onFinish(@NonNull Download args, @NonNull ServiceException e) {
@@ -820,14 +818,28 @@ public class DownloadService extends Service {
 	// TODO: Separate business logic into three engines that communicate through DownloadService
 
 	private final DownloadEngine downloadEngine = new DownloadEngine(this);
-	private final ConversionEngine conversionEngine = new ConversionEngine();
+	private final ConversionEngine conversionEngine = new ConversionEngine(this);
 	private final MetadataEngine metadataEngine = new MetadataEngine();
 
-	private void deploy(@NonNull Download requested) {
-		requested.getStatus().reset();
-		downloadEngine.download(requested)
+	private void deploy(@NonNull Download request) {
+		request.getStatus().reset();
+		downloadEngine.download(request)
 				.thenCompose(conversionEngine::convert)
-				.thenCompose(metadataEngine::process);
+				.thenCompose(metadataEngine::process)
+				.thenApply(download -> {
+					onFinish(download, true, null);
+					return download;
+				});
+	}
+
+	private static class Task {
+		@NonNull Download download;
+		@NonNull CompletableFuture<Download> future; // to call once download finishes
+
+		Task(@NonNull Download download, @NonNull CompletableFuture<Download> future) {
+			this.download = download;
+			this.future = future;
+		}
 	}
 
 	protected class DownloadEngine implements FetchListener {
@@ -835,16 +847,6 @@ public class DownloadService extends Service {
 		private static final int GROUP_ID = 0xC560_6A11;
 
 		private final Fetch fetch;
-
-		private class Task {
-			@NonNull Download download;
-			@NonNull CompletableFuture<Download> future; // to call once download finishes
-
-			Task(@NonNull Download download, @NonNull CompletableFuture<Download> future) {
-				this.download = download;
-				this.future = future;
-			}
-		}
 
 		// Though the type is called a SparseArray, it is, in fact, a Map<int, ... >
 		private final SparseArray<Task> tasks = new SparseArray<>();
@@ -1051,13 +1053,143 @@ public class DownloadService extends Service {
 		}
 	}
 	protected class ConversionEngine {
+		private final AndroidAudioConverter converter;
+		private final LinkedList<Task> queue = new LinkedList<>();
+		private Task currentTask = null;
+
+		public ConversionEngine(@NonNull Context context) {
+			converter = new AndroidAudioConverter(context);
+		}
+
 		public CompletableFuture<Download> convert(@NonNull Download download) {
-			throw new NotImplementedException("Not implemented yet.");
+			CompletableFuture<Download> future = new CompletableFuture<>();
+
+			queue.push(new Task(download, future));
+			if (currentTask == null) // if no tasks are running, start one
+				processNextTask();
+			return future;
+		}
+
+		private void processNextTask() {
+			if (queue.isEmpty())
+				return;
+
+			currentTask = queue.pop();
+			processTask(currentTask).thenApply(download -> {
+				currentTask = null;
+				processNextTask();
+				return download;
+			});
+		}
+
+		private CompletableFuture<Download> processTask(Task task) {
+			if (!task.download.getConvert()) {
+				// currentTask does not need converting, resolve future
+				skipConversion(task);
+				return task.future;
+			}
+
+			if (task.download.getDown() == null) {
+				ServiceException exception = new ServiceException("Cannot convert audio file. Filename lost.");
+				Log.e(TAG, exception.getMessage());
+				task.future.complete(task.download);
+				return task.future;
+			}
+
+			File downloadedFile = new File(Directories.getBIN(), task.download.getDown());
+			File convertedFile = converter.setFile(downloadedFile)
+					.setTrim(task.download.getStart(), task.download.getEnd())
+					.setNormalize(task.download.getNormalize())
+					.setFormat(AudioFormat.valueOf(task.download.getFormat().toUpperCase()))
+					.setBitrate(task.download.getBitrate())
+					.setCallback(new AndroidAudioConverter.IConvertCallback() {
+						@Override
+						public void onSuccess(File convertedFile) {
+							task.download.getStatus().setConvert(Status.Convert.COMPLETE);
+							task.download.setConv(convertedFile.getName());
+							converter.killProcess();
+
+							task.future.complete(task.download);
+						}
+
+						@Override
+						public void onProgress(long size, int c, int length) {
+							DownloadService.this.onProgress(
+									c, length, size, length == 0, task.download
+							);
+						}
+
+						@Override
+						public void onFailure(Exception error) {
+							converter.killProcess();
+							task.download.getStatus().setConvert(Status.Convert.FAILED);
+
+							error.printStackTrace();
+							onFinish(task.download, new ServiceException("Failed to process download", error));
+
+							task.future.completeExceptionally(error);
+						}
+					})
+					.convert();
+
+			if (convertedFile != null)
+				task.download.setConv(convertedFile.getAbsolutePath());
+			return task.future;
+		}
+
+		private void skipConversion(Task task) {
+			task.download.setConv(task.download.getDown());
+			task.download.getStatus().setConvert(Status.Convert.SKIPPED);
+			task.download.getStatus().setMetadata(null);
+			task.future.complete(task.download);
 		}
 	}
 	protected class MetadataEngine {
 		public CompletableFuture<Download> process(@NonNull Download download) {
-			throw new NotImplementedException("Not implemented yet.");
+			CompletableFuture<Download> future = new CompletableFuture<>();
+
+			if (download.getConv() == null) {
+				download.getStatus().setInvalid(true);
+
+				Exception exception = new IllegalArgumentException("No converted file found.");
+				future.completeExceptionally(exception);
+				return future;
+			}
+
+			DownloadService.this.onProgress(0L, 0L, true, download);
+
+			if (download.getOverwrite())
+				download.setMtdt(download.getFilenameWithExt());
+			else {
+				String filename = download.getFilename();
+				String metadataFilename = avoidFilenameConflict(download, filename);
+				download.setMtdt(metadataFilename);
+			}
+
+			if (writeMetadata(download)) {
+				download.setCompleteDate(new Date());
+				download.getStatus().setMetadata(true);
+
+				future.complete(download);
+				return future;
+			}
+
+			Log.w(TAG, "Failed to write metadata. Copying files instead...");
+
+			Objects.requireNonNull(download.getMtdt());
+			File convertedFile = new File(Directories.getBIN(), download.getConv());
+			File metadataFile = new File(Directories.getMUSIC(), download.getMtdt());
+			if (copyFile(convertedFile, metadataFile)) {
+				download.setCompleteDate(new Date());
+				download.getStatus().setMetadata(false);
+				future.complete(download);
+				return future;
+			}
+
+			download.setCompleteDate(new Date());
+			download.getStatus().setMetadata(true);
+			future.completeExceptionally(new ServiceException("Failed to copy file to output folder."));
+			return future;
 		}
 	}
 }
