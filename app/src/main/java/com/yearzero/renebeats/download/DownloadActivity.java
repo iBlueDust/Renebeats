@@ -548,7 +548,7 @@ public class DownloadActivity extends AppCompatActivity implements ServiceConnec
 					.setTitle(R.string.download_already)
 					.setMessage(R.string.download_already_msg)
 					.setPositiveButton(R.string.download_already_positive, (dialog, which) -> {
-						service.cancel(args.getDownloadId());
+						service.cancel(args);
 						InitDownload(args);
 					})
 					.setNeutralButton(R.string.retry, (dialog, which) -> InitDownload(args))

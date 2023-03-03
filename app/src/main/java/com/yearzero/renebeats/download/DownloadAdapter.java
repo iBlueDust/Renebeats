@@ -24,6 +24,7 @@ import com.yearzero.renebeats.preferences.Preferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -69,15 +70,12 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 		//        holder.setIsRecyclable(true);
 
 		holder.setOnClickListener(v -> {
-			dialog = new DownloadDialog()
-					.setDownload(args);
+			dialog = new DownloadDialog().setDownload(args);
 			dialog.show(manager, TAG);
 		});
 
 		holder.setOnLongClickListener(v -> {
-			dialog = new DownloadDialog()
-					.setDownload(args)
-					.setSecret(true);
+			dialog = new DownloadDialog().setDownload(args).setSecret(true);
 			dialog.show(manager, TAG);
 			return true;
 		});
@@ -87,7 +85,10 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 			n.setStatus(context.getString(R.string.adapter_download_invalid));
 
 			ErrorButtons(n, args);
-		} else if (args.getStatus().isFailed()) {
+			return;
+		}
+
+		if (args.getStatus().isFailed()) {
 			//region FailedViewHolder
 			FailedViewHolder n = (FailedViewHolder) holder;
 			n.setStatus(context.getString(R.string.failed));
@@ -103,7 +104,10 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 
 			ErrorButtons(n, args);
 			//endregion
-		} else if (args.getStatus().isCancelled()) {
+			return;
+		}
+
+		if (args.getStatus().isCancelled()) {
 			if (holder instanceof FailedViewHolder) {
 				FailedViewHolder h = (FailedViewHolder) holder;
 				h.setStatus(context.getString(R.string.cancelled));
@@ -117,115 +121,155 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 				notifyItemChanged(holder.getAdapterPosition());
 				Log.w(TAG, "Cancelled case got a non-FailedViewHolder");
 			}
-		} else if (args.getStatus().getDownload() != null) {
-			try {
-				//region Status Main
-				switch (args.getStatus().getDownload()) {
-					case QUEUED:
-						QueueViewHolder g = (QueueViewHolder) holder;
-						g.setStatus(context.getString(R.string.adapter_download_network));
-						g.setCancelListener(v -> service.cancel(args.getDownloadId()));
-						break;
-					case NETWORK_PENDING:
-						QueueViewHolder z = (QueueViewHolder) holder;
-						z.setStatus(context.getString(R.string.adapter_download_waiting));
-						z.setCancelListener(v -> service.cancel(args.getDownloadId()));
-						break;
-					case RUNNING:
-						RunningViewHolder i = (RunningViewHolder) holder;
-						i.setStatus(String.format(Locale.ENGLISH, context.getString(R.string.adapter_download_downloading), Commons.FormatBytes(args.getCurrent()), Commons.FormatBytes(args.getTotal())));
-						i.setProgress((int) args.getCurrent(), (int) args.getTotal(), args.getIndeterminate());
-						i.setCancelListener(v -> service.cancel(args.getDownloadId()));
-						break;
-					case COMPLETE:
-						if (args.getStatus().getConvert() == null) break;
-						switch (args.getStatus().getConvert()) {
-							case QUEUED:
-								QueueViewHolder h = (QueueViewHolder) holder;
-								h.setStatus(context.getString(R.string.adapter_download_downloaded));
-								break;
-							case RUNNING:
-								RunningViewHolder j = (RunningViewHolder) holder;
-								j.setCancelListener(v -> service.cancel(args.getDownloadId()));
-								j.setStatus(String.format(Locale.ENGLISH, context.getString(R.string.adapter_download_converting), Commons.FormatBytes(args.getSize())));
-								j.setProgress((int) args.getCurrent(), (int) args.getTotal(), false);
-								break;
-							case SKIPPED:
-							case COMPLETE:
-								if (args.getStatus().getMetadata() == null) {
-									RunningViewHolder n = (RunningViewHolder) holder;
-									n.setCancelListener(v -> service.cancel(args.getDownloadId()));
-									n.setStatus(context.getString(R.string.adapter_download_metadata));
-									n.setProgress(0, 0, true);
-								} else {
-									SuccessViewHolder o = (SuccessViewHolder) holder;
-									o.setStatus(context.getString(R.string.success));
-
-									if (!(args.getAssigned() == null || args.getCompleteDate() == null)) {
-										String text = context.getString(R.string.adapter_download_elapsed);
-
-										long elapsed = args.getCompleteDate().getTime() - args.getAssigned().getTime();
-										short hour = (short) (elapsed / 3600_000);
-										short minute = (short) ((elapsed / 60_000) % 60);
-										short second = (short) ((elapsed / 1000) % 60);
-
-										if (hour > 0) {
-											text += hour + context.getString(R.string.sym_hour) + ' ';
-											if (minute < 10) text += '0';
-											text += minute + context.getString(R.string.sym_minute) + ' ';
-											if (second < 10) text += '0';
-										} else if (minute > 0) {
-											text += minute + context.getString(R.string.sym_minute) + ' ';
-											if (second < 10) text += '0';
-										}
-										text += second + context.getString(R.string.sym_seconds);
-										o.setDate(text);
-									}
-
-									o.setRetryListener(v -> {
-										Intent intent = new Intent(context, DownloadActivity.class);
-										intent.putExtra(InternalArgs.DATA, args);
-										context.startActivity(intent);
-									});
-									//                                    Calendar ass = Calendar.getInstance();
-									//                                    ass.setTime(args.getCompleteDate());
-									//
-									//                                    Calendar yesterday = Calendar.getInstance();
-									//                                    yesterday.setTimeInMillis(System.currentTimeMillis());
-									//                                    yesterday.add(Calendar.DAY_OF_YEAR, -1);
-									//
-									//                                    if (DateUtils.isToday(args.getCompleteDate().getTime()))
-									//                                        o.setDate("Assigned at " + new SimpleDateFormat("hh:mm:ss a", Locale.ENGLISH).format(args.getCompleteDate()));
-									//                                    else if (yesterday.get(Calendar.YEAR) == ass.get(Calendar.YEAR) && yesterday.get(Calendar.DAY_OF_YEAR) == ass.get(Calendar.DAY_OF_YEAR))
-									//                                        o.setDate("Assigned yesterday");
-									//                                    else
-									//                                        o.setDate("Assigned on " + new SimpleDateFormat("EEE, d MMMM yyyy", Locale.ENGLISH).format(args.getCompleteDate()));
-								}
-						}
-					case CANCELLED:
-					case FAILED:
-						break;
-				}
-				//endregion
-			} catch (ClassCastException e) {
-				Log.v(TAG, "Class cast exception > " + e.getMessage());
-				recycler.post(() -> notifyItemChanged(holder.getAdapterPosition(), null));
-			}
+			return;
 		}
+
+		if (args.getStatus().getDownload() == null)
+			return;
+
+		try {
+			//region Status Main
+			switch (args.getStatus().getDownload()) {
+				case QUEUED:
+					initializeQueueViewHolder(
+							(QueueViewHolder) holder, R.string.adapter_download_network, args);
+					break;
+				case NETWORK_PENDING:
+					initializeQueueViewHolder(
+							(QueueViewHolder) holder, R.string.adapter_download_waiting, args);
+					break;
+				case RUNNING:
+					initializeRunningViewHolder((RunningViewHolder) holder, args);
+					break;
+				case COMPLETE:
+					if (args.getStatus().getConvert() == null)
+						break;
+					switch (args.getStatus().getConvert()) {
+						case QUEUED:
+							QueueViewHolder h = (QueueViewHolder) holder;
+							h.setStatus(context.getString(R.string.adapter_download_downloaded));
+							break;
+						case RUNNING:
+							RunningViewHolder j = (RunningViewHolder) holder;
+							j.setCancelListener(v -> service.cancel(args));
+							j.setStatus(String.format(Locale.ENGLISH, context.getString(R.string.adapter_download_converting), Commons.FormatBytes(args.getSize())));
+							j.setProgress((int) args.getCurrent(), (int) args.getTotal(), false);
+							break;
+						case SKIPPED:
+						case COMPLETE:
+							if (args.getStatus().getMetadata() == null) {
+								RunningViewHolder n = (RunningViewHolder) holder;
+								n.setCancelListener(v -> service.cancel(args));
+								n.setStatus(context.getString(R.string.adapter_download_metadata));
+								n.setProgress(0, 0, true);
+								break;
+							}
+
+							SuccessViewHolder o = (SuccessViewHolder) holder;
+							o.setStatus(context.getString(R.string.success));
+
+							if (args.getAssigned() != null && args.getCompleteDate() != null) {
+								Date start = args.getAssigned();
+								Date end = args.getCompleteDate();
+								String durationString = formatDuration(start, end);
+								o.setDate(durationString);
+							}
+
+							o.setRetryListener(v -> {
+								Intent intent = new Intent(context, DownloadActivity.class);
+								intent.putExtra(InternalArgs.DATA, args);
+								context.startActivity(intent);
+							});
+					}
+				case CANCELLED:
+				case FAILED:
+					break;
+			}
+			//endregion
+		} catch (ClassCastException e) {
+			Log.v(TAG, "Class cast exception > " + e.getMessage());
+			recycler.post(() -> notifyItemChanged(holder.getAdapterPosition(), null));
+		}
+	}
+
+	private void initializeRunningViewHolder(RunningViewHolder holder, Download args) {
+		String format = context.getString(R.string.adapter_download_downloading);
+		String statusString = String.format(Locale.ENGLISH,
+				format,
+				Commons.FormatBytes(args.getCurrent()),
+				Commons.FormatBytes(args.getTotal())
+		);
+		holder.setStatus(statusString);
+		holder.setProgress((int) args.getCurrent(), (int) args.getTotal(), args.getIndeterminate());
+		holder.setCancelListener(v -> service.cancel(args));
+	}
+
+	private void initializeQueueViewHolder(QueueViewHolder holder, int adapter_download_network, Download args) {
+		holder.setStatus(context.getString(adapter_download_network));
+		holder.setCancelListener(v -> service.cancel(args));
+	}
+
+	@NonNull
+	private String formatDuration(@NonNull Date start, @NonNull Date end) {
+		StringBuilder text = new StringBuilder();
+		text.append(context.getString(R.string.adapter_download_elapsed));
+
+		long elapsed = start.getTime() - end.getTime();
+		short hour = (short) (elapsed / 3600_000);
+		short minute = (short) ((elapsed / 60_000) % 60);
+		short second = (short) ((elapsed / 1000) % 60);
+
+		if (hour > 0) {
+			String hourString = String.format(
+					Locale.ENGLISH,
+					"%02d%s ",
+					hour,
+					context.getString(R.string.sym_hour)
+			);
+			text.append(hourString);
+		}
+
+		if (minute > 0) {
+			String minuteString = String.format(
+					Locale.ENGLISH,
+					"%02d%s ",
+					minute,
+					context.getString(R.string.sym_minute)
+			);
+			text.append(minuteString);
+		}
+
+		String secondString = String.format(
+				Locale.ENGLISH,
+				"%02d%s ",
+				second,
+				context.getString(R.string.sym_seconds)
+		);
+		text.append(secondString);
+
+		return text.toString();
 	}
 
 	private void ErrorButtons(FailedViewHolder viewHolder, Download args) {
 		viewHolder.setInfoListener(v -> {
 			ErrorLogDialog dialog;
-			if (Preferences.getAlways_log_failed()) {
-				String name = args.getException() == null ? null : Commons.LogExceptionReturn(args, args.getException());
+			if (!Preferences.getAlways_log_failed()) {
+				dialog = new ErrorLogDialog(null, args.getException());
+				dialog.show(manager, TAG);
+				return;
+			}
 
-				if (name == null) {
-					Toast.makeText(context, R.string.adapter_download_autolog_failed, Toast.LENGTH_LONG).show();
-					return;
-				} else dialog = new ErrorLogDialog(name, null);
-			} else dialog = new ErrorLogDialog(null, args.getException());
+			String name = null;
+			if (args.getException() != null)
+				name = Commons.LogExceptionReturn(args, args.getException());
 
+			if (name == null) {
+				Toast.makeText(context, R.string.adapter_download_autolog_failed, Toast.LENGTH_LONG)
+						.show();
+				return;
+			}
+
+			dialog = new ErrorLogDialog(name, null);
 			dialog.show(manager, TAG);
 		});
 
@@ -238,19 +282,36 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 
 	@Override
 	public void onProgress(Download args, long progress, long max, long size, boolean indeterminate) {
-		int index = getServiceDownloads().indexOf(args);
-		if (index >= 0) UpdateAtPosition(index, args);
-		else Log.w(TAG, "onProgress indexOf returned -1");
-		if (dialog != null) dialog.UpdateStatus(args);
+		int index = -1;
+
+		List<Download> downloads = getServiceDownloads();
+		for (int i = 0; i < downloads.size(); i++) {
+			if (downloads.get(i).getId() != args.getId())
+				continue;
+			index = i;
+			break;
+		}
+
+		if (index >= 0)
+			UpdateAtPosition(index, args);
+		else
+			Log.w(TAG, "onProgress indexOf returned -1");
+
+		if (dialog != null)
+			dialog.UpdateStatus(args);
 	}
 
 	@Override
 	public void onDone(Download args, boolean successful, Exception e) {
 		int index = getServiceDownloads().indexOf(args);
 
-		if (index < 0) notifyDataSetChanged();
-		else notifyItemChanged(index);
-		if (dialog != null) dialog.UpdateStatus(args);
+		if (index < 0)
+			notifyDataSetChanged();
+		else
+			notifyItemChanged(index);
+
+		if (dialog != null)
+			dialog.UpdateStatus(args);
 	}
 
 	@Override
@@ -272,13 +333,20 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 	}
 
 	private List<Download> getServiceDownloads() {
-		//        service.Sanitize();
 		ArrayList<Download> list = new ArrayList<>(service.getAll());
-		for (int i = 0; i < list.size();)
+		for (int i = 0; i < list.size(); /* do not increment */) {
 			if (blacklist.contains(list.get(i).getDownloadId()))
 				list.remove(i);
-			else i++;
-		Collections.sort(list, (a, b) -> a.getAssigned() == null || b.getAssigned() == null ? 0 : b.getAssigned().compareTo(a.getAssigned()));
+			else
+				i++;
+		}
+
+		list.sort((a, b) -> {
+			if (a.getAssigned() == null || b.getAssigned() == null)
+				return 0;
+
+			return b.getAssigned().compareTo(a.getAssigned());
+		});
 		return list;
 	}
 
@@ -294,6 +362,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<BasicViewHolder> imple
 
 	private void UpdateAtPosition(int position, Download download) {
 		RecyclerView.ViewHolder holder = recycler.findViewHolderForAdapterPosition(position);
-		if (holder instanceof BasicViewHolder) InitializeViewHolder((BasicViewHolder) holder, download);
+		if (holder instanceof BasicViewHolder)
+			InitializeViewHolder((BasicViewHolder) holder, download);
 	}
 }
