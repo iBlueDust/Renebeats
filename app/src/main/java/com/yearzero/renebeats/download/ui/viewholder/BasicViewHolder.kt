@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 import com.yearzero.renebeats.R
+import com.yearzero.renebeats.download.Download
+import com.yearzero.renebeats.download.DownloadService
 
 open class BasicViewHolder(private val Main: View) : RecyclerView.ViewHolder(Main) {
 	protected val Title: TextView = Main.findViewById(R.id.title)
@@ -16,6 +18,12 @@ open class BasicViewHolder(private val Main: View) : RecyclerView.ViewHolder(Mai
 
 	open fun setOnClickListener(listener: View.OnClickListener) = Main.setOnClickListener(listener)
 	open fun setOnLongClickListener(listener: View.OnLongClickListener) = Main.setOnLongClickListener(listener)
+
+	open fun update(download: Download, service: DownloadService?) {
+		setTitle(download.filename ?: itemView.context.getString(R.string.sym_empty))
+	}
+
+
 
 	companion object {
 		const val LocalID = 0

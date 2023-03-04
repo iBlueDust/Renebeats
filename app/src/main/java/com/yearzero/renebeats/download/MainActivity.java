@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -101,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 					&& !Preferences.getMobiledata()
 					&& Commons.getDownloadNetworkType() != NetworkType.ALL) {
 				ErrorCard.setVisibility(View.VISIBLE);
-				ErrorImg.setImageResource(R.drawable.ic_no_wifi_black_96dp);
+				ErrorImg.setImageResource(R.drawable.ic_no_wifi_gray_64dp);
 				ErrorTitle.setText(getString(R.string.no_wifi));
 				ErrorMsg.setText(R.string.error_wifi_msg);
 				ErrorAction.setText(R.string.error_wifi_action);

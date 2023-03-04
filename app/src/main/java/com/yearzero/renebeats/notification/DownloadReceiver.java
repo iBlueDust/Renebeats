@@ -37,32 +37,25 @@ public class DownloadReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if (intent == null) return;
+		if (intent == null)
+			return;
 
 		switch (intent.getIntExtra(InternalArgs.RESULT, InternalArgs.FAILED)) {
 			case InternalArgs.DESTROY:
 				Log.w(TAG, "Service was destroyed");
 
-				if (Preferences.getNotifications() && Notifications.manager != null) {
-					Download[] remaining = (Download[]) intent.getSerializableExtra(InternalArgs.DATA);
+				if (!Preferences.getNotifications() || Notifications.manager == null)
+					return;
+				Download[] remaining = (Download[]) intent.getSerializableExtra(InternalArgs.DATA);
 
-					if (remaining == null || !(Preferences.getNotifications() && Preferences.getNotifications_completed())) break;
-					for (Download d : remaining)
-						if (d.getStatus().isSuccessful())
-							Notifications.manager.notify(getNotificationID(d.getDownloadId()), new NotificationCompat.Builder(activity, Notifications.DOWNLOAD_PROGRESS)
-									.setContentIntent(PendingIntent.getActivity(activity, 0, new Intent(context, MainActivity.class), 0))
-									.setPriority(NotificationCompat.PRIORITY_HIGH)
-									.setSmallIcon(R.drawable.ic_notif)
-									.setContentTitle(d.getTitle())
-									.setColor(context.getResources().getColor(R.color.Accent))
-									.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-									.setGroup(Notifications.CHANNEL_ID)
-									.setContentText(context.getString(R.string.cancelled))
-									.setProgress(0, 0, false)
-									.setAutoCancel(true)
-									.setOngoing(false)
-									.build()
-							);
+				if (remaining == null
+						|| !Preferences.getNotifications()
+						|| !Preferences.getNotifications_completed())
+					break;
+				for (Download d : remaining) {
+					if (!d.getStatus().isSuccessful())
+						continue;
+					sendCancelledNotification(context, d);
 				}
 				return;
 			case InternalArgs.ERR_LOAD:
@@ -97,7 +90,6 @@ public class DownloadReceiver extends BroadcastReceiver {
 					success = true;
 					builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
 					builder.setProgress(0, 0, false);
-					//                    Snackbar.make(activity.findViewById(R.id.main), "Success!", Snackbar.LENGTH_LONG).show();
 
 					if (data.getAssigned() == null || data.getCompleteDate() == null)
 						builder.setContentText("");
@@ -142,81 +134,6 @@ public class DownloadReceiver extends BroadcastReceiver {
 								builder.setContentText("Download request is invalid");
 							else if (data.getException() instanceof DownloadService.ServiceException) {
 								DownloadService.ServiceException ex = (DownloadService.ServiceException) data.getException();
-								//                                //region ServiceException switch
-								//                                switch (ex.getDownload()) {
-								//                                    case QUEUED:
-								//                                        builder.setContentText("Failed while queueing for download");
-								//                                        break;
-								//                                    case RUNNING:
-								//                                        if (data.total > 0L) {
-								//                                            double c = data.current;
-								//                                            double t = data.total;
-								//
-								//                                            short ci = 0;
-								//                                            short ti = 0;
-								//
-								//                                            while (c >= 1000d && ci < Commons.suffix.size) {
-								//                                                c /= 1000d;
-								//                                                ci++;
-								//                                            }
-								//
-								//                                            while (t >= 1000d && ti < Commons.suffix.size) {
-								//                                                t /= 1000d;
-								//                                                ti++;
-								//                                            }
-								//
-								//                                            builder.setContentText(String.format(Locale.ENGLISH, "Failed while downloading. %.2f%s of %.2f%s completed.", c, Commons.suffix[ci], t, Commons.suffix[ti]));
-								//                                        } else builder.setContentText("Failed while downloading");
-								//                                        break;
-								//                                    case PAUSED:
-								//                                        if (data.current > 0L) {
-								//                                            double pc = data.current;
-								//                                            double pt = data.total;
-								//
-								//                                            short pci = 0;
-								//                                            short pti = 0;
-								//
-								//                                            while (pc >= 1000d && pci < Commons.suffix.size) {
-								//                                                pc /= 1000d;
-								//                                                pci++;
-								//                                            }
-								//
-								//                                            while (pt >= 1000d && pti < Commons.suffix.size) {
-								//                                                pt /= 1000d;
-								//                                                pti++;
-								//                                            }
-								//
-								//                                            builder.setContentText(String.format(Locale.ENGLISH, "An exception occurred while download was paused. %.2f%s of %.2f%s completed.", pc, Commons.suffix[pci], pt, Commons.suffix[pti]));
-								//                                        } else
-								//                                            builder.setContentText("An exception occurred while download was paused");
-								//                                        break;
-								//                                    default:
-								//                                        switch (((DownloadService.ServiceException) data.exception).getConvert()) {
-								//                                            case QUEUED:
-								//                                                builder.setContentText("An exception occurred while queueing for conversion");
-								//                                                break;
-								//                                            case PAUSED:
-								//                                                builder.setContentText("An exception occurred while paused before conversion");
-								//                                                break;
-								//                                            case SKIPPED:
-								//                                                builder.setContentText("An unknown exception occurred (skipped)");
-								//                                                break;
-								//                                            case RUNNING:
-								//                                                double v = data.current;
-								//                                                short vi = 0;
-								//
-								//                                                while (v >= 1000d && vi < Commons.suffix.size) {
-								//                                                    v /= 1000d;
-								//                                                    vi++;
-								//                                                }
-								//
-								//                                                builder.setContentText("Failed to convert file");
-								//                                                break;
-								//                                            default:
-								//                                                builder.setContentText("An exception occurred and was unhandled");
-								//                                        }
-								//                                }
-								//                                //endregion
 								builder.setContentText(ex.getMessage());
 								builder.setProgress(0, 0, false);
 								builder.setAutoCancel(true);
@@ -332,6 +249,23 @@ public class DownloadReceiver extends BroadcastReceiver {
 			if (success || !allowed) Notifications.manager.cancel(id);
 			if (allowed) Notifications.manager.notify(id, builder.build());
 		}
+	}
+
+	private void sendCancelledNotification(Context context, Download d) {
+		Notifications.manager.notify(getNotificationID(d.getDownloadId()), new NotificationCompat.Builder(activity, Notifications.DOWNLOAD_PROGRESS)
+				.setContentIntent(PendingIntent.getActivity(activity, 0, new Intent(context, MainActivity.class), 0))
+				.setPriority(NotificationCompat.PRIORITY_HIGH)
+				.setSmallIcon(R.drawable.ic_notif)
+				.setContentTitle(d.getTitle())
+				.setColor(context.getResources().getColor(R.color.Accent))
+				.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+				.setGroup(Notifications.CHANNEL_ID)
+				.setContentText(context.getString(R.string.cancelled))
+				.setProgress(0, 0, false)
+				.setAutoCancel(true)
+				.setOngoing(false)
+				.build()
+		);
 	}
 
 	private int getNotificationID(long id) {

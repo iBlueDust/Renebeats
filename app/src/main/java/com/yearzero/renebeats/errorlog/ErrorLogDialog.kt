@@ -27,9 +27,7 @@ class ErrorLogDialog() : DialogFragment() {
 	private var throwable: Throwable? = null
 
 	private lateinit var Pan0: PanView
-	//    private lateinit var Pan1: PanView
 	private lateinit var Payload: TextView
-//    private lateinit var Extra: TextView
 
 	private lateinit var Close: Button
 	private lateinit var Save: Button
@@ -68,11 +66,7 @@ class ErrorLogDialog() : DialogFragment() {
 		super.onCreate(savedInstanceState)
 		val view = inflater.inflate(R.layout.dialog_info, container, false)
 
-		Pan0 = view.findViewById(R.id.pan0)
-//        Pan1 = view.findViewById(R.id.pan1)
 		Payload = view.findViewById(R.id.payload)
-//        Extra = view.findViewById(R.id.extra)
-
 		Close = view.findViewById(R.id.close)
 		Save = view.findViewById(R.id.save)
 		Copy = view.findViewById(R.id.copy)
