@@ -18,15 +18,20 @@ public class Notifications {
 
 	public static void Initialize(Context context) {
 		manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		if (manager != null) {
-			manager.cancelAll();
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-				NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Downloads in Progress", android.app.NotificationManager.IMPORTANCE_LOW);
-				channel.setDescription(context.getString(R.string.notif_desc));
-				channel.enableLights(false);
-				channel.enableVibration(false);
-				manager.createNotificationChannel(channel);
-			}
-		}
+		if (manager == null)
+			return;
+
+		manager.cancelAll();
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+			return;
+
+		NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+				"Downloads in Progress",
+				android.app.NotificationManager.IMPORTANCE_LOW
+		);
+		channel.setDescription(context.getString(R.string.notif_desc));
+		channel.enableLights(false);
+		channel.enableVibration(false);
+		manager.createNotificationChannel(channel);
 	}
 }
