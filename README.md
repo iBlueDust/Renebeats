@@ -48,10 +48,10 @@ How to start developing this repository:
 4.  Get a [YT API key](https://blog.hubspot.com/website/how-to-get-youtube-api-key) and place it in
     a new file called `secret.properties` in the project root folder in the following format:
 
-        ```properties
-        YouTubeAPIKey_Debug="Insert your key here"
-        YouTubeAPIKey_Release="Insert your key here"
-        ```
+  ```properties
+YouTubeAPIKey_Debug="Insert your key here"
+YouTubeAPIKey_Release="Insert your key here"
+```
 
 5.  Start experimenting!
 
